@@ -6,17 +6,16 @@ namespace GoSuccess\TagLock\Route;
 
 use GoSuccess\TagLock\Contract\ApiRouteInterface;
 use GoSuccess\TagLock\Contract\CRMProviderInterface;
+use GoSuccess\TagLock\DTO\ApiResponse;
 use GoSuccess\TagLock\Enum\HookAction;
 use GoSuccess\TagLock\Enum\HookFilter;
 use GoSuccess\TagLock\Service\LoggerService;
 use GoSuccess\TagLock\Util\HookUtil;
-use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
 
 use function get_transient;
 use function register_rest_route;
-use function rest_ensure_response;
 use function wp_verify_nonce;
 
 /**
@@ -114,9 +113,9 @@ final class AccessCheckRoute implements ApiRouteInterface {
 	 * Handle the access check request.
 	 *
 	 * @param WP_REST_Request $request The REST request.
-	 * @return WP_REST_Response|WP_Error The REST response.
+	 * @return WP_REST_Response The API response.
 	 */
-	public function handleRequest( WP_REST_Request $request ): WP_REST_Response|WP_Error {
+	public function handleRequest( WP_REST_Request $request ): WP_REST_Response {
 		$subscriberId = $request->get_param( 'subscriber_id' );
 		$tagId        = $request->get_param( 'tag' );
 		$contentId    = $request->get_param( 'content_id' );
@@ -154,10 +153,10 @@ final class AccessCheckRoute implements ApiRouteInterface {
 
 			HookUtil::doAction( HookAction::API_EXCEPTION_CAUGHT, 'authentication_failed', $error );
 
-			return new WP_Error(
-				'authentication_failed',
+			return ApiResponse::error(
 				__( 'Service temporarily unavailable. Please try again later or contact support.', 'taglock' ),
-				[ 'status' => 503 ]
+				503,
+				'authentication_failed'
 			);
 		}
 
@@ -173,10 +172,10 @@ final class AccessCheckRoute implements ApiRouteInterface {
 			if ( false === $content ) {
 				$this->logger->error( __( 'Content not found or expired', 'taglock' ), [ 'content_id' => $contentId ] );
 
-				return new WP_Error(
-					'content_not_found',
+				return ApiResponse::error(
 					__( 'This content has expired. Please refresh the page and try again.', 'taglock' ),
-					[ 'status' => 410 ]
+					410,
+					'content_not_found'
 				);
 			}
 
@@ -190,16 +189,15 @@ final class AccessCheckRoute implements ApiRouteInterface {
 				'tag_id'        => $tagId,
 			] );
 
-			$response = [
-				'success' => true,
+			$data = [
 				'content' => $content,
 				'message' => __( 'Access granted', 'taglock' ),
 			];
 
 			// Allow Pro to modify response
-			$response = HookUtil::applyFilter( HookFilter::ACCESS_GRANTED_RESPONSE, $response, $subscriberId, $tagId );
+			$data = HookUtil::applyFilter( HookFilter::ACCESS_GRANTED_RESPONSE, $data, $subscriberId, $tagId );
 
-			return rest_ensure_response( $response );
+			return ApiResponse::success( $data );
 		}
 
 		// Access denied
@@ -210,15 +208,15 @@ final class AccessCheckRoute implements ApiRouteInterface {
 			'tag_id'        => $tagId,
 		] );
 
-		$response = [
+		$data = [
 			'success' => false,
 			'message' => __( 'You do not have access to this content. Please contact support if you believe this is an error.', 'taglock' ),
 		];
 
 		// CRITICAL: Pro filter for redirect URL and other features
 		// Pro version can add 'redirect_url' to response
-		$response = HookUtil::applyFilter( HookFilter::ACCESS_DENIED_RESPONSE, $response, $subscriberId, $tagId );
+		$data = HookUtil::applyFilter( HookFilter::ACCESS_DENIED_RESPONSE, $data, $subscriberId, $tagId );
 
-		return rest_ensure_response( $response );
+		return ApiResponse::custom( $data, 403 );
 	}
 }

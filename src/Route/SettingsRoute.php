@@ -5,16 +5,15 @@ declare(strict_types=1);
 namespace GoSuccess\TagLock\Route;
 
 use GoSuccess\TagLock\Contract\ApiRouteInterface;
+use GoSuccess\TagLock\DTO\ApiResponse;
 use GoSuccess\TagLock\Service\LoggerService;
 use GoSuccess\TagLock\Util\EncryptionUtil;
-use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
 
 use function current_user_can;
 use function get_option;
 use function register_rest_route;
-use function rest_ensure_response;
 use function sanitize_text_field;
 use function update_option;
 
@@ -118,10 +117,7 @@ final class SettingsRoute implements ApiRouteInterface {
 			'has_password'       => ! empty( get_option( 'taglock_klicktipp_password', '' ) ),
 		];
 
-		return rest_ensure_response( [
-			'success' => true,
-			'data'    => $settings,
-		] );
+		return ApiResponse::success( $settings );
 	}
 
 	/**
@@ -130,26 +126,26 @@ final class SettingsRoute implements ApiRouteInterface {
 	 * @param WP_REST_Request $request The REST request.
 	 * @return WP_REST_Response|WP_Error The REST response.
 	 */
-	public function saveSettings( WP_REST_Request $request ): WP_REST_Response|WP_Error {
+	public function saveSettings( WP_REST_Request $request ): WP_REST_Response {
 		$username = $request->get_param( 'klicktipp_username' );
 		$password = $request->get_param( 'klicktipp_password' );
 
 		// Validate
 		if ( empty( $username ) ) {
 			$this->logger->warning( __( 'Settings save failed: empty username', 'taglock' ) );
-			return new WP_Error(
-				'invalid_username',
+			return ApiResponse::error(
 				__( 'Username cannot be empty', 'taglock' ),
-				[ 'status' => 400 ]
+				'invalid_username',
+				400
 			);
 		}
 
 		if ( empty( $password ) ) {
 			$this->logger->warning( __( 'Settings save failed: empty password', 'taglock' ) );
-			return new WP_Error(
-				'invalid_password',
+			return ApiResponse::error(
 				__( 'Password cannot be empty', 'taglock' ),
-				[ 'status' => 400 ]
+				'invalid_password',
+				400
 			);
 		}
 
@@ -162,9 +158,6 @@ final class SettingsRoute implements ApiRouteInterface {
 
 		$this->logger->info( __( 'Settings saved successfully', 'taglock' ), [ 'username' => $username ] );
 
-		return rest_ensure_response( [
-			'success' => true,
-			'message' => __( 'Settings saved successfully', 'taglock' ),
-		] );
+		return ApiResponse::success( null, __( 'Settings saved successfully', 'taglock' ) );
 	}
 }
