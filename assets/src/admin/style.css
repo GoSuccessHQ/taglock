@@ -1,0 +1,30 @@
+.taglock-admin {
+	max-width: 1200px;
+	margin: 20px 0;
+}
+
+.taglock-admin .components-card {
+	margin-bottom: 20px;
+}
+
+.taglock-admin .components-card__header h2 {
+	margin: 0;
+	font-size: 1.3em;
+}
+
+.taglock-admin .components-text-control {
+	margin-bottom: 15px;
+}
+
+.taglock-admin pre {
+	padding: 10px;
+	background: #f0f0f0;
+	border-radius: 4px;
+	overflow-x: auto;
+	font-family: monospace;
+}
+
+.taglock-admin ul {
+	list-style: disc;
+	margin-left: 20px;
+}

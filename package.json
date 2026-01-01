@@ -1,13 +1,17 @@
 {
   "name": "taglock",
   "version": "1.0.0",
-  "description": "",
-  "license": "ISC",
+  "description": "Protect WordPress content based on KlickTipp tags - no membership required, 100% cache compatible and secure.",
+  "license": "GPL-3.0-or-later",
   "author": "GoSuccess <support@gosuccess.io>",
   "type": "commonjs",
-  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "wp-scripts build",
+    "start": "wp-scripts start",
+    "format": "wp-scripts format",
+    "lint:css": "wp-scripts lint-style",
+    "lint:js": "wp-scripts lint-js",
+    "packages-update": "wp-scripts packages-update"
   },
   "devDependencies": {
     "@wordpress/scripts": "^31.2.0"
@@ -16,6 +20,7 @@
     "@wordpress/api-fetch": "^7.37.0",
     "@wordpress/components": "^31.0.0",
     "@wordpress/dom-ready": "^4.37.0",
-    "@wordpress/element": "^6.37.0"
+    "@wordpress/element": "^6.37.0",
+    "@wordpress/i18n": "^5.37.0"
   }
 }

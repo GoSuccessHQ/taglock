@@ -1,0 +1,56 @@
+.taglock-container {
+	position: relative;
+	min-height: 50px;
+}
+
+.taglock-loader {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: 40px 20px;
+	text-align: center;
+}
+
+.taglock-spinner {
+	display: inline-block;
+	width: 40px;
+	height: 40px;
+	border: 4px solid #f3f3f3;
+	border-top: 4px solid #3498db;
+	border-radius: 50%;
+	animation: taglock-spin 1s linear infinite;
+	margin-bottom: 15px;
+}
+
+@keyframes taglock-spin {
+	0% { transform: rotate(0deg); }
+	100% { transform: rotate(360deg); }
+}
+
+.taglock-loader-text {
+	font-size: 14px;
+	color: #666;
+}
+
+.taglock-error {
+	padding: 20px;
+	background: #f8d7da;
+	border: 1px solid #f5c6cb;
+	border-radius: 4px;
+	color: #721c24;
+	margin: 20px 0;
+}
+
+.taglock-error p {
+	margin: 0;
+}
+
+.taglock-content {
+	animation: taglock-fadein 0.5s ease-in;
+}
+
+@keyframes taglock-fadein {
+	from { opacity: 0; }
+	to { opacity: 1; }
+}
