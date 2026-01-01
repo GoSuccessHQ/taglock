@@ -11,9 +11,19 @@ const ContentLoader = ({ tag, nonce, contentId, message, loaderText }) => {
 
 	useEffect(() => {
 		const checkAccess = async () => {
-			// Get subscriber ID from URL parameter only
+			// Get subscriber ID from URL parameter (has priority)
 			const urlParams = new URLSearchParams(window.location.search);
-			const subscriberId = urlParams.get('subscriber_id');
+			let subscriberId = urlParams.get('subscriber_id');
+
+			// If no URL parameter, check localStorage
+			if (!subscriberId) {
+				subscriberId = localStorage.getItem('taglock_subscriber_id');
+			}
+
+			// If subscriber ID found in URL, save it to localStorage for future visits
+			if (urlParams.get('subscriber_id')) {
+				localStorage.setItem('taglock_subscriber_id', urlParams.get('subscriber_id'));
+			}
 
 			if (!subscriberId) {
 				setState({
