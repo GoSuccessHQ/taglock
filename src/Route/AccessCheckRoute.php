@@ -11,6 +11,7 @@ use GoSuccess\TagLock\Enum\HookAction;
 use GoSuccess\TagLock\Enum\HookFilter;
 use GoSuccess\TagLock\Service\LoggerService;
 use GoSuccess\TagLock\Util\HookUtil;
+use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
 

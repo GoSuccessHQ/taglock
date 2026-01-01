@@ -8,6 +8,7 @@ use GoSuccess\TagLock\Contract\ApiRouteInterface;
 use GoSuccess\TagLock\DTO\ApiResponse;
 use GoSuccess\TagLock\Service\LoggerService;
 use GoSuccess\TagLock\Util\EncryptionUtil;
+use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
 
