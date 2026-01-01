@@ -25,6 +25,7 @@ return static function ( ContainerConfigurator $container ): void {
 
 	$excludedPaths = [
 		'Configuration/ServiceConfiguration.php',
+		'Contract/*',
 		'Core/*',
 		'DTO/*',
 		'Enum/*',
