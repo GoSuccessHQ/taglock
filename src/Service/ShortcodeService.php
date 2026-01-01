@@ -53,8 +53,8 @@ final class ShortcodeService {
 		$attributes = shortcode_atts(
 			[
 				'tag'          => '',
-				'message'      => 'This content is protected. Please check your access.',
-				'loader_text'  => 'Checking access...',
+				'message'      => __( 'This content is protected. Please check your access.', 'taglock' ),
+				'loader_text'  => __( 'Checking access...', 'taglock' ),
 			],
 			$atts,
 			'taglock'

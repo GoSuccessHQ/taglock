@@ -84,7 +84,7 @@ final class SettingsRoute implements ApiRouteInterface {
 			$this->logger->warning( 'Unauthorized settings access attempt' );
 			return new WP_Error(
 				'rest_forbidden',
-				'You do not have permission to manage settings',
+				__( 'You do not have permission to manage settings', 'taglock' ),
 				[ 'status' => 403 ]
 			);
 		}
@@ -107,7 +107,7 @@ final class SettingsRoute implements ApiRouteInterface {
 			$this->logger->warning( 'Settings save failed: empty username' );
 			return new WP_Error(
 				'invalid_username',
-				'Username cannot be empty',
+				__( 'Username cannot be empty', 'taglock' ),
 				[ 'status' => 400 ]
 			);
 		}
@@ -116,7 +116,7 @@ final class SettingsRoute implements ApiRouteInterface {
 			$this->logger->warning( 'Settings save failed: empty password' );
 			return new WP_Error(
 				'invalid_password',
-				'Password cannot be empty',
+				__( 'Password cannot be empty', 'taglock' ),
 				[ 'status' => 400 ]
 			);
 		}
@@ -132,7 +132,7 @@ final class SettingsRoute implements ApiRouteInterface {
 
 		return rest_ensure_response( [
 			'success' => true,
-			'message' => 'Settings saved successfully',
+			'message' => __( 'Settings saved successfully', 'taglock' ),
 		] );
 	}
 }

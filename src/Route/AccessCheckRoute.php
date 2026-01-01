@@ -102,7 +102,7 @@ final class AccessCheckRoute implements ApiRouteInterface {
 			$this->logger->warning( 'Invalid nonce for access check' );
 			return new WP_Error(
 				'invalid_nonce',
-				'Security verification failed',
+				__( 'Security verification failed', 'taglock' ),
 				[ 'status' => 403 ]
 			);
 		}
@@ -126,7 +126,7 @@ final class AccessCheckRoute implements ApiRouteInterface {
 			$this->logger->warning( 'Invalid subscriber ID', [ 'subscriber_id' => $subscriberId ] );
 			return new WP_Error(
 				'invalid_subscriber_id',
-				'Invalid subscriber ID. Please use the link from your email.',
+				__( 'Invalid subscriber ID. Please use the link from your email.', 'taglock' ),
 				[ 'status' => 400 ]
 			);
 		}
@@ -135,7 +135,7 @@ final class AccessCheckRoute implements ApiRouteInterface {
 			$this->logger->warning( 'Invalid tag ID', [ 'tag_id' => $tagId ] );
 			return new WP_Error(
 				'invalid_tag_id',
-				'Invalid tag configuration.',
+				__( 'Invalid tag configuration.', 'taglock' ),
 				[ 'status' => 400 ]
 			);
 		}
@@ -156,7 +156,7 @@ final class AccessCheckRoute implements ApiRouteInterface {
 
 			return new WP_Error(
 				'authentication_failed',
-				'Service temporarily unavailable. Please try again later or contact support.',
+				__( 'Service temporarily unavailable. Please try again later or contact support.', 'taglock' ),
 				[ 'status' => 503 ]
 			);
 		}
@@ -175,7 +175,7 @@ final class AccessCheckRoute implements ApiRouteInterface {
 
 				return new WP_Error(
 					'content_not_found',
-					'This content has expired. Please refresh the page and try again.',
+					__( 'This content has expired. Please refresh the page and try again.', 'taglock' ),
 					[ 'status' => 410 ]
 				);
 			}
@@ -193,7 +193,7 @@ final class AccessCheckRoute implements ApiRouteInterface {
 			$response = [
 				'success' => true,
 				'content' => $content,
-				'message' => 'Access granted',
+				'message' => __( 'Access granted', 'taglock' ),
 			];
 
 			// Allow Pro to modify response
@@ -212,7 +212,7 @@ final class AccessCheckRoute implements ApiRouteInterface {
 
 		$response = [
 			'success' => false,
-			'message' => 'You do not have access to this content. Please contact support if you believe this is an error.',
+			'message' => __( 'You do not have access to this content. Please contact support if you believe this is an error.', 'taglock' ),
 		];
 
 		// CRITICAL: Pro filter for redirect URL and other features
