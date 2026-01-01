@@ -56,12 +56,7 @@ final class AdminMenuService {
 	public function renderSettingsPage(): void {
 		HookUtil::doAction( HookAction::BEFORE_RENDER_ADMIN_PAGE );
 
-		?>
-		<div class="wrap">
-			<h1><?php echo esc_html( get_admin_page_title() ); ?></h1>
-			<div id="taglock-admin-root"></div>
-		</div>
-		<?php
+		echo '<div id="taglock-admin-root"></div>';
 
 		HookUtil::doAction( HookAction::AFTER_RENDER_ADMIN_PAGE );
 	}
