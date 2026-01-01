@@ -50,7 +50,7 @@ final class AssetService {
 		// Register admin script (will be built later)
 		wp_register_script(
 			'taglock-admin',
-			$pluginUrl . 'assets/build/admin.js',
+			$pluginUrl . 'assets/build/admin/index.js',
 			[ 'wp-element', 'wp-components', 'wp-i18n', 'wp-api-fetch' ],
 			$version,
 			true
@@ -76,7 +76,7 @@ final class AssetService {
 		// Register admin styles
 		wp_register_style(
 			'taglock-admin',
-			$pluginUrl . 'assets/build/admin.css',
+			$pluginUrl . 'assets/build/admin/style-index.css',
 			[],
 			$version
 		);
@@ -101,7 +101,7 @@ final class AssetService {
 		// Register frontend script
 		wp_register_script(
 			'taglock-frontend',
-			$pluginUrl . 'assets/build/frontend.js',
+			$pluginUrl . 'assets/build/frontend/index.js',
 			[ 'wp-element', 'wp-api-fetch' ],
 			$version,
 			true
@@ -121,7 +121,7 @@ final class AssetService {
 		// Register frontend styles
 		wp_register_style(
 			'taglock-frontend',
-			$pluginUrl . 'assets/build/frontend.css',
+			$pluginUrl . 'assets/build/frontend/style-index.css',
 			[],
 			$version
 		);
