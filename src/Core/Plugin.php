@@ -48,23 +48,7 @@ final class Plugin {
 
 		HookUtil::doAction( HookAction::AFTER_CONTAINER_BUILD, $this->container );
 
-		// Initialize all tagged services (they register WordPress hooks in their constructors)
-		$this->initializeServices();
-
 		HookUtil::doAction( HookAction::PLUGIN_INITIALIZED, $this );
-	}
-
-	/**
-	 * Initialize all services tagged with 'taglock.service'.
-	 * Services register their WordPress hooks in their constructors.
-	 */
-	private function initializeServices(): void {
-		/** @var array<string> $serviceIds */
-		$serviceIds = $this->container->getParameter( 'taglock.service_ids' );
-
-		foreach ( $serviceIds as $serviceId ) {
-			$this->container->get( $serviceId );
-		}
 	}
 
 	/**
