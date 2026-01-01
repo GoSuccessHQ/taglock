@@ -21,7 +21,7 @@ use function openssl_encrypt;
  */
 final class EncryptionUtil {
 
-	private const CIPHER = 'aes-256-cbc';
+	private const string CIPHER = 'aes-256-cbc';
 
 	/**
 	 * Encrypt a string.
@@ -36,7 +36,7 @@ final class EncryptionUtil {
 		$encrypted = openssl_encrypt( $data, self::CIPHER, $key, 0, $iv );
 
 		// Prepend IV to encrypted data
-		return base64_encode( $iv . $encrypted );
+		return base64_encode( "{$iv}{$encrypted}" );
 	}
 
 	/**

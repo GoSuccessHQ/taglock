@@ -10,6 +10,8 @@ use WP_REST_Request;
 
 use WP_REST_Response;
 use function add_filter;
+use function defined;
+use function get_class;
 
 /**
  * REST Exception Handler Service

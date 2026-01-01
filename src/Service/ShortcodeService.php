@@ -13,6 +13,11 @@ use function esc_attr;
 use function esc_html;
 use function shortcode_atts;
 use function wp_create_nonce;
+use function set_transient;
+use function sprintf;
+use function time;
+use function implode;
+use function array_map;
 
 /**
  * Shortcode Service

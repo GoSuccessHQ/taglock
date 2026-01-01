@@ -1,8 +1,8 @@
 === TagLock Lite - Instant Access for KlickTipp ===
 
 Contributors: gosuccess
-Requires at least: 6.8
-Tested up to: 6.9
+Requires at least: 6.0
+Tested up to: 6.7
 Requires PHP: 8.3
 Stable tag: 1.0.0
 License: GPL v3 or later
@@ -29,7 +29,7 @@ Unlike traditional solutions, TagLock uses a headless approach: Protected conten
 
 = Requirements =
 
-* WordPress 6.8 or higher
+* WordPress 6.0 or higher
 * PHP 8.3 or higher
 * KlickTipp account with API access
 

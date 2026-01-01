@@ -118,7 +118,7 @@ npm run format       # Format code
 
 ## Requirements
 
-- WordPress 6.8+
+- WordPress 6.0+
 - PHP 8.3+
 - Composer
 - Node.js & npm
