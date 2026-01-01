@@ -40,8 +40,8 @@ final class LoggerService {
 		$logger = new Logger( 'taglock' );
 
 		// Get log directory
-		$logDir  = WP_CONTENT_DIR . '/cache/taglock/logs';
-		$logFile = $logDir . '/taglock.log';
+		$logDir  = WP_CONTENT_DIR . '/uploads/taglock/logs';
+		$logFile = "{$logDir}/taglock.log";
 
 		// Create log directory if it doesn't exist
 		if ( ! is_dir( $logDir ) ) {
