@@ -48,7 +48,23 @@ final class Plugin {
 
 		HookUtil::doAction( HookAction::AFTER_CONTAINER_BUILD, $this->container );
 
+		// Initialize core services (they register WordPress hooks in their constructors)
+		$this->initializeServices();
+
 		HookUtil::doAction( HookAction::PLUGIN_INITIALIZED, $this );
+	}
+
+	/**
+	 * Initialize core services by retrieving them from the container.
+	 * Services register their WordPress hooks in their constructors.
+	 */
+	private function initializeServices(): void {
+		// Initialize services that register WordPress hooks
+		$this->container->get( \GoSuccess\TagLock\Service\AdminMenuService::class );
+		$this->container->get( \GoSuccess\TagLock\Service\AssetService::class );
+		$this->container->get( \GoSuccess\TagLock\Service\RestApiService::class );
+		$this->container->get( \GoSuccess\TagLock\Service\ShortcodeService::class );
+		$this->container->get( \GoSuccess\TagLock\Service\RestExceptionHandlerService::class );
 	}
 
 	/**
