@@ -35,7 +35,7 @@ use function wp_mkdir_p;
 final class Plugin {
 
 	private static ?self $instance = null;
-	public private(set) ContainerInterface $container;
+	public readonly ContainerInterface $container;
 
 	/**
 	 * Initializes the plugin and registers services.
