@@ -5,7 +5,9 @@
   "license": "GPL-3.0-or-later",
   "author": "GoSuccess <support@gosuccess.io>",
   "scripts": {
-    "build": "wp-scripts build",
+    "build": "npm run build:admin && npm run build:frontend",
+    "build:admin": "wp-scripts build --webpack-src-dir=assets/src/admin/ --output-path=assets/build/admin/",
+    "build:frontend": "wp-scripts build --webpack-src-dir=assets/src/frontend/ --output-path=assets/build/frontend/",
     "start": "wp-scripts start",
     "format": "wp-scripts format",
     "lint:css": "wp-scripts lint-style",

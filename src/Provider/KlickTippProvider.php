@@ -7,6 +7,7 @@ namespace GoSuccess\TagLock\Provider;
 use GoSuccess\TagLock\Contract\CRMProviderInterface;
 use GoSuccess\TagLock\Enum\HookAction;
 use GoSuccess\TagLock\Service\LoggerService;
+use GoSuccess\TagLock\Util\EncryptionUtil;
 use GoSuccess\TagLock\Util\HookUtil;
 use KlicktippConnector;
 
@@ -43,11 +44,20 @@ final class KlickTippProvider implements CRMProviderInterface {
 
 		// Get credentials from WordPress options
 		$username = get_option( 'taglock_klicktipp_username', '' );
-		$password = get_option( 'taglock_klicktipp_password', '' );
+		$encryptedPassword = get_option( 'taglock_klicktipp_password', '' );
 
-		if ( empty( $username ) || empty( $password ) ) {
-			$this->lastError = 'KlickTipp credentials not configured';
+		if ( empty( $username ) || empty( $encryptedPassword ) ) {
+			$this->lastError = 'KlickTipp credentials not configured. Please configure them in Settings > TagLock.';
 			$this->logger->error( 'KlickTipp credentials missing' );
+			return;
+		}
+
+		// Decrypt password
+		$password = EncryptionUtil::decrypt( $encryptedPassword );
+
+		if ( false === $password || empty( $password ) ) {
+			$this->lastError = 'Failed to decrypt KlickTipp password. Please re-save your credentials.';
+			$this->logger->error( 'Failed to decrypt KlickTipp password' );
 			return;
 		}
 
@@ -61,7 +71,7 @@ final class KlickTippProvider implements CRMProviderInterface {
 			$this->isAuthenticated = true;
 			$this->logger->debug( 'KlickTipp authentication successful' );
 		} else {
-			$this->lastError = $this->connector->get_last_error() ?: 'Login failed';
+			$this->lastError = $this->connector->get_last_error() ?: 'Login failed. Please check your credentials.';
 			$this->logger->error( 'KlickTipp authentication failed', [ 'error' => $this->lastError ] );
 			HookUtil::doAction( HookAction::CRM_API_ERROR, 'login', $this->lastError );
 		}

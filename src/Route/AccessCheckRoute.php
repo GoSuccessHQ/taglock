@@ -121,6 +121,25 @@ final class AccessCheckRoute implements ApiRouteInterface {
 		$tagId        = $request->get_param( 'tag' );
 		$contentId    = $request->get_param( 'content_id' );
 
+		// Additional validation
+		if ( empty( $subscriberId ) || ! ctype_digit( $subscriberId ) ) {
+			$this->logger->warning( 'Invalid subscriber ID', [ 'subscriber_id' => $subscriberId ] );
+			return new WP_Error(
+				'invalid_subscriber_id',
+				'Invalid subscriber ID. Please use the link from your email.',
+				[ 'status' => 400 ]
+			);
+		}
+
+		if ( empty( $tagId ) || ! ctype_digit( $tagId ) ) {
+			$this->logger->warning( 'Invalid tag ID', [ 'tag_id' => $tagId ] );
+			return new WP_Error(
+				'invalid_tag_id',
+				'Invalid tag configuration.',
+				[ 'status' => 400 ]
+			);
+		}
+
 		HookUtil::doAction( HookAction::BEFORE_ACCESS_CHECK, $subscriberId, $tagId );
 
 		$this->logger->info( 'Access check requested', [
@@ -137,8 +156,8 @@ final class AccessCheckRoute implements ApiRouteInterface {
 
 			return new WP_Error(
 				'authentication_failed',
-				'Unable to connect to CRM system: ' . $error,
-				[ 'status' => 500 ]
+				'Service temporarily unavailable. Please try again later or contact support.',
+				[ 'status' => 503 ]
 			);
 		}
 
@@ -152,12 +171,12 @@ final class AccessCheckRoute implements ApiRouteInterface {
 			$content = get_transient( $contentId );
 
 			if ( false === $content ) {
-				$this->logger->error( 'Content not found', [ 'content_id' => $contentId ] );
+				$this->logger->error( 'Content not found or expired', [ 'content_id' => $contentId ] );
 
 				return new WP_Error(
 					'content_not_found',
-					'Protected content has expired. Please refresh the page.',
-					[ 'status' => 404 ]
+					'This content has expired. Please refresh the page and try again.',
+					[ 'status' => 410 ]
 				);
 			}
 

@@ -6,6 +6,7 @@ namespace GoSuccess\TagLock\Route;
 
 use GoSuccess\TagLock\Contract\ApiRouteInterface;
 use GoSuccess\TagLock\Service\LoggerService;
+use GoSuccess\TagLock\Util\EncryptionUtil;
 use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
@@ -101,11 +102,33 @@ final class SettingsRoute implements ApiRouteInterface {
 		$username = $request->get_param( 'klicktipp_username' );
 		$password = $request->get_param( 'klicktipp_password' );
 
-		// Save settings
-		update_option( 'taglock_klicktipp_username', $username );
-		update_option( 'taglock_klicktipp_password', $password ); // TODO: Encrypt password
+		// Validate
+		if ( empty( $username ) ) {
+			$this->logger->warning( 'Settings save failed: empty username' );
+			return new WP_Error(
+				'invalid_username',
+				'Username cannot be empty',
+				[ 'status' => 400 ]
+			);
+		}
 
-		$this->logger->info( 'Settings saved', [ 'username' => $username ] );
+		if ( empty( $password ) ) {
+			$this->logger->warning( 'Settings save failed: empty password' );
+			return new WP_Error(
+				'invalid_password',
+				'Password cannot be empty',
+				[ 'status' => 400 ]
+			);
+		}
+
+		// Encrypt password before saving
+		$encryptedPassword = EncryptionUtil::encrypt( $password );
+
+		// Save settings
+		update_option( 'taglock_klicktipp_username', sanitize_text_field( $username ) );
+		update_option( 'taglock_klicktipp_password', $encryptedPassword );
+
+		$this->logger->info( 'Settings saved successfully', [ 'username' => $username ] );
 
 		return rest_ensure_response( [
 			'success' => true,

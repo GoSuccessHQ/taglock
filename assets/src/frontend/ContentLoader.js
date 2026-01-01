@@ -11,15 +11,15 @@ const ContentLoader = ({ tag, nonce, contentId, message, loaderText }) => {
 
 	useEffect(() => {
 		const checkAccess = async () => {
-			// Get subscriber ID from URL or cookie
+			// Get subscriber ID from URL parameter only
 			const urlParams = new URLSearchParams(window.location.search);
-			const subscriberId = urlParams.get('subscriber_id') || getCookie('taglock_subscriber_id');
+			const subscriberId = urlParams.get('subscriber_id');
 
 			if (!subscriberId) {
 				setState({
 					loading: false,
 					content: null,
-					error: __('Subscriber ID not found. Please use the access link provided.', 'taglock'),
+					error: __('Access denied. This link is invalid or has expired. Please use the link from your email.', 'taglock'),
 				});
 				return;
 			}
@@ -59,7 +59,7 @@ const ContentLoader = ({ tag, nonce, contentId, message, loaderText }) => {
 				setState({
 					loading: false,
 					content: null,
-					error: error.message || __('An error occurred while checking access.', 'taglock'),
+					error: error.message || __('An error occurred while checking access. Please try again later.', 'taglock'),
 				});
 			}
 		};
@@ -90,14 +90,6 @@ const ContentLoader = ({ tag, nonce, contentId, message, loaderText }) => {
 			dangerouslySetInnerHTML={{ __html: state.content }}
 		/>
 	);
-};
-
-// Helper function to get cookie
-const getCookie = (name) => {
-	const value = `; ${document.cookie}`;
-	const parts = value.split(`; ${name}=`);
-	if (parts.length === 2) return parts.pop().split(';').shift();
-	return null;
 };
 
 export default ContentLoader;
