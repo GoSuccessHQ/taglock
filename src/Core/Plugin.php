@@ -22,7 +22,6 @@ use function file_exists;
 use function function_exists;
 use function glob;
 use function is_dir;
-use function is_string;
 use function str_replace;
 use function unlink;
 use function wp_mkdir_p;
@@ -55,12 +54,12 @@ final class Plugin {
 	}
 
 	/**
-	 * Initialize core services by retrieving them from the container.
+	 * Initialize all services tagged with 'taglock.service'.
 	 * Services register their WordPress hooks in their constructors.
 	 */
 	private function initializeServices(): void {
-		// Get all services tagged with 'taglock.autoload'
-		$serviceIds = array_keys( $this->container->findTaggedServiceIds( 'taglock.autoload' ) );
+		/** @var array<string> $serviceIds */
+		$serviceIds = $this->container->getParameter( 'taglock.service_ids' );
 
 		foreach ( $serviceIds as $serviceId ) {
 			$this->container->get( $serviceId );
@@ -120,6 +119,10 @@ final class Plugin {
 
 			// Allow Pro version to modify container before compilation
 			HookUtil::doAction( HookAction::CONTAINER_PRE_COMPILE, $container );
+
+			// Collect service IDs before compilation (findTaggedServiceIds not available after)
+			$serviceIds = array_keys( $container->findTaggedServiceIds( 'taglock.service' ) );
+			$container->setParameter( 'taglock.service_ids', $serviceIds );
 
 			// Compile the container
 			$container->compile();
