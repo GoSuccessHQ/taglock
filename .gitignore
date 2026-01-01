@@ -1,34 +1,3 @@
 # Dependencies
 node_modules/
 vendor/
-
-# Build output
-assets/build/
-*.asset.php
-
-# WordPress cache
-wp-content/cache/
-
-# Logs
-*.log
-logs/
-
-# OS files
-.DS_Store
-Thumbs.db
-
-# IDE
-.vscode/
-.idea/
-*.sublime-*
-
-# Temporary files
-*.tmp
-*.bak
-*.swp
-*~
-
-# Environment
-.env
-.env.local
-

@@ -12,6 +12,7 @@ use WP_REST_Request;
 use WP_REST_Response;
 
 use function current_user_can;
+use function get_option;
 use function register_rest_route;
 use function rest_ensure_response;
 use function sanitize_text_field;
@@ -20,13 +21,14 @@ use function update_option;
 /**
  * Settings Route
  *
- * REST API endpoint to save plugin settings.
- * Endpoint: POST /wp-json/taglock/v1/settings
+ * REST API endpoints for plugin settings.
+ * GET /wp-json/taglock/v1/settings - Retrieve settings
+ * POST /wp-json/taglock/v1/settings - Save settings
  */
 final class SettingsRoute implements ApiRouteInterface {
 
-	private const NAMESPACE = 'taglock/v1';
-	private const ROUTE     = '/settings';
+	private const string NAMESPACE = 'taglock/v1';
+	private const string ROUTE     = '/settings';
 
 	public function __construct(
 		private readonly LoggerService $logger
@@ -36,12 +38,24 @@ final class SettingsRoute implements ApiRouteInterface {
 	 * @inheritDoc
 	 */
 	public function register(): void {
+		// GET endpoint - retrieve settings
+		register_rest_route(
+			self::NAMESPACE,
+			self::ROUTE,
+			[
+				'methods'             => 'GET',
+				'callback'            => [ $this, 'getSettings' ],
+				'permission_callback' => [ $this, 'checkPermissions' ],
+			]
+		);
+
+		// POST endpoint - save settings
 		register_rest_route(
 			self::NAMESPACE,
 			self::ROUTE,
 			[
 				'methods'             => 'POST',
-				'callback'            => [ $this, 'handleRequest' ],
+				'callback'            => [ $this, 'saveSettings' ],
 				'permission_callback' => [ $this, 'checkPermissions' ],
 				'args'                => [
 					'klicktipp_username' => [
@@ -93,12 +107,30 @@ final class SettingsRoute implements ApiRouteInterface {
 	}
 
 	/**
+	 * Get current settings.
+	 *
+	 * @param WP_REST_Request $request The REST request.
+	 * @return WP_REST_Response The REST response.
+	 */
+	public function getSettings( WP_REST_Request $request ): WP_REST_Response {
+		$settings = [
+			'klicktipp_username' => get_option( 'taglock_klicktipp_username', '' ),
+			'has_password'       => ! empty( get_option( 'taglock_klicktipp_password', '' ) ),
+		];
+
+		return rest_ensure_response( [
+			'success' => true,
+			'data'    => $settings,
+		] );
+	}
+
+	/**
 	 * Handle the settings save request.
 	 *
 	 * @param WP_REST_Request $request The REST request.
 	 * @return WP_REST_Response|WP_Error The REST response.
 	 */
-	public function handleRequest( WP_REST_Request $request ): WP_REST_Response|WP_Error {
+	public function saveSettings( WP_REST_Request $request ): WP_REST_Response|WP_Error {
 		$username = $request->get_param( 'klicktipp_username' );
 		$password = $request->get_param( 'klicktipp_password' );
 
