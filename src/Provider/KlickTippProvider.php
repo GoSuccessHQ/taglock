@@ -27,10 +27,7 @@ final class KlickTippProvider implements CRMProviderInterface {
 
 	public function __construct(
 		private readonly LoggerService $logger
-	) {
-		$connectorPath = dirname( TAGLOCK_FILE ) . '/vendor/klicktipp/php-connector/klicktipp.api.inc';
-		require_once $connectorPath;
-	}
+	) {}
 
 	/**
 	 * Initialize the KlickTipp connector and authenticate.
