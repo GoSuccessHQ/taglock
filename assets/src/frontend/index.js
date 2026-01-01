@@ -1,4 +1,4 @@
-import { render } from '@wordpress/element';
+import { createRoot } from '@wordpress/element';
 import domReady from '@wordpress/dom-ready';
 import ContentLoader from './ContentLoader';
 import './style.css';
@@ -14,7 +14,7 @@ domReady(() => {
 		const loaderText = container.getAttribute('data-loader-text');
 
 		if (tag && nonce && contentId) {
-			render(
+			createRoot(container).render(
 				<ContentLoader
 					tag={tag}
 					nonce={nonce}
