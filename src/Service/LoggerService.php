@@ -46,6 +46,22 @@ final class LoggerService {
 		// Create log directory if it doesn't exist
 		if ( ! is_dir( $logDir ) ) {
 			wp_mkdir_p( $logDir );
+			
+			// Create index.php to prevent directory listing
+			file_put_contents( 
+				"{$logDir}/index.php", 
+				"<?php\n// Silence is golden.\n" 
+			);
+			
+			// Create .htaccess to deny direct access
+			file_put_contents(
+				"{$logDir}/.htaccess",
+				"# Deny access to log files\n" .
+				"<Files *.log>\n" .
+				"    Order allow,deny\n" .
+				"    Deny from all\n" .
+				"</Files>\n"
+			);
 		}
 
 		// Determine log level based on WP_DEBUG
