@@ -63,9 +63,9 @@ final class RestExceptionHandlerService {
 	 *
 	 * @param Throwable $exception The thrown exception.
 	 * @param WP_REST_Request $request The REST request.
-	 * @return ApiResponse Standardized error response.
+	 * @return WP_REST_Response Standardized error response.
 	 */
-	public function handleUncaughtException( Throwable $exception, WP_REST_Request $request ): ApiResponse {
+	public function handleUncaughtException( Throwable $exception, WP_REST_Request $request ): WP_REST_Response {
 		$this->logger->error( __( 'Uncaught exception in REST API', 'taglock' ), [
 			'exception' => get_class( $exception ),
 			'message'   => $exception->getMessage(),
