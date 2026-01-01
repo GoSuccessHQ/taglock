@@ -27,7 +27,8 @@ final class KlickTippProvider implements CRMProviderInterface {
 	public function __construct(
 		private readonly LoggerService $logger
 	) {
-		require_once ABSPATH . 'wp-content/plugins/taglock/vendor/klicktipp/php-connector/klicktipp.api.inc';
+		$connectorPath = dirname( TAGLOCK_FILE ) . '/vendor/klicktipp/php-connector/klicktipp.api.inc';
+		require_once $connectorPath;
 	}
 
 	/**
