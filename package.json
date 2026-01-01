@@ -1,0 +1,21 @@
+{
+  "name": "taglock",
+  "version": "1.0.0",
+  "description": "",
+  "license": "ISC",
+  "author": "GoSuccess <support@gosuccess.io>",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "@wordpress/scripts": "^31.2.0"
+  },
+  "dependencies": {
+    "@wordpress/api-fetch": "^7.37.0",
+    "@wordpress/components": "^31.0.0",
+    "@wordpress/dom-ready": "^4.37.0",
+    "@wordpress/element": "^6.37.0"
+  }
+}

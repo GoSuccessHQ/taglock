@@ -1,0 +1,21 @@
+{
+    "name": "gosuccess/taglock",
+    "description": "Protect WordPress content based on KlickTipp tags - no membership required, 100% cache compatible and secure.",
+    "autoload": {
+        "psr-4": {
+            "GoSuccess\\TagLock\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "GoSuccess",
+            "email": "support@gosuccess.io"
+        }
+    ],
+    "require": {
+        "klicktipp/php-connector": "^1.0",
+        "symfony/dependency-injection": "^8.0",
+        "symfony/config": "^8.0",
+        "monolog/monolog": "^3.9"
+    }
+}
