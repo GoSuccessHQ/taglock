@@ -81,7 +81,7 @@ final class SettingsRoute implements ApiRouteInterface {
 	 */
 	public function checkPermissions( WP_REST_Request $request ): bool|WP_Error {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			$this->logger->warning( 'Unauthorized settings access attempt' );
+			$this->logger->warning( __( 'Unauthorized settings access attempt', 'taglock' ) );
 			return new WP_Error(
 				'rest_forbidden',
 				__( 'You do not have permission to manage settings', 'taglock' ),
@@ -104,7 +104,7 @@ final class SettingsRoute implements ApiRouteInterface {
 
 		// Validate
 		if ( empty( $username ) ) {
-			$this->logger->warning( 'Settings save failed: empty username' );
+			$this->logger->warning( __( 'Settings save failed: empty username', 'taglock' ) );
 			return new WP_Error(
 				'invalid_username',
 				__( 'Username cannot be empty', 'taglock' ),
@@ -113,7 +113,7 @@ final class SettingsRoute implements ApiRouteInterface {
 		}
 
 		if ( empty( $password ) ) {
-			$this->logger->warning( 'Settings save failed: empty password' );
+			$this->logger->warning( __( 'Settings save failed: empty password', 'taglock' ) );
 			return new WP_Error(
 				'invalid_password',
 				__( 'Password cannot be empty', 'taglock' ),
@@ -128,7 +128,7 @@ final class SettingsRoute implements ApiRouteInterface {
 		update_option( 'taglock_klicktipp_username', sanitize_text_field( $username ) );
 		update_option( 'taglock_klicktipp_password', $encryptedPassword );
 
-		$this->logger->info( 'Settings saved successfully', [ 'username' => $username ] );
+		$this->logger->info( __( 'Settings saved successfully', 'taglock' ), [ 'username' => $username ] );
 
 		return rest_ensure_response( [
 			'success' => true,

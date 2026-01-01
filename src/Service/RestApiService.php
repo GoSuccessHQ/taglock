@@ -47,7 +47,7 @@ final class RestApiService {
 
 			$route->register();
 
-			$this->logger->debug( 'API route registered', [
+			$this->logger->debug( __( 'API route registered', 'taglock' ), [
 				'namespace' => $route->getNamespace(),
 				'route'     => $route->getRoute(),
 			] );

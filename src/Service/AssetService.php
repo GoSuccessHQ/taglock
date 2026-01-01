@@ -83,7 +83,7 @@ final class AssetService {
 
 		wp_enqueue_style( 'taglock-admin' );
 
-		$this->logger->debug( 'Admin assets enqueued' );
+		$this->logger->debug( __( 'Admin assets enqueued', 'taglock' ) );
 	}
 
 	/**
@@ -128,7 +128,7 @@ final class AssetService {
 
 		wp_enqueue_style( 'taglock-frontend' );
 
-		$this->logger->debug( 'Frontend assets enqueued' );
+		$this->logger->debug( __( 'Frontend assets enqueued', 'taglock' ) );
 	}
 
 	/**

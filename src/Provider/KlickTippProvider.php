@@ -45,7 +45,7 @@ final class KlickTippProvider implements CRMProviderInterface {
 
 		if ( empty( $username ) || empty( $encryptedPassword ) ) {
 			$this->lastError = __( 'KlickTipp credentials not configured. Please configure them in Settings > TagLock.', 'taglock' );
-			$this->logger->error( 'KlickTipp credentials missing' );
+			$this->logger->error( __( 'KlickTipp credentials missing', 'taglock' ) );
 			return;
 		}
 
@@ -54,7 +54,7 @@ final class KlickTippProvider implements CRMProviderInterface {
 
 		if ( false === $password || empty( $password ) ) {
 			$this->lastError = __( 'Failed to decrypt KlickTipp password. Please re-save your credentials.', 'taglock' );
-			$this->logger->error( 'Failed to decrypt KlickTipp password' );
+			$this->logger->error( __( 'Failed to decrypt KlickTipp password', 'taglock' ) );
 			return;
 		}
 
@@ -66,10 +66,10 @@ final class KlickTippProvider implements CRMProviderInterface {
 
 		if ( $result ) {
 			$this->isAuthenticated = true;
-			$this->logger->debug( 'KlickTipp authentication successful' );
+			$this->logger->debug( __( 'KlickTipp authentication successful', 'taglock' ) );
 		} else {
 			$this->lastError = $this->connector->get_last_error() ?: __( 'Login failed. Please check your credentials.', 'taglock' );
-			$this->logger->error( 'KlickTipp authentication failed', [ 'error' => $this->lastError ] );
+			$this->logger->error( __( 'KlickTipp authentication failed', 'taglock' ), [ 'error' => $this->lastError ] );
 			HookUtil::doAction( HookAction::CRM_API_ERROR, 'login', $this->lastError );
 		}
 	}
@@ -103,7 +103,7 @@ final class KlickTippProvider implements CRMProviderInterface {
 
 		if ( ! $subscriber ) {
 			$this->lastError = $this->connector->get_last_error() ?: __( 'Subscriber not found', 'taglock' );
-			$this->logger->warning( 'Subscriber not found', [
+			$this->logger->warning( __( 'Subscriber not found', 'taglock' ), [
 				'subscriber_id' => $subscriberId,
 				'error'         => $this->lastError,
 			] );
@@ -119,7 +119,7 @@ final class KlickTippProvider implements CRMProviderInterface {
 
 			$hasTag = in_array( $tagId, $tags, true );
 
-			$this->logger->debug( 'Tag check completed', [
+			$this->logger->debug( __( 'Tag check completed', 'taglock' ), [
 				'subscriber_id' => $subscriberId,
 				'tag_id'        => $tagId,
 				'has_tag'       => $hasTag,
@@ -129,7 +129,7 @@ final class KlickTippProvider implements CRMProviderInterface {
 			return $hasTag;
 		}
 
-		$this->logger->debug( 'Subscriber has no tags', [ 'subscriber_id' => $subscriberId ] );
+		$this->logger->debug( __( 'Subscriber has no tags', 'taglock' ), [ 'subscriber_id' => $subscriberId ] );
 		return false;
 	}
 
@@ -149,7 +149,7 @@ final class KlickTippProvider implements CRMProviderInterface {
 
 		if ( ! $subscriber || empty( $subscriber->email ) ) {
 			$this->lastError = $this->connector->get_last_error() ?: __( 'Subscriber not found', 'taglock' );
-			$this->logger->error( 'Cannot apply tag: Subscriber not found', [
+			$this->logger->error( __( 'Cannot apply tag: Subscriber not found', 'taglock' ), [
 				'subscriber_id' => $subscriberId,
 				'tag_id'        => $tagId,
 			] );
@@ -162,7 +162,7 @@ final class KlickTippProvider implements CRMProviderInterface {
 		HookUtil::doAction( HookAction::AFTER_CRM_API_CALL, 'tag', $result );
 
 		if ( $result ) {
-			$this->logger->info( 'Tag applied successfully', [
+			$this->logger->info( __( 'Tag applied successfully', 'taglock' ), [
 				'subscriber_id' => $subscriberId,
 				'tag_id'        => $tagId,
 			] );
@@ -170,7 +170,7 @@ final class KlickTippProvider implements CRMProviderInterface {
 		}
 
 		$this->lastError = $this->connector->get_last_error() ?: __( 'Failed to apply tag', 'taglock' );
-		$this->logger->error( 'Failed to apply tag', [
+		$this->logger->error( __( 'Failed to apply tag', 'taglock' ), [
 			'subscriber_id' => $subscriberId,
 			'tag_id'        => $tagId,
 			'error'         => $this->lastError,
@@ -193,7 +193,7 @@ final class KlickTippProvider implements CRMProviderInterface {
 	public function __destruct() {
 		if ( $this->isAuthenticated && null !== $this->connector ) {
 			$this->connector->logout();
-			$this->logger->debug( 'KlickTipp session logged out' );
+			$this->logger->debug( __( 'KlickTipp session logged out', 'taglock' ) );
 		}
 	}
 }

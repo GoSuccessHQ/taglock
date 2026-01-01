@@ -99,7 +99,7 @@ final class AccessCheckRoute implements ApiRouteInterface {
 		$nonce = $request->get_param( 'nonce' );
 
 		if ( ! wp_verify_nonce( $nonce, 'taglock_access_check' ) ) {
-			$this->logger->warning( 'Invalid nonce for access check' );
+			$this->logger->warning( __( 'Invalid nonce for access check', 'taglock' ) );
 			return new WP_Error(
 				'invalid_nonce',
 				__( 'Security verification failed', 'taglock' ),
@@ -123,7 +123,7 @@ final class AccessCheckRoute implements ApiRouteInterface {
 
 		// Additional validation
 		if ( empty( $subscriberId ) || ! ctype_digit( $subscriberId ) ) {
-			$this->logger->warning( 'Invalid subscriber ID', [ 'subscriber_id' => $subscriberId ] );
+			$this->logger->warning( __( 'Invalid subscriber ID', 'taglock' ), [ 'subscriber_id' => $subscriberId ] );
 			return new WP_Error(
 				'invalid_subscriber_id',
 				__( 'Invalid subscriber ID. Please use the link from your email.', 'taglock' ),
@@ -132,7 +132,7 @@ final class AccessCheckRoute implements ApiRouteInterface {
 		}
 
 		if ( empty( $tagId ) || ! ctype_digit( $tagId ) ) {
-			$this->logger->warning( 'Invalid tag ID', [ 'tag_id' => $tagId ] );
+			$this->logger->warning( __( 'Invalid tag ID', 'taglock' ), [ 'tag_id' => $tagId ] );
 			return new WP_Error(
 				'invalid_tag_id',
 				__( 'Invalid tag configuration.', 'taglock' ),
@@ -142,7 +142,7 @@ final class AccessCheckRoute implements ApiRouteInterface {
 
 		HookUtil::doAction( HookAction::BEFORE_ACCESS_CHECK, $subscriberId, $tagId );
 
-		$this->logger->info( 'Access check requested', [
+		$this->logger->info( __( 'Access check requested', 'taglock' ), [
 			'subscriber_id' => $subscriberId,
 			'tag_id'        => $tagId,
 		] );
@@ -150,7 +150,7 @@ final class AccessCheckRoute implements ApiRouteInterface {
 		// Check if CRM provider is authenticated
 		if ( ! $this->crmProvider->isAuthenticated() ) {
 			$error = $this->crmProvider->getLastError();
-			$this->logger->error( 'CRM authentication failed', [ 'error' => $error ] );
+			$this->logger->error( __( 'CRM authentication failed', 'taglock' ), [ 'error' => $error ] );
 
 			HookUtil::doAction( HookAction::API_EXCEPTION_CAUGHT, 'authentication_failed', $error );
 
@@ -171,7 +171,7 @@ final class AccessCheckRoute implements ApiRouteInterface {
 			$content = get_transient( $contentId );
 
 			if ( false === $content ) {
-				$this->logger->error( 'Content not found or expired', [ 'content_id' => $contentId ] );
+				$this->logger->error( __( 'Content not found or expired', 'taglock' ), [ 'content_id' => $contentId ] );
 
 				return new WP_Error(
 					'content_not_found',
@@ -185,7 +185,7 @@ final class AccessCheckRoute implements ApiRouteInterface {
 
 			HookUtil::doAction( HookAction::ACCESS_GRANTED, $subscriberId, $tagId, $content );
 
-			$this->logger->info( 'Access granted', [
+			$this->logger->info( __( 'Access granted', 'taglock' ), [
 				'subscriber_id' => $subscriberId,
 				'tag_id'        => $tagId,
 			] );
@@ -205,7 +205,7 @@ final class AccessCheckRoute implements ApiRouteInterface {
 		// Access denied
 		HookUtil::doAction( HookAction::ACCESS_DENIED, $subscriberId, $tagId );
 
-		$this->logger->info( 'Access denied', [
+		$this->logger->info( __( 'Access denied', 'taglock' ), [
 			'subscriber_id' => $subscriberId,
 			'tag_id'        => $tagId,
 		] );

@@ -33,7 +33,7 @@ final class ShortcodeService {
 	 */
 	private function registerShortcode(): void {
 		add_shortcode( 'taglock', [ $this, 'renderShortcode' ] );
-		$this->logger->debug( 'TagLock shortcode registered' );
+		$this->logger->debug( __( 'TagLock shortcode registered', 'taglock' ) );
 	}
 
 	/**
@@ -65,7 +65,7 @@ final class ShortcodeService {
 
 		// Validate required attributes
 		if ( empty( $attributes['tag'] ) ) {
-			$this->logger->warning( 'TagLock shortcode missing required "tag" attribute' );
+			$this->logger->warning( __( 'TagLock shortcode missing required "tag" attribute', 'taglock' ) );
 			return '<div class="taglock-error">' . esc_html__( 'Error: Tag attribute is required.', 'taglock' ) . '</div>';
 		}
 
@@ -109,7 +109,7 @@ final class ShortcodeService {
 
 		HookUtil::doAction( HookAction::AFTER_SHORTCODE_RENDER, $html, $attributes );
 
-		$this->logger->debug( 'TagLock shortcode rendered', [
+		$this->logger->debug( __( 'TagLock shortcode rendered', 'taglock' ), [
 			'tag'        => $attributes['tag'],
 			'content_id' => $contentId,
 		] );

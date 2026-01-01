@@ -45,7 +45,7 @@ final class AdminMenuService {
 			[ $this, 'renderSettingsPage' ]
 		);
 
-		$this->logger->debug( 'Admin menu registered' );
+		$this->logger->debug( __( 'Admin menu registered', 'taglock' ) );
 
 		HookUtil::doAction( HookAction::AFTER_ADD_MENU );
 	}
