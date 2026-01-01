@@ -47,22 +47,25 @@ const AdminApp = () => {
 	};
 
 	return (
-		<div className="taglock-admin">
-			{notice && (
-				<Notice
-					status={notice.status}
-					isDismissible
-					onRemove={() => setNotice(null)}
-				>
-					{notice.message}
-				</Notice>
-			)}
+		<div className="wrap">
+			<h1>{__('TagLock Settings', 'taglock')}</h1>
+			
+			<div className="taglock-admin">
+				{notice && (
+					<Notice
+						status={notice.status}
+						isDismissible
+						onRemove={() => setNotice(null)}
+					>
+						{notice.message}
+					</Notice>
+				)}
 
-			<Card>
-				<CardHeader>
-					<h2>{__('KlickTipp Connection', 'taglock')}</h2>
-				</CardHeader>
-				<CardBody>
+				<Card>
+					<CardHeader>
+						<h2>{__('KlickTipp Connection', 'taglock')}</h2>
+					</CardHeader>
+					<CardBody>
 					<p className="description">
 						{__(
 							'Enter your KlickTipp username and password to connect.',
@@ -137,6 +140,7 @@ const AdminApp = () => {
 					</ul>
 				</CardBody>
 			</Card>
+		</div>
 		</div>
 	);
 };
