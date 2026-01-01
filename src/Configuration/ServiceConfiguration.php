@@ -25,8 +25,8 @@ return static function ( ContainerConfigurator $container ): void {
 
 	$excludedPaths = [
 		'Configuration/ServiceConfiguration.php',
-		'Contract/*',
 		'Core/*',
+		'DTO/*',
 		'Enum/*',
 		'Exception/*',
 		'Util/*',
@@ -39,7 +39,4 @@ return static function ( ContainerConfigurator $container ): void {
 	// Tag all Route classes as API routes
 	$services->instanceof( \GoSuccess\TagLock\Contract\ApiRouteInterface::class )
 		->tag( 'taglock.api_route' );
-
-	// Alias CRM provider interface to its implementation for autowiring
-	$services->alias( \GoSuccess\TagLock\Contract\CRMProviderInterface::class, \GoSuccess\TagLock\Provider\KlickTippProvider::class );
 };
