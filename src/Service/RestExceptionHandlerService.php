@@ -8,6 +8,7 @@ use GoSuccess\TagLock\DTO\ApiResponse;
 use Throwable;
 use WP_REST_Request;
 
+use WP_REST_Response;
 use function add_filter;
 
 /**

@@ -36,7 +36,9 @@ final class ApiResponse {
 			$response['data'] = $data;
 		}
 
-		return rest_ensure_response( $response )->set_status( $status );
+		$wpResponse = rest_ensure_response( $response );
+		$wpResponse->set_status( $status );
+		return $wpResponse;
 	}
 
 	/**
@@ -59,7 +61,9 @@ final class ApiResponse {
 			$response['data'] = $data;
 		}
 
-		return rest_ensure_response( $response )->set_status( $status );
+		$wpResponse = rest_ensure_response( $response );
+		$wpResponse->set_status( $status );
+		return $wpResponse;
 	}
 
 	/**
@@ -70,6 +74,8 @@ final class ApiResponse {
 	 * @return WP_REST_Response The WordPress REST response.
 	 */
 	public static function custom( array $data, int $status = 200 ): WP_REST_Response {
-		return rest_ensure_response( $data )->set_status( $status );
+		$wpResponse = rest_ensure_response( $data );
+		$wpResponse->set_status( $status );
+		return $wpResponse;
 	}
 }

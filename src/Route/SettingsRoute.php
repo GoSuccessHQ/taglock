@@ -27,8 +27,8 @@ use function update_option;
  */
 final class SettingsRoute implements ApiRouteInterface {
 
-	private const NAMESPACE = 'taglock/v1';
-	private const ROUTE     = '/settings';
+	private const string NAMESPACE = 'taglock/v1';
+	private const string ROUTE     = '/settings';
 
 	public function __construct(
 		private readonly LoggerService $logger

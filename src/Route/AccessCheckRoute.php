@@ -27,8 +27,8 @@ use function wp_verify_nonce;
  */
 final class AccessCheckRoute implements ApiRouteInterface {
 
-	private const NAMESPACE = 'taglock/v1';
-	private const ROUTE     = '/check-access';
+	private const string NAMESPACE = 'taglock/v1';
+	private const string ROUTE     = '/check-access';
 
 	public function __construct(
 		private readonly CRMProviderInterface $crmProvider,
