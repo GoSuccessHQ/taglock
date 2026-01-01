@@ -44,7 +44,7 @@ final class KlickTippProvider implements CRMProviderInterface {
 		$encryptedPassword = get_option( 'taglock_klicktipp_password', '' );
 
 		if ( empty( $username ) || empty( $encryptedPassword ) ) {
-			$this->lastError = 'KlickTipp credentials not configured. Please configure them in Settings > TagLock.';
+			$this->lastError = __( 'KlickTipp credentials not configured. Please configure them in Settings > TagLock.', 'taglock' );
 			$this->logger->error( 'KlickTipp credentials missing' );
 			return;
 		}
@@ -53,7 +53,7 @@ final class KlickTippProvider implements CRMProviderInterface {
 		$password = EncryptionUtil::decrypt( $encryptedPassword );
 
 		if ( false === $password || empty( $password ) ) {
-			$this->lastError = 'Failed to decrypt KlickTipp password. Please re-save your credentials.';
+			$this->lastError = __( 'Failed to decrypt KlickTipp password. Please re-save your credentials.', 'taglock' );
 			$this->logger->error( 'Failed to decrypt KlickTipp password' );
 			return;
 		}
@@ -68,7 +68,7 @@ final class KlickTippProvider implements CRMProviderInterface {
 			$this->isAuthenticated = true;
 			$this->logger->debug( 'KlickTipp authentication successful' );
 		} else {
-			$this->lastError = $this->connector->get_last_error() ?: 'Login failed. Please check your credentials.';
+			$this->lastError = $this->connector->get_last_error() ?: __( 'Login failed. Please check your credentials.', 'taglock' );
 			$this->logger->error( 'KlickTipp authentication failed', [ 'error' => $this->lastError ] );
 			HookUtil::doAction( HookAction::CRM_API_ERROR, 'login', $this->lastError );
 		}
@@ -90,7 +90,7 @@ final class KlickTippProvider implements CRMProviderInterface {
 	 */
 	public function hasTag( string $subscriberId, string $tagId ): bool {
 		if ( ! $this->isAuthenticated() ) {
-			$this->lastError = 'Not authenticated';
+			$this->lastError = __( 'Not authenticated', 'taglock' );
 			return false;
 		}
 
@@ -102,7 +102,7 @@ final class KlickTippProvider implements CRMProviderInterface {
 		HookUtil::doAction( HookAction::AFTER_CRM_API_CALL, 'subscriber_get', $subscriber );
 
 		if ( ! $subscriber ) {
-			$this->lastError = $this->connector->get_last_error() ?: 'Subscriber not found';
+			$this->lastError = $this->connector->get_last_error() ?: __( 'Subscriber not found', 'taglock' );
 			$this->logger->warning( 'Subscriber not found', [
 				'subscriber_id' => $subscriberId,
 				'error'         => $this->lastError,
@@ -138,7 +138,7 @@ final class KlickTippProvider implements CRMProviderInterface {
 	 */
 	public function applyTag( string $subscriberId, string $tagId ): bool {
 		if ( ! $this->isAuthenticated() ) {
-			$this->lastError = 'Not authenticated';
+			$this->lastError = __( 'Not authenticated', 'taglock' );
 			return false;
 		}
 
@@ -148,7 +148,7 @@ final class KlickTippProvider implements CRMProviderInterface {
 		$subscriber = $this->connector->subscriber_get( $subscriberId );
 
 		if ( ! $subscriber || empty( $subscriber->email ) ) {
-			$this->lastError = $this->connector->get_last_error() ?: 'Subscriber not found';
+			$this->lastError = $this->connector->get_last_error() ?: __( 'Subscriber not found', 'taglock' );
 			$this->logger->error( 'Cannot apply tag: Subscriber not found', [
 				'subscriber_id' => $subscriberId,
 				'tag_id'        => $tagId,
@@ -169,7 +169,7 @@ final class KlickTippProvider implements CRMProviderInterface {
 			return true;
 		}
 
-		$this->lastError = $this->connector->get_last_error() ?: 'Failed to apply tag';
+		$this->lastError = $this->connector->get_last_error() ?: __( 'Failed to apply tag', 'taglock' );
 		$this->logger->error( 'Failed to apply tag', [
 			'subscriber_id' => $subscriberId,
 			'tag_id'        => $tagId,
