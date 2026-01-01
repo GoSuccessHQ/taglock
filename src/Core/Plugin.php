@@ -59,12 +59,12 @@ final class Plugin {
 	 * Services register their WordPress hooks in their constructors.
 	 */
 	private function initializeServices(): void {
-		// Initialize services that register WordPress hooks
-		$this->container->get( \GoSuccess\TagLock\Service\AdminMenuService::class );
-		$this->container->get( \GoSuccess\TagLock\Service\AssetService::class );
-		$this->container->get( \GoSuccess\TagLock\Service\RestApiService::class );
-		$this->container->get( \GoSuccess\TagLock\Service\ShortcodeService::class );
-		$this->container->get( \GoSuccess\TagLock\Service\RestExceptionHandlerService::class );
+		// Get all services tagged with 'taglock.autoload'
+		$serviceIds = array_keys( $this->container->findTaggedServiceIds( 'taglock.autoload' ) );
+
+		foreach ( $serviceIds as $serviceId ) {
+			$this->container->get( $serviceId );
+		}
 	}
 
 	/**
