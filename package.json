@@ -4,7 +4,6 @@
   "description": "Protect WordPress content based on KlickTipp tags - no membership required, 100% cache compatible and secure.",
   "license": "GPL-3.0-or-later",
   "author": "GoSuccess <support@gosuccess.io>",
-  "type": "commonjs",
   "scripts": {
     "build": "wp-scripts build",
     "start": "wp-scripts start",
@@ -17,10 +16,10 @@
     "@wordpress/scripts": "^31.2.0"
   },
   "dependencies": {
-    "@wordpress/api-fetch": "^7.37.0",
-    "@wordpress/components": "^31.0.0",
-    "@wordpress/dom-ready": "^4.37.0",
-    "@wordpress/element": "^6.37.0",
-    "@wordpress/i18n": "^5.37.0"
+    "@wordpress/api-fetch": "^7.0.0",
+    "@wordpress/components": "^28.0.0",
+    "@wordpress/dom-ready": "^4.0.0",
+    "@wordpress/element": "^6.0.0",
+    "@wordpress/i18n": "^5.0.0"
   }
 }
