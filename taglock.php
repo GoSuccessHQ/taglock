@@ -29,11 +29,11 @@ require_once __DIR__ . '/vendor/autoload.php';
  * Initialize the TagLock plugin
  */
 function taglock(): void {
-	// HookUtil::doAction( HookAction::BEFORE_INIT );
+	HookUtil::doAction( HookAction::BEFORE_INIT );
 
-	// \GoSuccess\TagLock\Core\Plugin::getInstance();
+	\GoSuccess\TagLock\Core\Plugin::getInstance();
 
-	// HookUtil::doAction( HookAction::AFTER_INIT );
+	HookUtil::doAction( HookAction::AFTER_INIT );
 }
 
 taglock();
