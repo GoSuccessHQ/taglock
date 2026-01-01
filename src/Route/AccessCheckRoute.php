@@ -123,19 +123,19 @@ final class AccessCheckRoute implements ApiRouteInterface {
 		// Additional validation
 		if ( empty( $subscriberId ) || ! ctype_digit( $subscriberId ) ) {
 			$this->logger->warning( __( 'Invalid subscriber ID', 'taglock' ), [ 'subscriber_id' => $subscriberId ] );
-			return new WP_Error(
-				'invalid_subscriber_id',
+			return ApiResponse::error(
 				__( 'Invalid subscriber ID. Please use the link from your email.', 'taglock' ),
-				[ 'status' => 400 ]
+				'invalid_subscriber_id',
+				400
 			);
 		}
 
 		if ( empty( $tagId ) || ! ctype_digit( $tagId ) ) {
 			$this->logger->warning( __( 'Invalid tag ID', 'taglock' ), [ 'tag_id' => $tagId ] );
-			return new WP_Error(
-				'invalid_tag_id',
+			return ApiResponse::error(
 				__( 'Invalid tag configuration.', 'taglock' ),
-				[ 'status' => 400 ]
+				'invalid_tag_id',
+				400
 			);
 		}
 
@@ -155,8 +155,8 @@ final class AccessCheckRoute implements ApiRouteInterface {
 
 			return ApiResponse::error(
 				__( 'Service temporarily unavailable. Please try again later or contact support.', 'taglock' ),
-				503,
-				'authentication_failed'
+				'authentication_failed',
+				503
 			);
 		}
 
@@ -174,8 +174,8 @@ final class AccessCheckRoute implements ApiRouteInterface {
 
 				return ApiResponse::error(
 					__( 'This content has expired. Please refresh the page and try again.', 'taglock' ),
-					410,
-					'content_not_found'
+					'content_not_found',
+					410
 				);
 			}
 
