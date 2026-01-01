@@ -96,51 +96,51 @@ const AdminApp = () => {
 						{__('Save Settings', 'taglock')}
 					</Button>
 				</CardBody>
-			</Card>
+                </Card>
 
-			<Card style={{ marginTop: '20px' }}>
-				<CardHeader>
-					<h2>{__('Usage', 'taglock')}</h2>
-				</CardHeader>
-				<CardBody>
-					<p>
-						{__(
-							'Use the [taglock] shortcode to protect your content:',
-							'taglock'
-						)}
-					</p>
-					<pre style={{ padding: '10px', background: '#f0f0f0' }}>
-						{'[taglock tag="123"]Your protected content here[/taglock]'}
-					</pre>
-					<p className="description">
-						{__(
-							'Replace "123" with your KlickTipp tag ID.',
-							'taglock'
-						)}
-					</p>
-				</CardBody>
-			</Card>
+                <Card style={{ marginTop: '20px' }}>
+                    <CardHeader>
+                        <h2>{__('Usage', 'taglock')}</h2>
+                    </CardHeader>
+                    <CardBody>
+                        <p>
+                            {__(
+                                'Use the [taglock] shortcode to protect your content:',
+                                'taglock'
+                            )}
+                        </p>
+                        <pre style={{ padding: '10px', background: '#f0f0f0' }}>
+                            {'[taglock tag="123"]Your protected content here[/taglock]'}
+                        </pre>
+                        <p className="description">
+                            {__(
+                                'Replace "123" with your KlickTipp tag ID.',
+                                'taglock'
+                            )}
+                        </p>
+                    </CardBody>
+                </Card>
 
-			<Card style={{ marginTop: '20px' }}>
-				<CardHeader>
-					<h2>{__('Pro Features (Coming Soon)', 'taglock')}</h2>
-				</CardHeader>
-				<CardBody>
-					<p className="description">
-						{__(
-							'Upgrade to Pro for additional features:',
-							'taglock'
-						)}
-					</p>
-					<ul>
-						<li>{__('Custom redirect URLs on access denied', 'taglock')}</li>
-						<li>{__('Automatically apply tags after viewing content', 'taglock')}</li>
-						<li>{__('Advanced analytics and tracking', 'taglock')}</li>
-						<li>{__('Priority support', 'taglock')}</li>
-					</ul>
-				</CardBody>
-			</Card>
-		</div>
+                <Card style={{ marginTop: '20px' }}>
+                    <CardHeader>
+                        <h2>{__('Pro Features (Coming Soon)', 'taglock')}</h2>
+                    </CardHeader>
+                    <CardBody>
+                        <p className="description">
+                            {__(
+                                'Upgrade to Pro for additional features:',
+                                'taglock'
+                            )}
+                        </p>
+                        <ul>
+                            <li>{__('Custom redirect URLs on access denied', 'taglock')}</li>
+                            <li>{__('Automatically apply tags after viewing content', 'taglock')}</li>
+                            <li>{__('Advanced analytics and tracking', 'taglock')}</li>
+                            <li>{__('Priority support', 'taglock')}</li>
+                        </ul>
+                    </CardBody>
+                </Card>
+            </div>
 		</div>
 	);
 };
