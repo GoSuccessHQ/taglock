@@ -39,7 +39,4 @@ return static function ( ContainerConfigurator $container ): void {
 	// Tag all Route classes as API routes
 	$services->instanceof( \GoSuccess\TagLock\Contract\ApiRouteInterface::class )
 		->tag( 'taglock.api_route' );
-
-	// Store service IDs tagged with 'taglock.service' in a parameter
-	$container->parameters()->set( 'taglock.service_ids', tagged_iterator( 'taglock.service' ) );
 };
