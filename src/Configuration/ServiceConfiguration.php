@@ -20,7 +20,8 @@ return static function ( ContainerConfigurator $container ): void {
 		->defaults()
 		->autowire()
 		->autoconfigure()
-		->tag( 'taglock.service' );
+		->tag( 'taglock.service' )
+		->bind( 'iterable $routes', tagged_iterator( 'taglock.api_route' ) );
 
 	$excludedPaths = [
 		'Configuration/ServiceConfiguration.php',
@@ -34,6 +35,10 @@ return static function ( ContainerConfigurator $container ): void {
 	$services->load( 'GoSuccess\\TagLock\\', __DIR__ . '/../*' )
 		->exclude( __DIR__ . '/../{' . implode( ',', $excludedPaths ) . '}' )
 		->public();
+
+	// Tag all Route classes as API routes
+	$services->instanceof( \GoSuccess\TagLock\Contract\ApiRouteInterface::class )
+		->tag( 'taglock.api_route' );
 
 	// Store service IDs tagged with 'taglock.service' in a parameter
 	$container->parameters()->set( 'taglock.service_ids', tagged_iterator( 'taglock.service' ) );

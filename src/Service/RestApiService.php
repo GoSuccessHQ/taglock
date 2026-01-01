@@ -1,0 +1,60 @@
+<?php
+
+declare(strict_types=1);
+
+namespace GoSuccess\TagLock\Service;
+
+use GoSuccess\TagLock\Enum\HookAction;
+use GoSuccess\TagLock\Util\HookUtil;
+
+use function add_action;
+
+/**
+ * REST API Service
+ *
+ * Registers all REST API routes for TagLock.
+ *
+ * @param iterable<\GoSuccess\TagLock\Contract\ApiRouteInterface> $routes
+ */
+final class RestApiService {
+
+	/**
+	 * @param iterable<\GoSuccess\TagLock\Contract\ApiRouteInterface> $routes All API routes.
+	 * @param LoggerService $logger Logger service.
+	 */
+	public function __construct(
+		private readonly iterable $routes,
+		private readonly LoggerService $logger
+	) {
+		$this->registerHooks();
+	}
+
+	/**
+	 * Register WordPress hooks.
+	 */
+	private function registerHooks(): void {
+		add_action( 'rest_api_init', [ $this, 'registerRoutes' ] );
+	}
+
+	/**
+	 * Register all API routes.
+	 */
+	public function registerRoutes(): void {
+		HookUtil::doAction( HookAction::BEFORE_REGISTER_API_ROUTES );
+
+		foreach ( $this->routes as $route ) {
+			HookUtil::doAction( HookAction::BEFORE_REGISTER_ROUTE, $route );
+
+			$route->register();
+
+			$this->logger->debug( 'API route registered', [
+				'namespace' => $route->getNamespace(),
+				'route'     => $route->getRoute(),
+			] );
+
+			HookUtil::doAction( HookAction::AFTER_REGISTER_ROUTE, $route );
+		}
+
+		HookUtil::doAction( HookAction::AFTER_REGISTER_API_ROUTES );
+	}
+}
