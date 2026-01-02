@@ -102,6 +102,7 @@ final class AssetService {
 			'window.taglockAdminConfig = ' . wp_json_encode( [
 				'apiNamespace' => $this->pluginConfiguration->apiNamespace,
 				'proUrl'       => $this->pluginConfiguration->proLandingUrl,
+				'isPro'        => false,
 			] ) . ';',
 			'before'
 		);

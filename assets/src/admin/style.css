@@ -16,6 +16,13 @@
 	margin: var(--taglock-admin-space) 0;
 }
 
+/* The wp.components <Modal /> renders in a portal outside of .taglock-admin. */
+.taglock-admin__modal {
+	--taglock-admin-space: clamp(12px, 2cqi, 20px);
+	--taglock-admin-gap: clamp(10px, 1.6cqi, 16px);
+	--taglock-admin-input-margin: clamp(12px, 1.8cqi, 15px);
+}
+
 .taglock-admin__notice {
 	margin-block-end: var(--taglock-admin-space);
 	border-radius: var(--taglock-admin-radius);
@@ -73,6 +80,14 @@
 	margin-bottom: var(--taglock-admin-input-margin);
 }
 
+.taglock-admin__modal .components-base-control {
+	margin-bottom: var(--taglock-admin-input-margin);
+}
+
+.taglock-admin__modal .components-base-control:last-child {
+	margin-bottom: 0;
+}
+
 .taglock-admin__credentials .components-base-control {
 	margin-bottom: 0;
 }
@@ -108,6 +123,17 @@
 	line-height: 1.4;
 }
 
+.taglock-admin__pro-badge--inline {
+	margin-left: var(--taglock-admin-gap);
+	padding: 1px 8px;
+	font-size: 0.75rem;
+}
+
+.taglock-admin__label-with-badge {
+	display: inline-flex;
+	align-items: center;
+}
+
 .taglock-admin__pro-badge:focus {
 	outline: 2px solid var(--wp-admin-theme-color);
 	outline-offset: 2px;
@@ -137,6 +163,11 @@
 .taglock-admin__modal-actions {
 	display: flex;
 	justify-content: flex-end;
+	gap: var(--taglock-admin-gap);
+	margin-top: var(--taglock-admin-space);
+}
+
+.taglock-admin__modal .taglock-admin__modal-actions {
 	gap: var(--taglock-admin-gap);
 	margin-top: var(--taglock-admin-space);
 }

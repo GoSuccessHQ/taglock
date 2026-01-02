@@ -27,6 +27,18 @@ const AdminApp = () => {
 	const adminConfig = getAdminConfig();
 	const apiNamespace = adminConfig?.apiNamespace || 'taglock/v1';
 	const proUrl = adminConfig?.proUrl || 'https://gosuccess.io/taglock';
+	const isPro = Boolean(adminConfig?.isPro);
+	const isProDisabled = !isPro;
+	const proBadge = (
+		<a
+			className="taglock-admin__pro-badge taglock-admin__pro-badge--inline"
+			href={proUrl}
+			target="_blank"
+			rel="noopener noreferrer"
+		>
+			PRO
+		</a>
+	);
 
 	const [username, setUsername] = useState('');
 	const [password, setPassword] = useState('');
@@ -643,6 +655,7 @@ const AdminApp = () => {
 							? __('Edit TagLocker', 'taglock')
 							: __('New TagLocker', 'taglock')
 					}
+					className="taglock-admin__modal"
 					onRequestClose={closeRuleModal}
 				>
 					{ruleModalNotice && (
@@ -698,16 +711,25 @@ const AdminApp = () => {
 					/>
 
 					<SelectControl
-						label={__('Deny mode', 'taglock')}
+						label={
+							<span className="taglock-admin__label-with-badge">
+								{__('Deny mode', 'taglock')}
+								{proBadge}
+							</span>
+						}
 						value={ruleForm.deny_mode}
 						onChange={(value) =>
 							setRuleForm({ ...ruleForm, deny_mode: value })
 						}
 						options={[
 							{ label: __('Message', 'taglock'), value: 'message' },
-							{ label: __('Teaser', 'taglock'), value: 'teaser' },
-							{ label: __('Redirect', 'taglock'), value: 'redirect' },
+							{ label: __('Teaser', 'taglock'), value: 'teaser', disabled: isProDisabled },
+							{ label: __('Redirect', 'taglock'), value: 'redirect', disabled: isProDisabled },
 						]}
+						help={__(
+							'Teaser and redirect modes are available in TagLock Pro.',
+							'taglock'
+						)}
 						__next40pxDefaultSize
 						__nextHasNoMarginBottom
 					/>
@@ -726,7 +748,13 @@ const AdminApp = () => {
 
 					{ruleForm.deny_mode === 'teaser' && (
 						<TextareaControl
-							label={__('Teaser HTML', 'taglock')}
+							disabled={isProDisabled}
+							label={
+								<span className="taglock-admin__label-with-badge">
+									{__('Teaser HTML', 'taglock')}
+									{proBadge}
+								</span>
+							}
 							value={ruleForm.teaser_html}
 							onChange={(value) =>
 								setRuleForm({ ...ruleForm, teaser_html: value })
@@ -741,7 +769,13 @@ const AdminApp = () => {
 
 					{ruleForm.deny_mode === 'redirect' && (
 						<TextControl
-							label={__('Redirect post ID', 'taglock')}
+							disabled={isProDisabled}
+							label={
+								<span className="taglock-admin__label-with-badge">
+									{__('Redirect post ID', 'taglock')}
+									{proBadge}
+								</span>
+							}
 							type="number"
 							value={ruleForm.redirect_post_id}
 							onChange={(value) =>
@@ -753,7 +787,13 @@ const AdminApp = () => {
 					)}
 
 					<ToggleControl
-						label={__('Engagement tagging', 'taglock')}
+						disabled={isProDisabled}
+						label={
+							<span className="taglock-admin__label-with-badge">
+								{__('Engagement tagging', 'taglock')}
+								{proBadge}
+							</span>
+						}
 						checked={ruleForm.engagement_tagging_enabled}
 						onChange={(value) =>
 							setRuleForm({
@@ -766,7 +806,13 @@ const AdminApp = () => {
 
 					{ruleForm.engagement_tagging_enabled && (
 						<TextControl
-							label={__('Engagement tag IDs', 'taglock')}
+							disabled={isProDisabled}
+							label={
+								<span className="taglock-admin__label-with-badge">
+									{__('Engagement tag IDs', 'taglock')}
+									{proBadge}
+								</span>
+							}
 							help={__('Comma-separated KlickTipp tag IDs.', 'taglock')}
 							value={ruleForm.engagement_tag_ids}
 							onChange={(value) =>
@@ -778,7 +824,13 @@ const AdminApp = () => {
 					)}
 
 					<ToggleControl
-						label={__('Admin bypass (preview without subscriber ID)', 'taglock')}
+						disabled={isProDisabled}
+						label={
+							<span className="taglock-admin__label-with-badge">
+								{__('Admin bypass (preview without subscriber ID)', 'taglock')}
+								{proBadge}
+							</span>
+						}
 						checked={ruleForm.admin_bypass_enabled}
 						onChange={(value) =>
 							setRuleForm({ ...ruleForm, admin_bypass_enabled: value })
