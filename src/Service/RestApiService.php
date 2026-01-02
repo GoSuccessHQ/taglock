@@ -42,11 +42,13 @@ final class RestApiService {
 	public function registerRoutes(): void {
 		HookUtil::doAction( HookAction::BEFORE_REGISTER_API_ROUTES );
 
+		$routeCount = 0;
 		foreach ( $this->routes as $route ) {
 			HookUtil::doAction( HookAction::BEFORE_REGISTER_ROUTE, $route );
 
 			$route->register();
 
+			$routeCount++;
 			$this->logger->debug( __( 'API route registered', 'taglock' ), [
 				'namespace' => $route->getNamespace(),
 				'route'     => $route->getRoute(),
@@ -54,6 +56,8 @@ final class RestApiService {
 
 			HookUtil::doAction( HookAction::AFTER_REGISTER_ROUTE, $route );
 		}
+
+		$this->logger->info( __( 'All API routes registered', 'taglock' ), [ 'count' => $routeCount ] );
 
 		HookUtil::doAction( HookAction::AFTER_REGISTER_API_ROUTES );
 	}
