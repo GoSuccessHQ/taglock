@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace GoSuccess\TagLock\Service;
 
+use GoSuccess\TagLock\Configuration\PluginConfiguration;
 use RuntimeException;
 
 use function basename;
@@ -12,8 +13,10 @@ use function file_exists;
 use function plugin_dir_url;
 use function rtrim;
 use function sprintf;
+use function wp_add_inline_script;
 use function wp_enqueue_script;
 use function wp_enqueue_style;
+use function wp_json_encode;
 use function wp_register_script;
 use function wp_register_style;
 
@@ -25,6 +28,7 @@ use function wp_register_style;
 final class AssetService {
 
 	public function __construct(
+		private readonly PluginConfiguration $pluginConfiguration,
 		private readonly LoggerService $logger
 	) {}
 
@@ -91,6 +95,15 @@ final class AssetService {
 			$assetData['dependencies'],
 			$assetData['version'],
 			true
+		);
+
+		wp_add_inline_script(
+			'taglock-admin',
+			'window.taglockAdminConfig = ' . wp_json_encode( [
+				'apiNamespace' => $this->pluginConfiguration->apiNamespace,
+				'proUrl'       => $this->pluginConfiguration->proLandingUrl,
+			] ) . ';',
+			'before'
 		);
 
 		wp_enqueue_script( 'taglock-admin' );

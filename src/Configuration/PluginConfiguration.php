@@ -10,7 +10,8 @@ namespace GoSuccess\TagLock\Configuration;
 final class PluginConfiguration {
 
 	public function __construct(
-		public readonly string $apiNamespace = 'taglock/v1'
+		public readonly string $apiNamespace = 'taglock/v1',
+		public readonly string $proLandingUrl = 'https://gosuccess.io/taglock'
 	) {
 	}
 }

@@ -5,6 +5,8 @@ import {
 	CardBody,
 	CardHeader,
 	TextControl,
+	TextareaControl,
+	ToggleControl,
 	Button,
 	Notice,
 	Spinner,
@@ -12,7 +14,18 @@ import {
 } from '@wordpress/components';
 import apiFetch from '@wordpress/api-fetch';
 
+const getAdminConfig = () => {
+	if (typeof window === 'undefined') {
+		return null;
+	}
+	return window.taglockAdminConfig || null;
+};
+
 const AdminApp = () => {
+	const adminConfig = getAdminConfig();
+	const apiNamespace = adminConfig?.apiNamespace || 'taglock/v1';
+	const proUrl = adminConfig?.proUrl || 'https://gosuccess.io/taglock';
+
 	const [username, setUsername] = useState('');
 	const [password, setPassword] = useState('');
 	const [hasPassword, setHasPassword] = useState(null);
@@ -26,7 +39,7 @@ const AdminApp = () => {
 		const loadSettings = async () => {
 			try {
 				const response = await apiFetch({
-					path: '/taglock/v1/settings',
+					path: `/${apiNamespace}/settings`,
 					method: 'GET',
 				});
 
@@ -72,7 +85,7 @@ const AdminApp = () => {
 			}
 
 			await apiFetch({
-				path: '/taglock/v1/settings',
+				path: `/${apiNamespace}/settings`,
 				method: 'POST',
 				data,
 			});
@@ -222,21 +235,99 @@ const AdminApp = () => {
 
 				<Card className="taglock-admin__card taglock-admin__card--spaced">
                     <CardHeader>
-                        <h2>{__('Pro Features (Coming Soon)', 'taglock')}</h2>
+						<div className="taglock-admin__card-header">
+							<h2 className="taglock-admin__card-header-title">{__('Pro Features', 'taglock')}</h2>
+							<a
+								className="taglock-admin__pro-badge"
+								href={proUrl}
+								target="_blank"
+								rel="noopener noreferrer"
+							>
+								PRO
+							</a>
+						</div>
                     </CardHeader>
                     <CardBody>
-                        <p className="description">
-                            {__(
-                                'Upgrade to Pro for additional features:',
-                                'taglock'
-                            )}
-                        </p>
-                        <ul>
-                            <li>{__('Custom redirect URLs on access denied', 'taglock')}</li>
-                            <li>{__('Automatically apply tags after viewing content', 'taglock')}</li>
-                            <li>{__('Advanced analytics and tracking', 'taglock')}</li>
-                            <li>{__('Priority support', 'taglock')}</li>
-                        </ul>
+						<p className="description">
+							{__(
+								'These settings are available in TagLock Pro. They are shown here but disabled in the Lite version.',
+								'taglock'
+							)}
+						</p>
+
+						<Disabled isDisabled={true}>
+							<div className="taglock-admin__pro-settings">
+								<ToggleControl
+									label={__('Enable teaser mode', 'taglock')}
+									checked={false}
+									onChange={() => {}}
+									help={__(
+										'Show a teaser instead of a hard error when access is denied.',
+										'taglock'
+									)}
+								/>
+
+								<TextareaControl
+									label={__('Teaser HTML', 'taglock')}
+									value={''}
+									onChange={() => {}}
+									help={__(
+										'HTML shown when access is denied (sanitized on output).',
+										'taglock'
+									)}
+									__next40pxDefaultSize
+									__nextHasNoMarginBottom
+								/>
+
+								<ToggleControl
+									label={__('Enable redirect on access denied', 'taglock')}
+									checked={false}
+									onChange={() => {}}
+									help={__(
+										'Redirect visitors to a URL instead of showing the default message.',
+										'taglock'
+									)}
+								/>
+
+								<TextControl
+									label={__('Redirect URL', 'taglock')}
+									value={''}
+									onChange={() => {}}
+									placeholder="https://"
+									__next40pxDefaultSize
+									__nextHasNoMarginBottom
+								/>
+
+								<ToggleControl
+									label={__('Enable engagement tagging', 'taglock')}
+									checked={false}
+									onChange={() => {}}
+									help={__(
+										'Automatically apply a tag after a visitor successfully views protected content.',
+										'taglock'
+									)}
+								/>
+
+								<TextControl
+									label={__('Engagement tag ID', 'taglock')}
+									value={''}
+									onChange={() => {}}
+									placeholder={__('e.g. 456', 'taglock')}
+									__next40pxDefaultSize
+									__nextHasNoMarginBottom
+								/>
+
+								<ToggleControl
+									label={__('Enable admin bypass (preview without subscriber ID)', 'taglock')}
+									checked={false}
+									onChange={() => {}}
+									help={__(
+										'Allow administrators to view protected content without an access link.',
+										'taglock'
+									)}
+								/>
+							</div>
+						</Disabled>
                     </CardBody>
                 </Card>
             </div>
