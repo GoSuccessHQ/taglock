@@ -8,7 +8,6 @@ use GoSuccess\TagLock\Enum\HookAction;
 use GoSuccess\TagLock\Enum\HookFilter;
 use GoSuccess\TagLock\Util\HookUtil;
 
-use function add_shortcode;
 use function esc_attr;
 use function esc_html;
 use function shortcode_atts;
@@ -29,17 +28,7 @@ final class ShortcodeService {
 
 	public function __construct(
 		private readonly LoggerService $logger
-	) {
-		$this->registerShortcode();
-	}
-
-	/**
-	 * Register the [taglock] shortcode.
-	 */
-	private function registerShortcode(): void {
-		add_shortcode( 'taglock', [ $this, 'renderShortcode' ] );
-		$this->logger->debug( __( 'TagLock shortcode registered', 'taglock' ) );
-	}
+	) {}
 
 	/**
 	 * Render the shortcode.

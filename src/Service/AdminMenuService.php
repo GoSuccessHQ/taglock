@@ -7,7 +7,6 @@ namespace GoSuccess\TagLock\Service;
 use GoSuccess\TagLock\Enum\HookAction;
 use GoSuccess\TagLock\Util\HookUtil;
 
-use function add_action;
 use function add_options_page;
 use function esc_html__;
 
@@ -20,16 +19,7 @@ final class AdminMenuService {
 
 	public function __construct(
 		private readonly LoggerService $logger
-	) {
-		$this->registerHooks();
-	}
-
-	/**
-	 * Register WordPress hooks.
-	 */
-	private function registerHooks(): void {
-		add_action( 'admin_menu', [ $this, 'addMenu' ] );
-	}
+	) {}
 
 	/**
 	 * Add the settings page to WordPress admin.

@@ -9,7 +9,6 @@ use Throwable;
 use WP_REST_Request;
 
 use WP_REST_Response;
-use function add_filter;
 use function defined;
 use function get_class;
 
@@ -22,16 +21,7 @@ final class RestExceptionHandlerService {
 
 	public function __construct(
 		private readonly LoggerService $logger
-	) {
-		$this->registerHooks();
-	}
-
-	/**
-	 * Register WordPress hooks.
-	 */
-	private function registerHooks(): void {
-		add_filter( 'rest_request_after_callbacks', [ $this, 'handleException' ], 10, 3 );
-	}
+	) {}
 
 	/**
 	 * Handle exceptions thrown during REST API requests.
