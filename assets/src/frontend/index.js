@@ -1,5 +1,6 @@
 import { createRoot } from '@wordpress/element';
 import domReady from '@wordpress/dom-ready';
+import apiFetch from '@wordpress/api-fetch';
 import ContentLoader from './ContentLoader';
 import './style.css';
 
@@ -34,7 +35,7 @@ domReady(() => {
 	});
 
 	const batchRequest = subscriberId && firstNonce && items.length
-		? window.wp.apiFetch({
+		? apiFetch({
 			path: '/taglock/v1/check-access-batch',
 			method: 'POST',
 			data: {
