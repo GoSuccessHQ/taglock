@@ -5,7 +5,6 @@ import {
 	CardBody,
 	CardHeader,
 	TextControl,
-	TextareaControl,
 	ToggleControl,
 	Button,
 	Notice,
@@ -256,7 +255,7 @@ const AdminApp = () => {
 						</p>
 
 						<Disabled isDisabled={true}>
-							<div className="taglock-admin__pro-settings">
+							<div className="taglock-admin__pro-toggle-list">
 								<ToggleControl
 									label={__('Enable teaser mode', 'taglock')}
 									checked={false}
@@ -265,18 +264,6 @@ const AdminApp = () => {
 										'Show a teaser instead of a hard error when access is denied.',
 										'taglock'
 									)}
-								/>
-
-								<TextareaControl
-									label={__('Teaser HTML', 'taglock')}
-									value={''}
-									onChange={() => {}}
-									help={__(
-										'HTML shown when access is denied (sanitized on output).',
-										'taglock'
-									)}
-									__next40pxDefaultSize
-									__nextHasNoMarginBottom
 								/>
 
 								<ToggleControl
@@ -289,15 +276,6 @@ const AdminApp = () => {
 									)}
 								/>
 
-								<TextControl
-									label={__('Redirect URL', 'taglock')}
-									value={''}
-									onChange={() => {}}
-									placeholder="https://"
-									__next40pxDefaultSize
-									__nextHasNoMarginBottom
-								/>
-
 								<ToggleControl
 									label={__('Enable engagement tagging', 'taglock')}
 									checked={false}
@@ -306,15 +284,6 @@ const AdminApp = () => {
 										'Automatically apply a tag after a visitor successfully views protected content.',
 										'taglock'
 									)}
-								/>
-
-								<TextControl
-									label={__('Engagement tag ID', 'taglock')}
-									value={''}
-									onChange={() => {}}
-									placeholder={__('e.g. 456', 'taglock')}
-									__next40pxDefaultSize
-									__nextHasNoMarginBottom
 								/>
 
 								<ToggleControl

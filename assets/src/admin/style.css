@@ -101,9 +101,9 @@
 	outline-offset: 2px;
 }
 
-.taglock-admin__pro-settings {
-	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(var(--taglock-admin-credentials-min-col), 1fr));
+.taglock-admin__pro-toggle-list {
+	display: flex;
+	flex-direction: column;
 	gap: var(--taglock-admin-gap);
 }
 
