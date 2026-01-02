@@ -97,7 +97,7 @@ const AdminApp = () => {
 
 	const handleSubmit = (event) => {
 		event.preventDefault();
-		if (isSaving) {
+		if (isLoading || isSaving) {
 			return;
 		}
 		handleSave();
@@ -120,16 +120,13 @@ const AdminApp = () => {
 
 				<Card>
 					<CardHeader>
-						<h2>{__('KlickTipp Connection', 'taglock')}</h2>
+						<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
+							<h2 style={{ margin: 0 }}>{__('KlickTipp Connection', 'taglock')}</h2>
+							{isLoading ? <Spinner /> : null}
+						</div>
 					</CardHeader>
 					<CardBody>
-						{isLoading ? (
-							<div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-								<Spinner />
-								<span>{__('Loading…', 'taglock')}</span>
-							</div>
-						) : (
-							<form onSubmit={handleSubmit}>
+						<form onSubmit={handleSubmit}>
 							<p className="description">
 								{__(
 									'Enter your KlickTipp username and password to connect.',
@@ -142,6 +139,7 @@ const AdminApp = () => {
 									label={__('Username', 'taglock')}
 									value={username}
 									onChange={setUsername}
+									disabled={isLoading}
 									autoComplete="username"
 									autoCapitalize="none"
 									autoCorrect="off"
@@ -156,6 +154,7 @@ const AdminApp = () => {
 									type="password"
 									value={password}
 									onChange={setPassword}
+									disabled={isLoading}
 									autoComplete="current-password"
 									autoCapitalize="none"
 									autoCorrect="off"
@@ -182,11 +181,15 @@ const AdminApp = () => {
 								/>
 							</div>
 
-							<Button variant="primary" type="submit" isBusy={isSaving}>
+							<Button
+								variant="primary"
+								type="submit"
+								isBusy={isSaving}
+								disabled={isLoading || isSaving}
+							>
 								{__('Save Settings', 'taglock')}
 							</Button>
 						</form>
-					)}
 				</CardBody>
                 </Card>
 
