@@ -8,7 +8,7 @@ import {
 	TextareaControl,
 	ToggleControl,
 	SelectControl,
-	FormTokenField,
+	ComboboxControl,
 	Button,
 	Notice,
 	Spinner,
@@ -60,6 +60,13 @@ const AdminApp = () => {
 	const [rulesLoading, setRulesLoading] = useState(false);
 	const [rulesNotice, setRulesNotice] = useState(null);
 
+	const [tagsLoading, setTagsLoading] = useState(false);
+	const [tagOptions, setTagOptions] = useState([]);
+	const [tagsById, setTagsById] = useState({});
+	const [tagsNotice, setTagsNotice] = useState(null);
+	const [requiredTagPicker, setRequiredTagPicker] = useState('');
+	const [engagementTagPicker, setEngagementTagPicker] = useState('');
+
 	const [isRuleModalOpen, setIsRuleModalOpen] = useState(false);
 	const [editingRuleId, setEditingRuleId] = useState(null);
 	const [isRuleSaving, setIsRuleSaving] = useState(false);
@@ -96,6 +103,9 @@ const AdminApp = () => {
 						setHasPassword(false);
 					}
 					setIsLoading(false);
+					// Load tags (for combobox labels) after settings were loaded.
+					// If credentials are missing/invalid, this will fail gracefully.
+					loadTags();
 				}
 			} catch (error) {
 				if (!isMounted) {
@@ -149,57 +159,65 @@ const AdminApp = () => {
 		loadRules(rulesPage);
 	}, [rulesPage]);
 
-	const parseIdList = (value) => {
-		if (!value || (Array.isArray(value) && value.length === 0)) {
-			return [];
-		}
-
-		const parts = Array.isArray(value)
-			? value
-			: String(value)
-					.split(',')
-					.map((part) => part.trim())
-					.filter(Boolean);
-
-		return parts
-			.map((part) => String(part).trim())
-			.filter((part) => /^\d+$/.test(part))
-			.map((part) => Number(part))
-			.filter((n) => Number.isInteger(n) && n > 0);
-	};
-
-	const normalizeTagIdTokens = (tokens) => {
-		const raw = Array.isArray(tokens) ? tokens : [];
+	const normalizeIdArray = (ids) => {
 		const seen = new Set();
-		return raw
-			.map((t) => String(t).trim())
-			.filter((t) => /^\d+$/.test(t))
-			.filter((t) => t !== '0')
-			.filter((t) => {
-				if (seen.has(t)) {
+		return (Array.isArray(ids) ? ids : [])
+			.map((v) => Number(v))
+			.filter((n) => Number.isInteger(n) && n > 0)
+			.filter((n) => {
+				if (seen.has(n)) {
 					return false;
 				}
-				seen.add(t);
+				seen.add(n);
 				return true;
 			});
 	};
 
-	const tagIdSuggestions = (() => {
-		const ids = new Set();
-		rules.forEach((rule) => {
-			if (Array.isArray(rule?.required_tag_ids)) {
-				rule.required_tag_ids.forEach((id) => ids.add(String(id)));
+	const loadTags = async () => {
+		setTagsLoading(true);
+		setTagsNotice(null);
+		try {
+			const response = await apiFetch({
+				path: `/${apiNamespace}/tags`,
+				method: 'GET',
+			});
+
+			if (response?.success && response?.data?.items) {
+				const items = Array.isArray(response.data.items)
+					? response.data.items
+					: [];
+				const byId = {};
+				const options = items
+					.filter((t) => t && t.id && t.name)
+					.map((t) => {
+						byId[String(t.id)] = String(t.name);
+						return { value: String(t.id), label: String(t.name) };
+					});
+
+				setTagsById(byId);
+				setTagOptions(options);
+			} else {
+				setTagsById({});
+				setTagOptions([]);
 			}
-			if (Array.isArray(rule?.engagement_tag_ids)) {
-				rule.engagement_tag_ids.forEach((id) => ids.add(String(id)));
-			}
-		});
-		return Array.from(ids).filter(Boolean).sort();
-	})();
+		} catch (error) {
+			setTagsById({});
+			setTagOptions([]);
+			setTagsNotice({
+				status: 'warning',
+				message:
+					error.message || __('Failed to load tags. Check your credentials.', 'taglock'),
+			});
+		} finally {
+			setTagsLoading(false);
+		}
+	};
 
 	const openCreateRuleModal = () => {
 		setRuleModalNotice(null);
 		setEditingRuleId(null);
+		setRequiredTagPicker('');
+		setEngagementTagPicker('');
 		setRuleForm({
 			name: '',
 			is_active: true,
@@ -219,12 +237,14 @@ const AdminApp = () => {
 	const openEditRuleModal = (rule) => {
 		setRuleModalNotice(null);
 		setEditingRuleId(rule?.id ?? null);
+		setRequiredTagPicker('');
+		setEngagementTagPicker('');
 		setRuleForm({
 			name: rule?.name || '',
 			is_active: Boolean(rule?.is_active),
 			access_mode: rule?.access_mode || 'tag_any',
 			required_tag_ids: Array.isArray(rule?.required_tag_ids)
-				? rule.required_tag_ids.map((id) => String(id))
+				? normalizeIdArray(rule.required_tag_ids)
 				: [],
 			deny_mode: rule?.deny_mode || 'message',
 			deny_message: rule?.deny_message || '',
@@ -235,7 +255,7 @@ const AdminApp = () => {
 					: '',
 			engagement_tagging_enabled: Boolean(rule?.engagement_tagging_enabled),
 			engagement_tag_ids: Array.isArray(rule?.engagement_tag_ids)
-				? rule.engagement_tag_ids.map((id) => String(id))
+				? normalizeIdArray(rule.engagement_tag_ids)
 				: [],
 			admin_bypass_enabled: Boolean(rule?.admin_bypass_enabled),
 		});
@@ -254,7 +274,7 @@ const AdminApp = () => {
 	const saveRule = async () => {
 		setRuleModalNotice(null);
 		const name = (ruleForm.name || '').trim();
-		const requiredTagIds = parseIdList(ruleForm.required_tag_ids);
+		const requiredTagIds = normalizeIdArray(ruleForm.required_tag_ids);
 
 		if (!name) {
 			setRuleModalNotice({
@@ -284,7 +304,7 @@ const AdminApp = () => {
 				? Number(ruleForm.redirect_post_id)
 				: null,
 			engagement_tagging_enabled: Boolean(ruleForm.engagement_tagging_enabled),
-			engagement_tag_ids: parseIdList(ruleForm.engagement_tag_ids),
+			engagement_tag_ids: normalizeIdArray(ruleForm.engagement_tag_ids),
 			admin_bypass_enabled: Boolean(ruleForm.admin_bypass_enabled),
 		};
 
@@ -367,6 +387,7 @@ const AdminApp = () => {
 				status: 'success',
 				message: __('Settings saved successfully!', 'taglock'),
 			});
+			loadTags();
 		} catch (error) {
 			setNotice({
 				status: 'error',
@@ -390,6 +411,16 @@ const AdminApp = () => {
 			<h1>{__('TagLock Settings', 'taglock')}</h1>
 			
 			<div className="taglock-admin">
+				{tagsNotice && (
+					<Notice
+						className="taglock-admin__notice"
+						status={tagsNotice.status}
+						isDismissible
+						onRemove={() => setTagsNotice(null)}
+					>
+						{tagsNotice.message}
+					</Notice>
+				)}
 				{notice && (
 					<Notice
                         className="taglock-admin__notice"
@@ -638,18 +669,61 @@ const AdminApp = () => {
 						__nextHasNoMarginBottom
 					/>
 
-					<FormTokenField
-						label={__('Required tag IDs', 'taglock')}
-						help={__('Add one or more KlickTipp tag IDs (numbers only).', 'taglock')}
-						value={ruleForm.required_tag_ids}
-						onChange={(tokens) =>
+					<ComboboxControl
+						label={__('Required tags', 'taglock')}
+						value={requiredTagPicker}
+						onChange={(value) => {
+							setRequiredTagPicker(value || '');
+							const id = Number(value);
+							if (!Number.isInteger(id) || id <= 0) {
+								return;
+							}
 							setRuleForm({
 								...ruleForm,
-								required_tag_ids: normalizeTagIdTokens(tokens),
-							})
+								required_tag_ids: normalizeIdArray([
+									...ruleForm.required_tag_ids,
+									id,
+								]),
+							});
+							setRequiredTagPicker('');
+						}}
+						options={tagOptions}
+						help={
+							tagsLoading
+								? __('Loading tags…', 'taglock')
+								: __('Select a KlickTipp tag by name to add it.', 'taglock')
 						}
-						suggestions={tagIdSuggestions}
 					/>
+
+					{ruleForm.required_tag_ids.length > 0 && (
+						<div className="taglock-admin__selected-tags">
+							{ruleForm.required_tag_ids.map((id) => {
+								const name = tagsById[String(id)];
+								const label = name
+									? `${name} (#${id})`
+									: `#${id}`;
+								return (
+									<div key={`required-${id}`} className="taglock-admin__selected-tag">
+										<span>{label}</span>
+										<Button
+											variant="secondary"
+											isSmall
+											onClick={() =>
+												setRuleForm({
+													...ruleForm,
+													required_tag_ids: ruleForm.required_tag_ids.filter(
+														(v) => v !== id
+													),
+												})
+											}
+										>
+											{__('Remove', 'taglock')}
+										</Button>
+									</div>
+								);
+							})}
+						</div>
+					)}
 
 					<SelectControl
 						label={
@@ -746,27 +820,67 @@ const AdminApp = () => {
 					/>
 
 					{ruleForm.engagement_tagging_enabled && (
-						<FormTokenField
+						<ComboboxControl
 							disabled={isProDisabled}
 							label={
 								<span className="taglock-admin__label-with-badge">
-									{__('Engagement tag IDs', 'taglock')}
+									{__('Engagement tags', 'taglock')}
 									{proBadge}
 								</span>
 							}
 							help={__(
-								'Add one or more KlickTipp tag IDs to apply on access (numbers only).',
+								'Select a KlickTipp tag by name to add it.',
 								'taglock'
 							)}
-							value={ruleForm.engagement_tag_ids}
-							onChange={(tokens) =>
+							value={engagementTagPicker}
+							onChange={(value) => {
+								setEngagementTagPicker(value || '');
+								const id = Number(value);
+								if (!Number.isInteger(id) || id <= 0) {
+									return;
+								}
 								setRuleForm({
 									...ruleForm,
-									engagement_tag_ids: normalizeTagIdTokens(tokens),
-								})
-							}
-							suggestions={tagIdSuggestions}
+									engagement_tag_ids: normalizeIdArray([
+										...ruleForm.engagement_tag_ids,
+										id,
+									]),
+								});
+								setEngagementTagPicker('');
+							}}
+							options={tagOptions}
 						/>
+					)}
+
+					{ruleForm.engagement_tagging_enabled && ruleForm.engagement_tag_ids.length > 0 && (
+						<div className="taglock-admin__selected-tags">
+							{ruleForm.engagement_tag_ids.map((id) => {
+								const name = tagsById[String(id)];
+								const label = name
+									? `${name} (#${id})`
+									: `#${id}`;
+								return (
+									<div key={`engagement-${id}`} className="taglock-admin__selected-tag">
+										<span>{label}</span>
+										<Button
+											variant="secondary"
+											isSmall
+											disabled={isProDisabled}
+											onClick={() =>
+												setRuleForm({
+													...ruleForm,
+													engagement_tag_ids: ruleForm.engagement_tag_ids.filter(
+														(v) => v !== id
+													),
+												})
+											}
+										>
+											{__('Remove', 'taglock')}
+										</Button>
+									</div>
+								);
+							})}
+						</div>
 					)}
 
 					<ToggleControl

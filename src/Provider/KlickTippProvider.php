@@ -248,6 +248,38 @@ final class KlickTippProvider implements CRMProviderInterface {
 	/**
 	 * @inheritDoc
 	 */
+	public function getTags(): array {
+		if ( ! $this->isAuthenticated() ) {
+			$this->lastError = __( 'Not authenticated', 'taglock' );
+			return [];
+		}
+
+		HookUtil::doAction( HookAction::BEFORE_CRM_API_CALL, 'tag_index' );
+		$result = $this->connector->tag_index();
+		HookUtil::doAction( HookAction::AFTER_CRM_API_CALL, 'tag_index', $result );
+
+		if ( $result === false || $result === null ) {
+			$this->lastError = $this->connector->get_last_error() ?: __( 'Failed to load tags', 'taglock' );
+			$this->logger->error( __( 'Failed to load KlickTipp tags', 'taglock' ), [ 'error' => $this->lastError ] );
+			HookUtil::doAction( HookAction::CRM_API_ERROR, 'tag_index', $this->lastError );
+			return [];
+		}
+
+		$tags = [];
+		foreach ( $result as $id => $name ) {
+			if ( ! is_string( $name ) ) {
+				continue;
+			}
+			$tags[ (string) $id ] = $name;
+		}
+
+		$this->lastError = '';
+		return $tags;
+	}
+
+	/**
+	 * @inheritDoc
+	 */
 	public function getLastError(): string {
 		return $this->lastError;
 	}

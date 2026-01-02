@@ -88,6 +88,20 @@
 	margin-bottom: 0;
 }
 
+.taglock-admin__selected-tags {
+	display: flex;
+	flex-direction: column;
+	gap: var(--taglock-admin-gap);
+	margin-bottom: var(--taglock-admin-input-margin);
+}
+
+.taglock-admin__selected-tag {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--taglock-admin-gap);
+}
+
 .taglock-admin__credentials .components-base-control {
 	margin-bottom: 0;
 }

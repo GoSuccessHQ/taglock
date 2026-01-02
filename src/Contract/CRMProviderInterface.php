@@ -37,6 +37,13 @@ interface CRMProviderInterface {
 	public function applyTag( string $subscriberId, string $tagId ): bool;
 
 	/**
+	 * Get available tags for the authenticated account.
+	 *
+	 * @return array<string, string> Associative array of tag id => tag name.
+	 */
+	public function getTags(): array;
+
+	/**
 	 * Get the last error message from the CRM provider.
 	 *
 	 * @return string The last error message, or empty string if no error.
