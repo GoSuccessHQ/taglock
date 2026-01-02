@@ -4,7 +4,7 @@ import apiFetch from '@wordpress/api-fetch';
 import ContentLoader from './ContentLoader';
 import './style.css';
 
-const getTlIdFromHash = () => {
+const getSubscriberIdFromHash = () => {
 	const rawHash = window.location.hash || '';
 	if (!rawHash.includes('taglock_subscriber_id=')) {
 		return null;
@@ -16,12 +16,12 @@ const getTlIdFromHash = () => {
 	}
 
 	const params = new URLSearchParams(hash);
-	const tlId = params.get('taglock_subscriber_id');
-	if (!tlId) {
+	const subscriberId = params.get('taglock_subscriber_id');
+	if (!subscriberId) {
 		return null;
 	}
 
-	localStorage.setItem('taglock_subscriber_id', tlId);
+	localStorage.setItem('taglock_subscriber_id', subscriberId);
 
 	// Remove taglock_subscriber_id from the address bar after persisting it.
 	params.delete('taglock_subscriber_id');
@@ -29,11 +29,11 @@ const getTlIdFromHash = () => {
 	const nextUrl = `${window.location.pathname}${window.location.search}${nextHash ? `#${nextHash}` : ''}`;
 	window.history.replaceState(null, '', nextUrl);
 
-	return tlId;
+	return subscriberId;
 };
 
-const getTlId = () => {
-	const fromHash = getTlIdFromHash();
+const getSubscriberId = () => {
+	const fromHash = getSubscriberIdFromHash();
 	if (fromHash) {
 		return fromHash;
 	}
@@ -46,7 +46,7 @@ domReady(() => {
 		return;
 	}
 
-	const tlId = getTlId();
+	const subscriberId = getSubscriberId();
 
 	const firstNonce = containers[0].getAttribute('data-nonce');
 	const items = [];
@@ -59,12 +59,12 @@ domReady(() => {
 		}
 	});
 
-	const batchRequest = tlId && firstNonce && items.length
+	const batchRequest = subscriberId && firstNonce && items.length
 		? apiFetch({
 			path: '/taglock/v1/check-access',
 			method: 'POST',
 			data: {
-				subscriber_id: tlId,
+				subscriber_id: subscriberId,
 				items,
 				nonce: firstNonce,
 			},
@@ -82,7 +82,7 @@ domReady(() => {
 					contentId={contentId}
 					message={message}
 					loaderText={loaderText}
-					tlId={tlId}
+					subscriberId={subscriberId}
 					batchRequest={batchRequest}
 				/>
 			);
