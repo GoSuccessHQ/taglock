@@ -17,6 +17,7 @@
 	align-items: center;
 	justify-content: space-between;
 	gap: 12px;
+	width: 100%;
 }
 
 .taglock-admin__card-header-title {
@@ -27,8 +28,15 @@
 	display: flex;
 	align-items: center;
 	justify-content: flex-end;
-	min-width: 20px;
-	min-height: 20px;
+	flex: 0 0 20px;
+	width: 20px;
+	height: 20px;
+}
+
+.taglock-admin__card-header-indicator .components-spinner {
+	margin: 0;
+	width: 20px;
+	height: 20px;
 }
 
 .taglock-admin__card--spaced {
