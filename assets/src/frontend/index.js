@@ -4,15 +4,40 @@ import apiFetch from '@wordpress/api-fetch';
 import ContentLoader from './ContentLoader';
 import './style.css';
 
-const getSubscriberId = () => {
-	const urlParams = new URLSearchParams(window.location.search);
-	const fromUrl = urlParams.get('subscriber_id');
-	if (fromUrl) {
-		localStorage.setItem('taglock_subscriber_id', fromUrl);
-		return fromUrl;
+const getTlIdFromHash = () => {
+	const rawHash = window.location.hash || '';
+	if (!rawHash.includes('tl_id=')) {
+		return null;
 	}
 
-	return localStorage.getItem('taglock_subscriber_id');
+	const hash = rawHash.startsWith('#') ? rawHash.slice(1) : rawHash;
+	if (!hash.includes('=')) {
+		return null;
+	}
+
+	const params = new URLSearchParams(hash);
+	const tlId = params.get('tl_id');
+	if (!tlId) {
+		return null;
+	}
+
+	localStorage.setItem('taglock_tl_id', tlId);
+
+	// Remove tl_id from the address bar after persisting it.
+	params.delete('tl_id');
+	const nextHash = params.toString();
+	const nextUrl = `${window.location.pathname}${window.location.search}${nextHash ? `#${nextHash}` : ''}`;
+	window.history.replaceState(null, '', nextUrl);
+
+	return tlId;
+};
+
+const getTlId = () => {
+	const fromHash = getTlIdFromHash();
+	if (fromHash) {
+		return fromHash;
+	}
+	return localStorage.getItem('taglock_tl_id');
 };
 
 domReady(() => {
@@ -21,7 +46,7 @@ domReady(() => {
 		return;
 	}
 
-	const subscriberId = getSubscriberId();
+	const tlId = getTlId();
 
 	const firstNonce = containers[0].getAttribute('data-nonce');
 	const items = [];
@@ -34,12 +59,12 @@ domReady(() => {
 		}
 	});
 
-	const batchRequest = subscriberId && firstNonce && items.length
+	const batchRequest = tlId && firstNonce && items.length
 		? apiFetch({
 			path: '/taglock/v1/check-access',
 			method: 'POST',
 			data: {
-				subscriber_id: subscriberId,
+				tl_id: tlId,
 				items,
 				nonce: firstNonce,
 			},
@@ -57,7 +82,7 @@ domReady(() => {
 					contentId={contentId}
 					message={message}
 					loaderText={loaderText}
-					subscriberId={subscriberId}
+					tlId={tlId}
 					batchRequest={batchRequest}
 				/>
 			);

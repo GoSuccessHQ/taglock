@@ -142,10 +142,10 @@ final class KlickTippProvider implements CRMProviderInterface {
 	/**
 	 * @inheritDoc
 	 */
-	public function hasTag( string $subscriberId, string $tagId ): bool {
-		if ( isset( $this->subscriberTagsCache[ $subscriberId ] ) ) {
+	public function hasTag( string $tlId, string $tagId ): bool {
+		if ( isset( $this->subscriberTagsCache[ $tlId ] ) ) {
 			$this->lastError = '';
-			return in_array( $tagId, $this->subscriberTagsCache[ $subscriberId ], true );
+			return in_array( $tagId, $this->subscriberTagsCache[ $tlId ], true );
 		}
 
 		if ( ! $this->isAuthenticated() ) {
@@ -153,17 +153,17 @@ final class KlickTippProvider implements CRMProviderInterface {
 			return false;
 		}
 
-		HookUtil::doAction( HookAction::BEFORE_CRM_API_CALL, 'subscriber_get', $subscriberId );
+		HookUtil::doAction( HookAction::BEFORE_CRM_API_CALL, 'subscriber_get', $tlId );
 
 		// Get subscriber data
-		$subscriber = $this->connector->subscriber_get( $subscriberId );
+		$subscriber = $this->connector->subscriber_get( $tlId );
 
 		HookUtil::doAction( HookAction::AFTER_CRM_API_CALL, 'subscriber_get', $subscriber );
 
 		if ( ! $subscriber ) {
 			$this->lastError = $this->connector->get_last_error() ?: __( 'Subscriber not found', 'taglock' );
 			$this->logger->warning( __( 'Subscriber not found', 'taglock' ), [
-				'subscriber_id' => $subscriberId,
+				'tl_id'  => $tlId,
 				'error'         => $this->lastError,
 			] );
 			HookUtil::doAction( HookAction::CRM_API_ERROR, 'subscriber_get', $this->lastError );
@@ -178,14 +178,14 @@ final class KlickTippProvider implements CRMProviderInterface {
 			$tags = array_map( 'trim', $tags );
 		}
 
-		$this->subscriberTagsCache[ $subscriberId ] = $tags;
+		$this->subscriberTagsCache[ $tlId ] = $tags;
 		$this->lastError = '';
 
 		if ( [] !== $tags ) {
 			$hasTag = in_array( $tagId, $tags, true );
 
 			$this->logger->debug( __( 'Tag check completed', 'taglock' ), [
-				'subscriber_id' => $subscriberId,
+				'tl_id'  => $tlId,
 				'tag_id'        => $tagId,
 				'has_tag'       => $hasTag,
 				'subscriber_tags' => $tags,
@@ -194,28 +194,28 @@ final class KlickTippProvider implements CRMProviderInterface {
 			return $hasTag;
 		}
 
-		$this->logger->debug( __( 'Subscriber has no tags', 'taglock' ), [ 'subscriber_id' => $subscriberId ] );
+		$this->logger->debug( __( 'Subscriber has no tags', 'taglock' ), [ 'tl_id' => $tlId ] );
 		return false;
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	public function applyTag( string $subscriberId, string $tagId ): bool {
+	public function applyTag( string $tlId, string $tagId ): bool {
 		if ( ! $this->isAuthenticated() ) {
 			$this->lastError = __( 'Not authenticated', 'taglock' );
 			return false;
 		}
 
-		HookUtil::doAction( HookAction::BEFORE_CRM_API_CALL, 'tag', $subscriberId, $tagId );
+		HookUtil::doAction( HookAction::BEFORE_CRM_API_CALL, 'tag', $tlId, $tagId );
 
 		// Get subscriber email first (required by KlickTipp API)
-		$subscriber = $this->connector->subscriber_get( $subscriberId );
+		$subscriber = $this->connector->subscriber_get( $tlId );
 
 		if ( ! $subscriber || empty( $subscriber->email ) ) {
 			$this->lastError = $this->connector->get_last_error() ?: __( 'Subscriber not found', 'taglock' );
 			$this->logger->error( __( 'Cannot apply tag: Subscriber not found', 'taglock' ), [
-				'subscriber_id' => $subscriberId,
+				'tl_id'  => $tlId,
 				'tag_id'        => $tagId,
 			] );
 			return false;
@@ -228,7 +228,7 @@ final class KlickTippProvider implements CRMProviderInterface {
 
 		if ( $result ) {
 			$this->logger->info( __( 'Tag applied successfully', 'taglock' ), [
-				'subscriber_id' => $subscriberId,
+				'tl_id'  => $tlId,
 				'tag_id'        => $tagId,
 			] );
 			return true;
@@ -236,7 +236,7 @@ final class KlickTippProvider implements CRMProviderInterface {
 
 		$this->lastError = $this->connector->get_last_error() ?: __( 'Failed to apply tag', 'taglock' );
 		$this->logger->error( __( 'Failed to apply tag', 'taglock' ), [
-			'subscriber_id' => $subscriberId,
+			'tl_id'  => $tlId,
 			'tag_id'        => $tagId,
 			'error'         => $this->lastError,
 		] );

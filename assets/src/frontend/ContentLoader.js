@@ -1,7 +1,7 @@
 import { useState, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
-const ContentLoader = ({ subscriberId, contentId, message, loaderText, batchRequest }) => {
+const ContentLoader = ({ tlId, contentId, message, loaderText, batchRequest }) => {
 	const [state, setState] = useState({
 		loading: true,
 		content: null,
@@ -10,7 +10,7 @@ const ContentLoader = ({ subscriberId, contentId, message, loaderText, batchRequ
 
 	useEffect(() => {
 		const checkAccess = async () => {
-			if (!subscriberId) {
+			if (!tlId) {
 				setState({
 					loading: false,
 					content: null,
@@ -77,7 +77,7 @@ const ContentLoader = ({ subscriberId, contentId, message, loaderText, batchRequ
 		};
 
 		checkAccess();
-	}, [subscriberId, contentId, message, batchRequest]);
+	}, [tlId, contentId, message, batchRequest]);
 
 	if (state.loading) {
 		return (

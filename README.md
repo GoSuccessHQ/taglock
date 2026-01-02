@@ -43,20 +43,20 @@ Your protected content here. Only subscribers with tag #123 can see this.
 
 ### Access URL
 
-**Important:** Users access protected content via KlickTipp email links containing their subscriber ID:
+**Important:** Users access protected content via email links containing their TagLock identifier (`tl_id`) in the URL hash (not as a query parameter):
 
 ```
-https://yoursite.com/page/?subscriber_id=12345
+https://yoursite.com/page/#tl_id=12345
 ```
 
 **How it works:**
-1. You send an email via KlickTipp with a link to your protected page
-2. KlickTipp automatically appends `?subscriber_id=XXX` to the URL
-3. The page loads, React detects the subscriber ID from the URL
-4. Backend checks if this subscriber has the required tag
+1. You send an email with a link to your protected page including `#tl_id=...`
+2. The page loads, React reads `tl_id` from the URL hash
+3. React stores `tl_id` in LocalStorage and immediately removes it from the address bar
+4. Backend checks if this identifier has the required tag
 5. Content is displayed or access is denied
 
-**No user login required!** The subscriber ID in the URL is sufficient.
+**No user login required!** The identifier is sufficient.
 
 ## Architecture
 

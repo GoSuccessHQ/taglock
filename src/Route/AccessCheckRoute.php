@@ -29,7 +29,7 @@ use function wp_verify_nonce;
 /**
  * Access Check Route
  *
- * REST API endpoint to verify subscriber access based on KlickTipp tags.
+ * REST API endpoint to verify access based on CRM tags.
  * Endpoint: POST /wp-json/taglock/v1/check-access
  */
 #[AutoconfigureTag( 'taglock.api_route' )]
@@ -59,7 +59,7 @@ final class AccessCheckRoute implements ApiRouteInterface {
 				fn( WP_REST_Request $request ) => $this->handleRequest( $request ),
 				fn( WP_REST_Request $request ) => $this->checkPermissions( $request ),
 				[
-					'subscriber_id' => [
+					'tl_id'  => [
 						'required'          => true,
 						'type'              => 'string',
 						'validate_callback' => static fn( $param ) => ! empty( $param ),
@@ -109,14 +109,15 @@ final class AccessCheckRoute implements ApiRouteInterface {
 	 * @return WP_REST_Response The API response.
 	 */
 	public function handleRequest( WP_REST_Request $request ): WP_REST_Response {
-		$subscriberId = (string) $request->get_param( 'subscriber_id' );
+		$tlId = (string) $request->get_param( 'tl_id' );
 		$items = $request->get_param( 'items' );
 
-		if ( $subscriberId === '' || ! ctype_digit( $subscriberId ) ) {
-			$this->logger->warning( __( 'Invalid subscriber ID', 'taglock' ), [ 'subscriber_id' => $subscriberId ] );
+		// Currently KlickTipp subscriber IDs are numeric; keep strict validation.
+		if ( $tlId === '' || ! ctype_digit( $tlId ) ) {
+			$this->logger->warning( __( 'Invalid identifier', 'taglock' ), [ 'tl_id' => $tlId ] );
 			return ApiResponse::error(
-				__( 'Invalid subscriber ID. Please use the link from your email.', 'taglock' ),
-				'invalid_subscriber_id',
+				__( 'Invalid identifier. Please use the link from your email.', 'taglock' ),
+				'invalid_tl_id',
 				400
 			);
 		}
@@ -130,7 +131,7 @@ final class AccessCheckRoute implements ApiRouteInterface {
 		}
 
 		$this->logger->info( __( 'Access check requested', 'taglock' ), [
-			'subscriber_id' => $subscriberId,
+			'tl_id'  => $tlId,
 			'count'         => count( $items ),
 		] );
 
@@ -184,11 +185,11 @@ final class AccessCheckRoute implements ApiRouteInterface {
 				continue;
 			}
 
-			HookUtil::doAction( HookAction::BEFORE_ACCESS_CHECK, $subscriberId, $tagId );
+			HookUtil::doAction( HookAction::BEFORE_ACCESS_CHECK, $tlId, $tagId );
 
-			$hasAccess = $this->crmProvider->hasTag( $subscriberId, $tagId );
+			$hasAccess = $this->crmProvider->hasTag( $tlId, $tagId );
 
-			HookUtil::doAction( HookAction::AFTER_ACCESS_CHECK, $subscriberId, $tagId, $hasAccess );
+			HookUtil::doAction( HookAction::AFTER_ACCESS_CHECK, $tlId, $tagId, $hasAccess );
 
 			if ( $hasAccess ) {
 				$content = get_transient( $contentId );
@@ -203,16 +204,16 @@ final class AccessCheckRoute implements ApiRouteInterface {
 					continue;
 				}
 
-				$content = HookUtil::applyFilter( HookFilter::PROTECTED_CONTENT, $content, $subscriberId, $tagId );
+				$content = HookUtil::applyFilter( HookFilter::PROTECTED_CONTENT, $content, $tlId, $tagId );
 
-				HookUtil::doAction( HookAction::ACCESS_GRANTED, $subscriberId, $tagId, $content );
+				HookUtil::doAction( HookAction::ACCESS_GRANTED, $tlId, $tagId, $content );
 
 				$data = [
 					'content' => $content,
 					'message' => __( 'Access granted', 'taglock' ),
 				];
 
-				$data = HookUtil::applyFilter( HookFilter::ACCESS_GRANTED_RESPONSE, $data, $subscriberId, $tagId );
+				$data = HookUtil::applyFilter( HookFilter::ACCESS_GRANTED_RESPONSE, $data, $tlId, $tagId );
 
 				$results[ $contentId ] = [
 					'success' => true,
@@ -223,14 +224,14 @@ final class AccessCheckRoute implements ApiRouteInterface {
 				continue;
 			}
 
-			HookUtil::doAction( HookAction::ACCESS_DENIED, $subscriberId, $tagId );
+			HookUtil::doAction( HookAction::ACCESS_DENIED, $tlId, $tagId );
 
 			$data = [
 				'success' => false,
 				'message' => __( 'You do not have access to this content. Please contact support if you believe this is an error.', 'taglock' ),
 			];
 
-			$data = HookUtil::applyFilter( HookFilter::ACCESS_DENIED_RESPONSE, $data, $subscriberId, $tagId );
+			$data = HookUtil::applyFilter( HookFilter::ACCESS_DENIED_RESPONSE, $data, $tlId, $tagId );
 
 			$results[ $contentId ] = [
 				'success'      => false,
