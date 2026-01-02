@@ -66,7 +66,7 @@ final class SettingsRoute implements ApiRouteInterface {
 						'sanitize_callback' => 'sanitize_text_field',
 					],
 					'klicktipp_password' => [
-						'required'          => true,
+						'required'          => false,
 						'type'              => 'string',
 						// Do not sanitize like a normal text field; passwords must remain intact.
 						'sanitize_callback' => static fn( $value ) => is_string( $value ) ? $value : '',
@@ -119,6 +119,7 @@ final class SettingsRoute implements ApiRouteInterface {
 	public function saveSettings( WP_REST_Request $request ): WP_REST_Response {
 		$username = (string) $request->get_param( 'klicktipp_username' );
 		$password = wp_unslash( (string) $request->get_param( 'klicktipp_password' ) );
+		$existingEncryptedPassword = (string) get_option( 'taglock_klicktipp_password', '' );
 
 		// Validate
 		if ( empty( $username ) ) {
@@ -130,7 +131,28 @@ final class SettingsRoute implements ApiRouteInterface {
 			);
 		}
 
-		if ( empty( $password ) ) {
+		// Save settings
+		update_option( 'taglock_klicktipp_username', sanitize_text_field( $username ) );
+
+		// Only update password if a new one was provided.
+		if ( '' !== $password ) {
+			try {
+				$encryptedPassword = EncryptionUtil::encrypt( $password );
+			} catch ( Throwable $exception ) {
+				$this->logger->error( __( 'Failed to encrypt password', 'taglock' ), [
+					'exception' => get_class( $exception ),
+					'message'   => $exception->getMessage(),
+				] );
+
+				return ApiResponse::error(
+					__( 'Failed to save credentials. Please try again.', 'taglock' ),
+					'encryption_failed',
+					500
+				);
+			}
+
+			update_option( 'taglock_klicktipp_password', $encryptedPassword );
+		} elseif ( '' === $existingEncryptedPassword ) {
 			$this->logger->warning( __( 'Settings save failed: empty password', 'taglock' ) );
 			return ApiResponse::error(
 				__( 'Password cannot be empty', 'taglock' ),
@@ -138,26 +160,6 @@ final class SettingsRoute implements ApiRouteInterface {
 				400
 			);
 		}
-
-		// Encrypt password before saving
-		try {
-			$encryptedPassword = EncryptionUtil::encrypt( $password );
-		} catch ( Throwable $exception ) {
-			$this->logger->error( __( 'Failed to encrypt password', 'taglock' ), [
-				'exception' => get_class( $exception ),
-				'message'   => $exception->getMessage(),
-			] );
-
-			return ApiResponse::error(
-				__( 'Failed to save credentials. Please try again.', 'taglock' ),
-				'encryption_failed',
-				500
-			);
-		}
-
-		// Save settings
-		update_option( 'taglock_klicktipp_username', sanitize_text_field( $username ) );
-		update_option( 'taglock_klicktipp_password', $encryptedPassword );
 
 		$this->logger->info( __( 'Settings saved successfully', 'taglock' ), [ 'username' => $username ] );
 

@@ -13,6 +13,7 @@ import apiFetch from '@wordpress/api-fetch';
 const AdminApp = () => {
 	const [username, setUsername] = useState('');
 	const [password, setPassword] = useState('');
+	const [hasPassword, setHasPassword] = useState(false);
 	const [isSaving, setIsSaving] = useState(false);
 	const [notice, setNotice] = useState(null);
 
@@ -28,6 +29,7 @@ const AdminApp = () => {
 
 				if (isMounted && response?.success && response?.data) {
 					setUsername(response.data.klicktipp_username || '');
+					setHasPassword(Boolean(response.data.has_password));
 				}
 			} catch (error) {
 				if (!isMounted) {
@@ -52,16 +54,23 @@ const AdminApp = () => {
 		setNotice(null);
 
 		try {
+			const data = {
+				klicktipp_username: username,
+			};
+			if (password) {
+				data.klicktipp_password = password;
+			}
+
 			await apiFetch({
 				path: '/taglock/v1/settings',
 				method: 'POST',
-				data: {
-					klicktipp_username: username,
-					klicktipp_password: password,
-				},
+				data,
 			});
 
 			setPassword('');
+			if (password) {
+				setHasPassword(true);
+			}
 
 			setNotice({
 				status: 'success',
@@ -113,28 +122,42 @@ const AdminApp = () => {
 								)}
 							</p>
 
-							<TextControl
-								label={__('Username', 'taglock')}
-								value={username}
-								onChange={setUsername}
-								required
-								__next40pxDefaultSize
-								__nextHasNoMarginBottom
-							/>
+							<div className="taglock-admin__credentials">
+								<TextControl
+									label={__('Username', 'taglock')}
+									value={username}
+									onChange={setUsername}
+									required
+									__next40pxDefaultSize
+									__nextHasNoMarginBottom
+								/>
 
-							<TextControl
-								label={__('Password', 'taglock')}
-								type="password"
-								value={password}
-								onChange={setPassword}
-								help={__(
-									'For security reasons, the password is not displayed after saving.',
-									'taglock'
-								)}
-								required
-								__next40pxDefaultSize
-								__nextHasNoMarginBottom
-							/>
+								<TextControl
+									label={__('Password', 'taglock')}
+									type="password"
+									value={password}
+									onChange={setPassword}
+									placeholder={
+										hasPassword
+											? __('Saved. Enter a new password to update.', 'taglock')
+											: ''
+									}
+									help={
+										hasPassword
+											? __(
+												'Password is already saved. Enter a new one only if you want to change it.',
+												'taglock'
+											)
+											: __(
+												'For security reasons, the password is not displayed after saving.',
+												'taglock'
+											)
+									}
+									required={!hasPassword}
+									__next40pxDefaultSize
+									__nextHasNoMarginBottom
+								/>
+							</div>
 
 							<Button variant="primary" type="submit" isBusy={isSaving}>
 								{__('Save Settings', 'taglock')}

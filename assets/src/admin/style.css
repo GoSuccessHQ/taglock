@@ -16,6 +16,16 @@
 	margin-bottom: 15px;
 }
 
+.taglock-admin__credentials {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+	gap: 16px;
+}
+
+.taglock-admin__credentials .components-text-control {
+	margin-bottom: 0;
+}
+
 .taglock-admin pre {
 	padding: 10px;
 	background: #f0f0f0;
