@@ -442,29 +442,6 @@ const AdminApp = () => {
                 </Card>
 
 				<Card className="taglock-admin__card taglock-admin__card--spaced">
-                    <CardHeader>
-						<h2>{__('Usage', 'taglock')}</h2>
-                    </CardHeader>
-                    <CardBody>
-                        <p>
-                            {__(
-								'Use the [taglock] shortcode with a TagLocker ID to protect your content:',
-                                'taglock'
-                            )}
-                        </p>
-						<pre className="taglock-admin__code">
-							{'[taglock id="1"]Your protected content here[/taglock]'}
-                        </pre>
-                        <p className="description">
-                            {__(
-								'Replace "1" with the TagLocker ID from the list below.',
-                                'taglock'
-                            )}
-                        </p>
-                    </CardBody>
-                </Card>
-
-				<Card className="taglock-admin__card taglock-admin__card--spaced">
 					<CardHeader>
 						<div className="taglock-admin__card-header">
 							<h2 className="taglock-admin__card-header-title">{__('TagLockers', 'taglock')}</h2>
@@ -571,81 +548,6 @@ const AdminApp = () => {
 					</CardBody>
 				</Card>
 
-				<Card className="taglock-admin__card taglock-admin__card--spaced">
-                    <CardHeader>
-						<div className="taglock-admin__card-header">
-							<h2 className="taglock-admin__card-header-title">{__('Pro Features', 'taglock')}</h2>
-							<a
-								className="taglock-admin__pro-badge"
-								href={proUrl}
-								target="_blank"
-								rel="noopener noreferrer"
-							>
-								PRO
-							</a>
-						</div>
-                    </CardHeader>
-                    <CardBody>
-						<p className="description">
-							{__(
-								'These settings are available in TagLock Pro. They are shown here but disabled in the Lite version.',
-								'taglock'
-							)}
-						</p>
-
-						<Disabled isDisabled={true}>
-							<div className="taglock-admin__pro-toggle-list">
-								<ToggleControl
-									label={__('Enable teaser mode', 'taglock')}
-									disabled={true}
-									checked={false}
-									onChange={() => {}}
-									__nextHasNoMarginBottom
-									help={__(
-										'Show a teaser instead of a hard error when access is denied.',
-										'taglock'
-									)}
-								/>
-
-								<ToggleControl
-									label={__('Enable redirect on access denied', 'taglock')}
-									disabled={true}
-									checked={false}
-									onChange={() => {}}
-									__nextHasNoMarginBottom
-									help={__(
-										'Redirect visitors to a URL instead of showing the default message.',
-										'taglock'
-									)}
-								/>
-
-								<ToggleControl
-									label={__('Enable engagement tagging', 'taglock')}
-									disabled={true}
-									checked={false}
-									onChange={() => {}}
-									__nextHasNoMarginBottom
-									help={__(
-										'Automatically apply a tag after a visitor successfully views protected content.',
-										'taglock'
-									)}
-								/>
-
-								<ToggleControl
-									label={__('Enable admin bypass (preview without subscriber ID)', 'taglock')}
-									disabled={true}
-									checked={false}
-									onChange={() => {}}
-									__nextHasNoMarginBottom
-									help={__(
-										'Allow administrators to view protected content without an access link.',
-										'taglock'
-									)}
-								/>
-							</div>
-						</Disabled>
-                    </CardBody>
-                </Card>
             </div>
 
 			{isRuleModalOpen && (
