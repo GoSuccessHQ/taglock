@@ -132,6 +132,10 @@ const AdminApp = () => {
 									label={__('Username', 'taglock')}
 									value={username}
 									onChange={setUsername}
+									autoComplete="username"
+									autoCapitalize="none"
+									autoCorrect="off"
+									spellCheck={false}
 									required
 									__next40pxDefaultSize
 									__nextHasNoMarginBottom
