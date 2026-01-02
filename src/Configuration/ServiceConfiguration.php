@@ -32,15 +32,7 @@ return static function ( ContainerConfigurator $container ): void {
 		'Util/*',
 	];
 
-	// Load all services
 	$services->load( 'GoSuccess\\TagLock\\', __DIR__ . '/../*' )
 		->exclude( __DIR__ . '/../{' . implode( ',', $excludedPaths ) . '}' )
 		->public();
-
-	// Manually tag Route services because instanceof() doesn't work reliably with load()
-	$services->get( \GoSuccess\TagLock\Route\AccessCheckRoute::class )
-		->tag( 'taglock.api_route' );
-
-	$services->get( \GoSuccess\TagLock\Route\SettingsRoute::class )
-		->tag( 'taglock.api_route' );
 };

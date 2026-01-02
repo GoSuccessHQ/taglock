@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace GoSuccess\TagLock\Route;
 
 use GoSuccess\TagLock\Contract\ApiRouteInterface;
+use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use GoSuccess\TagLock\DTO\ApiResponse;
 use GoSuccess\TagLock\Service\LoggerService;
 use GoSuccess\TagLock\Util\EncryptionUtil;
@@ -21,10 +22,11 @@ use function update_option;
 /**
  * Settings Route
  *
- * REST API endpoints for plugin settings.
- * GET /wp-json/taglock/v1/settings - Retrieve settings
- * POST /wp-json/taglock/v1/settings - Save settings
+ * REST API endpoints for managing TagLock settings (KlickTipp credentials).
+ * GET /wp-json/taglock/v1/settings - Retrieve current settings
+ * POST /wp-json/taglock/v1/settings - Update settings
  */
+#[AutoconfigureTag( 'taglock.api_route' )]
 final class SettingsRoute implements ApiRouteInterface {
 
 	private const string NAMESPACE = 'taglock/v1';

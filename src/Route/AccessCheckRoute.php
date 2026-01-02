@@ -11,6 +11,7 @@ use GoSuccess\TagLock\Enum\HookAction;
 use GoSuccess\TagLock\Enum\HookFilter;
 use GoSuccess\TagLock\Service\LoggerService;
 use GoSuccess\TagLock\Util\HookUtil;
+use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
@@ -25,6 +26,7 @@ use function wp_verify_nonce;
  * REST API endpoint to verify subscriber access based on KlickTipp tags.
  * Endpoint: POST /wp-json/taglock/v1/check-access
  */
+#[AutoconfigureTag( 'taglock.api_route' )]
 final class AccessCheckRoute implements ApiRouteInterface {
 
 	private const string NAMESPACE = 'taglock/v1';
