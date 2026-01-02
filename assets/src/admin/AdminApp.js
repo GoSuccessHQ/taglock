@@ -7,6 +7,7 @@ import {
 	TextControl,
 	Button,
 	Notice,
+	Spinner,
 } from '@wordpress/components';
 import apiFetch from '@wordpress/api-fetch';
 
@@ -14,6 +15,7 @@ const AdminApp = () => {
 	const [username, setUsername] = useState('');
 	const [password, setPassword] = useState('');
 	const [hasPassword, setHasPassword] = useState(null);
+	const [isLoading, setIsLoading] = useState(true);
 	const [isSaving, setIsSaving] = useState(false);
 	const [notice, setNotice] = useState(null);
 
@@ -34,6 +36,7 @@ const AdminApp = () => {
 					} else {
 						setHasPassword(false);
 					}
+					setIsLoading(false);
 				}
 			} catch (error) {
 				if (!isMounted) {
@@ -44,6 +47,7 @@ const AdminApp = () => {
 					status: 'error',
 					message: error.message || __('Failed to load settings.', 'taglock'),
 				});
+				setIsLoading(false);
 			}
 		};
 
@@ -119,7 +123,13 @@ const AdminApp = () => {
 						<h2>{__('KlickTipp Connection', 'taglock')}</h2>
 					</CardHeader>
 					<CardBody>
-						<form onSubmit={handleSubmit}>
+						{isLoading ? (
+							<div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+								<Spinner />
+								<span>{__('Loading…', 'taglock')}</span>
+							</div>
+						) : (
+							<form onSubmit={handleSubmit}>
 							<p className="description">
 								{__(
 									'Enter your KlickTipp username and password to connect.',
@@ -176,6 +186,7 @@ const AdminApp = () => {
 								{__('Save Settings', 'taglock')}
 							</Button>
 						</form>
+					)}
 				</CardBody>
                 </Card>
 

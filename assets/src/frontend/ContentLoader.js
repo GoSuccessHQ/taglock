@@ -1,5 +1,6 @@
 import { useState, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { Spinner } from '@wordpress/components';
 
 const ContentLoader = ({ subscriberId, contentId, message, loaderText, batchRequest }) => {
 	const [state, setState] = useState({
@@ -82,7 +83,7 @@ const ContentLoader = ({ subscriberId, contentId, message, loaderText, batchRequ
 	if (state.loading) {
 		return (
 			<div className="taglock-loader">
-				<span className="taglock-spinner"></span>
+				<Spinner />
 				<span className="taglock-loader-text">{loaderText}</span>
 			</div>
 		);

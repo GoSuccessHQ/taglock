@@ -82,6 +82,11 @@ final class AssetService {
 
 		wp_enqueue_script( 'taglock-admin' );
 
+		// Ensure WordPress Components styles are available (e.g. <Spinner />).
+		if ( in_array( 'wp-components', $assetData['dependencies'], true ) ) {
+			wp_enqueue_style( 'wp-components' );
+		}
+
 		// Register admin styles
 		wp_register_style(
 			'taglock-admin',
@@ -123,6 +128,11 @@ final class AssetService {
 		);
 
 		wp_enqueue_script( 'taglock-frontend' );
+
+		// Ensure WordPress Components styles are available (e.g. <Spinner />).
+		if ( in_array( 'wp-components', $assetData['dependencies'], true ) ) {
+			wp_enqueue_style( 'wp-components' );
+		}
 
 		// Register frontend styles
 		wp_register_style(
