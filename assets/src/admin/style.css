@@ -65,6 +65,18 @@
 	margin-bottom: var(--taglock-admin-input-margin);
 }
 
+/*
+ * WP 6.7+ starts removing default bottom margins for some wp.components controls.
+ * We control spacing explicitly within the TagLock admin UI.
+ */
+.taglock-admin .components-base-control {
+	margin-bottom: var(--taglock-admin-input-margin);
+}
+
+.taglock-admin__credentials .components-base-control {
+	margin-bottom: 0;
+}
+
 .taglock-admin__credentials {
 	display: grid;
 	grid-template-columns: repeat(auto-fit, minmax(var(--taglock-admin-credentials-min-col), 1fr));
@@ -105,6 +117,10 @@
 	display: flex;
 	flex-direction: column;
 	gap: var(--taglock-admin-gap);
+}
+
+.taglock-admin__pro-toggle-list .components-base-control {
+	margin-bottom: 0;
 }
 
 .taglock-admin__pagination {
