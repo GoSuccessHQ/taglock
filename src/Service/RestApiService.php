@@ -26,6 +26,8 @@ final class RestApiService {
 		private readonly iterable $routes,
 		private readonly LoggerService $logger
 	) {
+		// Force immediate logging to verify service initialization
+		error_log( 'TagLock RestApiService instantiated' );
 		$this->registerHooks();
 	}
 
@@ -40,10 +42,14 @@ final class RestApiService {
 	 * Register all API routes.
 	 */
 	public function registerRoutes(): void {
+		error_log( 'TagLock registerRoutes() called' );
+		
 		HookUtil::doAction( HookAction::BEFORE_REGISTER_API_ROUTES );
 
 		$routeCount = 0;
 		foreach ( $this->routes as $route ) {
+			error_log( 'TagLock registering route: ' . get_class( $route ) );
+			
 			HookUtil::doAction( HookAction::BEFORE_REGISTER_ROUTE, $route );
 
 			$route->register();
@@ -57,6 +63,8 @@ final class RestApiService {
 			HookUtil::doAction( HookAction::AFTER_REGISTER_ROUTE, $route );
 		}
 
+		error_log( "TagLock registered {$routeCount} routes" );
+		
 		$this->logger->info( __( 'All API routes registered', 'taglock' ), [ 'count' => $routeCount ] );
 
 		HookUtil::doAction( HookAction::AFTER_REGISTER_API_ROUTES );
