@@ -21,20 +21,20 @@ interface CRMProviderInterface {
 	/**
 	 * Check if a subscriber has a specific tag.
 	 *
-	 * @param string $tlId The TagLock identifier (tl_id) used to identify the subscriber in the CRM.
+	 * @param string $subscriberId The subscriber identifier (subscriber_id) used to identify the subscriber in the CRM.
 	 * @param string $tagId The tag ID to check.
 	 * @return bool True if the subscriber has the tag, false otherwise.
 	 */
-	public function hasTag( string $tlId, string $tagId ): bool;
+	public function hasTag( string $subscriberId, string $tagId ): bool;
 
 	/**
 	 * Apply a tag to a subscriber.
 	 *
-	 * @param string $tlId The TagLock identifier (tl_id) used to identify the subscriber in the CRM.
+	 * @param string $subscriberId The subscriber identifier (subscriber_id) used to identify the subscriber in the CRM.
 	 * @param string $tagId The tag ID to apply.
 	 * @return bool True if the tag was applied successfully, false otherwise.
 	 */
-	public function applyTag( string $tlId, string $tagId ): bool;
+	public function applyTag( string $subscriberId, string $tagId ): bool;
 
 	/**
 	 * Get the last error message from the CRM provider.

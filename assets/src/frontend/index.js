@@ -64,7 +64,7 @@ domReady(() => {
 			path: '/taglock/v1/check-access',
 			method: 'POST',
 			data: {
-				tl_id: tlId,
+				subscriber_id: tlId,
 				items,
 				nonce: firstNonce,
 			},

@@ -59,7 +59,7 @@ final class AccessCheckRoute implements ApiRouteInterface {
 				fn( WP_REST_Request $request ) => $this->handleRequest( $request ),
 				fn( WP_REST_Request $request ) => $this->checkPermissions( $request ),
 				[
-					'tl_id'  => [
+					'subscriber_id'  => [
 						'required'          => true,
 						'type'              => 'string',
 						'validate_callback' => static fn( $param ) => ! empty( $param ),
@@ -109,15 +109,15 @@ final class AccessCheckRoute implements ApiRouteInterface {
 	 * @return WP_REST_Response The API response.
 	 */
 	public function handleRequest( WP_REST_Request $request ): WP_REST_Response {
-		$tlId = (string) $request->get_param( 'tl_id' );
+		$subscriberId = (string) $request->get_param( 'subscriber_id' );
 		$items = $request->get_param( 'items' );
 
 		// Currently KlickTipp subscriber IDs are numeric; keep strict validation.
-		if ( $tlId === '' || ! ctype_digit( $tlId ) ) {
-			$this->logger->warning( __( 'Invalid identifier', 'taglock' ), [ 'tl_id' => $tlId ] );
+		if ( $subscriberId === '' || ! ctype_digit( $subscriberId ) ) {
+			$this->logger->warning( __( 'Invalid identifier', 'taglock' ), [ 'subscriber_id' => $subscriberId ] );
 			return ApiResponse::error(
 				__( 'Invalid identifier. Please use the link from your email.', 'taglock' ),
-				'invalid_tl_id',
+				'invalid_subscriber_id',
 				400
 			);
 		}
@@ -131,7 +131,7 @@ final class AccessCheckRoute implements ApiRouteInterface {
 		}
 
 		$this->logger->info( __( 'Access check requested', 'taglock' ), [
-			'tl_id'  => $tlId,
+			'subscriber_id'  => $subscriberId,
 			'count'         => count( $items ),
 		] );
 
@@ -185,11 +185,11 @@ final class AccessCheckRoute implements ApiRouteInterface {
 				continue;
 			}
 
-			HookUtil::doAction( HookAction::BEFORE_ACCESS_CHECK, $tlId, $tagId );
+			HookUtil::doAction( HookAction::BEFORE_ACCESS_CHECK, $subscriberId, $tagId );
 
-			$hasAccess = $this->crmProvider->hasTag( $tlId, $tagId );
+			$hasAccess = $this->crmProvider->hasTag( $subscriberId, $tagId );
 
-			HookUtil::doAction( HookAction::AFTER_ACCESS_CHECK, $tlId, $tagId, $hasAccess );
+			HookUtil::doAction( HookAction::AFTER_ACCESS_CHECK, $subscriberId, $tagId, $hasAccess );
 
 			if ( $hasAccess ) {
 				$content = get_transient( $contentId );
@@ -204,16 +204,16 @@ final class AccessCheckRoute implements ApiRouteInterface {
 					continue;
 				}
 
-				$content = HookUtil::applyFilter( HookFilter::PROTECTED_CONTENT, $content, $tlId, $tagId );
+				$content = HookUtil::applyFilter( HookFilter::PROTECTED_CONTENT, $content, $subscriberId, $tagId );
 
-				HookUtil::doAction( HookAction::ACCESS_GRANTED, $tlId, $tagId, $content );
+				HookUtil::doAction( HookAction::ACCESS_GRANTED, $subscriberId, $tagId, $content );
 
 				$data = [
 					'content' => $content,
 					'message' => __( 'Access granted', 'taglock' ),
 				];
 
-				$data = HookUtil::applyFilter( HookFilter::ACCESS_GRANTED_RESPONSE, $data, $tlId, $tagId );
+				$data = HookUtil::applyFilter( HookFilter::ACCESS_GRANTED_RESPONSE, $data, $subscriberId, $tagId );
 
 				$results[ $contentId ] = [
 					'success' => true,
@@ -224,14 +224,14 @@ final class AccessCheckRoute implements ApiRouteInterface {
 				continue;
 			}
 
-			HookUtil::doAction( HookAction::ACCESS_DENIED, $tlId, $tagId );
+			HookUtil::doAction( HookAction::ACCESS_DENIED, $subscriberId, $tagId );
 
 			$data = [
 				'success' => false,
 				'message' => __( 'You do not have access to this content. Please contact support if you believe this is an error.', 'taglock' ),
 			];
 
-			$data = HookUtil::applyFilter( HookFilter::ACCESS_DENIED_RESPONSE, $data, $tlId, $tagId );
+			$data = HookUtil::applyFilter( HookFilter::ACCESS_DENIED_RESPONSE, $data, $subscriberId, $tagId );
 
 			$results[ $contentId ] = [
 				'success'      => false,
