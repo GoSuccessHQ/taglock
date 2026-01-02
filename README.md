@@ -46,13 +46,13 @@ Your protected content here. Only subscribers with tag #123 can see this.
 **Important:** Users access protected content via email links containing their subscriber identifier (`subscriber_id`) in the URL hash (not as a query parameter):
 
 ```
-https://yoursite.com/page/#subscriber_id=12345
+https://yoursite.com/page/#taglock_subscriber_id=12345
 ```
 
 **How it works:**
-1. You send an email with a link to your protected page including `#subscriber_id=...`
-2. The page loads, React reads `subscriber_id` from the URL hash
-3. React stores `subscriber_id` in LocalStorage and immediately removes it from the address bar
+1. You send an email with a link to your protected page including `#taglock_subscriber_id=...`
+2. The page loads, React reads `taglock_subscriber_id` from the URL hash
+3. React stores it in LocalStorage and immediately removes it from the address bar
 4. Backend checks if this identifier has the required tag
 5. Content is displayed or access is denied
 

@@ -6,7 +6,7 @@ import './style.css';
 
 const getTlIdFromHash = () => {
 	const rawHash = window.location.hash || '';
-	if (!rawHash.includes('subscriber_id=')) {
+	if (!rawHash.includes('taglock_subscriber_id=')) {
 		return null;
 	}
 
@@ -16,15 +16,15 @@ const getTlIdFromHash = () => {
 	}
 
 	const params = new URLSearchParams(hash);
-	const tlId = params.get('subscriber_id');
+	const tlId = params.get('taglock_subscriber_id');
 	if (!tlId) {
 		return null;
 	}
 
 	localStorage.setItem('taglock_subscriber_id', tlId);
 
-	// Remove subscriber_id from the address bar after persisting it.
-	params.delete('subscriber_id');
+	// Remove taglock_subscriber_id from the address bar after persisting it.
+	params.delete('taglock_subscriber_id');
 	const nextHash = params.toString();
 	const nextUrl = `${window.location.pathname}${window.location.search}${nextHash ? `#${nextHash}` : ''}`;
 	window.history.replaceState(null, '', nextUrl);
