@@ -8,6 +8,7 @@ import {
 	Button,
 	Notice,
 	Spinner,
+	Disabled,
 } from '@wordpress/components';
 import apiFetch from '@wordpress/api-fetch';
 
@@ -136,61 +137,61 @@ const AdminApp = () => {
 								)}
 							</p>
 
-							<div className="taglock-admin__credentials">
-								<TextControl
-									label={__('Username', 'taglock')}
-									value={username}
-									onChange={setUsername}
-									disabled={isLoading}
-									autoComplete="username"
-									autoCapitalize="none"
-									autoCorrect="off"
-									spellCheck={false}
-									required
-									__next40pxDefaultSize
-									__nextHasNoMarginBottom
-								/>
+							<Disabled isDisabled={isLoading}>
+								<div className="taglock-admin__credentials">
+									<TextControl
+										label={__('Username', 'taglock')}
+										value={username}
+										onChange={setUsername}
+										autoComplete="username"
+										autoCapitalize="none"
+										autoCorrect="off"
+										spellCheck={false}
+										required
+										__next40pxDefaultSize
+										__nextHasNoMarginBottom
+									/>
 
-								<TextControl
-									label={__('Password', 'taglock')}
-									type="password"
-									value={password}
-									onChange={setPassword}
-									disabled={isLoading}
-									autoComplete="current-password"
-									autoCapitalize="none"
-									autoCorrect="off"
-									spellCheck={false}
-									placeholder={
-										hasPassword === true
-											? __('Saved. Enter a new password to update.', 'taglock')
-											: ''
-									}
-									help={
-										hasPassword === true
-											? __(
-												'Password is already saved. Enter a new one only if you want to change it.',
-												'taglock'
-											)
+									<TextControl
+										label={__('Password', 'taglock')}
+										type="password"
+										value={password}
+										onChange={setPassword}
+										autoComplete="current-password"
+										autoCapitalize="none"
+										autoCorrect="off"
+										spellCheck={false}
+										placeholder={
+											hasPassword === true
+												? __('Saved. Enter a new password to update.', 'taglock')
+												: ''
+										}
+										help={
+											hasPassword === true
+												? __(
+													'Password is already saved. Enter a new one only if you want to change it.',
+													'taglock'
+												)
 											: __(
-												'For security reasons, the password is not displayed after saving.',
-												'taglock'
-											)
+													'For security reasons, the password is not displayed after saving.',
+													'taglock'
+												)
 									}
 									required={hasPassword === false}
 									__next40pxDefaultSize
 									__nextHasNoMarginBottom
 								/>
-							</div>
+								</div>
 
-							<Button
-								variant="primary"
-								type="submit"
-								isBusy={isSaving}
-								disabled={isLoading || isSaving}
-							>
-								{__('Save Settings', 'taglock')}
-							</Button>
+								<Button
+									variant="primary"
+									type="submit"
+									isBusy={isSaving}
+									disabled={isSaving}
+								>
+									{__('Save Settings', 'taglock')}
+								</Button>
+							</Disabled>
 						</form>
 				</CardBody>
                 </Card>
