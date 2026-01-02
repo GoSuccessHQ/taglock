@@ -28,6 +28,9 @@ final class RestApiService {
 	) {
 		// Force immediate logging to verify service initialization
 		error_log( 'TagLock RestApiService instantiated' );
+		error_log( 'TagLock $routes type: ' . get_debug_type( $routes ) );
+		error_log( 'TagLock $routes is_array: ' . ( is_array( $routes ) ? 'yes' : 'no' ) );
+		error_log( 'TagLock $routes is Traversable: ' . ( $routes instanceof \Traversable ? 'yes' : 'no' ) );
 		$this->registerHooks();
 	}
 
