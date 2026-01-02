@@ -85,7 +85,8 @@ final class Plugin {
 		$this->cleanupOldContainerCaches( $cacheDir, $version );
 
 		// Use ConfigCache to handle cache validation
-		$containerConfigCache = new ConfigCache( $cacheFile, $isDebug );
+		// Always validate cache freshness to avoid stale containers after plugin updates.
+		$containerConfigCache = new ConfigCache( $cacheFile, true );
 		$containerClass       = $this->getContainerClassName( $version );
 
 		// We check on every request whether the cached container is still usable.
