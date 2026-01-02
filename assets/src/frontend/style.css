@@ -3,6 +3,10 @@
 	min-height: 50px;
 }
 
+.taglock-config {
+	display: none;
+}
+
 .taglock-loader {
 	display: flex;
 	flex-direction: column;
