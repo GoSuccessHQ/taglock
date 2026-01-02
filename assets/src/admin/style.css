@@ -12,6 +12,29 @@
 	font-size: 1.3em;
 }
 
+.taglock-admin__card-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+}
+
+.taglock-admin__card-header-title {
+	margin: 0;
+}
+
+.taglock-admin__card-header-indicator {
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	min-width: 20px;
+	min-height: 20px;
+}
+
+.taglock-admin__card--spaced {
+	margin-top: 20px;
+}
+
 .taglock-admin .components-text-control {
 	margin-bottom: 15px;
 }
@@ -26,7 +49,7 @@
 	margin-bottom: 0;
 }
 
-.taglock-admin pre {
+.taglock-admin__code {
 	padding: 10px;
 	background: #f0f0f0;
 	border-radius: 4px;

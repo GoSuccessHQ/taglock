@@ -120,9 +120,11 @@ const AdminApp = () => {
 
 				<Card>
 					<CardHeader>
-						<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
-							<h2 style={{ margin: 0 }}>{__('KlickTipp Connection', 'taglock')}</h2>
-							{isLoading ? <Spinner /> : null}
+						<div className="taglock-admin__card-header">
+							<h2 className="taglock-admin__card-header-title">{__('KlickTipp Connection', 'taglock')}</h2>
+							<div className="taglock-admin__card-header-indicator" aria-hidden="true">
+								{isLoading ? <Spinner /> : null}
+							</div>
 						</div>
 					</CardHeader>
 					<CardBody>
@@ -193,7 +195,7 @@ const AdminApp = () => {
 				</CardBody>
                 </Card>
 
-                <Card style={{ marginTop: '20px' }}>
+				<Card className="taglock-admin__card taglock-admin__card--spaced">
                     <CardHeader>
                         <h2>{__('Usage', 'taglock')}</h2>
                     </CardHeader>
@@ -204,7 +206,7 @@ const AdminApp = () => {
                                 'taglock'
                             )}
                         </p>
-                        <pre style={{ padding: '10px', background: '#f0f0f0' }}>
+						<pre className="taglock-admin__code">
                             {'[taglock tag="123"]Your protected content here[/taglock]'}
                         </pre>
                         <p className="description">
@@ -216,7 +218,7 @@ const AdminApp = () => {
                     </CardBody>
                 </Card>
 
-                <Card style={{ marginTop: '20px' }}>
+				<Card className="taglock-admin__card taglock-admin__card--spaced">
                     <CardHeader>
                         <h2>{__('Pro Features (Coming Soon)', 'taglock')}</h2>
                     </CardHeader>
