@@ -1,22 +1,40 @@
 .taglock-admin {
-	max-width: 1200px;
-	margin: 20px 0;
+	--taglock-admin-max-width: 1200px;
+	--taglock-admin-space-lg: 20px;
+	--taglock-admin-gap-sm: 12px;
+	--taglock-admin-gap-md: 16px;
+	--taglock-admin-input-margin: 15px;
+	--taglock-admin-spinner-size: 20px;
+	--taglock-admin-credentials-min-col: 260px;
+	--taglock-admin-code-padding: 10px;
+	--taglock-admin-radius-sm: 0.4rem;
+	--taglock-admin-radius-xs: 4px;
+	--taglock-admin-code-bg: #f0f0f0;
+	--taglock-admin-h2-size: 1.3em;
+
+	max-width: var(--taglock-admin-max-width);
+	margin: var(--taglock-admin-space-lg) 0;
+}
+
+.taglock-admin__notice {
+	margin-block-end: var(--taglock-admin-space-lg);
+	border-radius: var(--taglock-admin-radius-sm);
 }
 
 .taglock-admin .components-card {
-	margin-bottom: 20px;
+	margin-bottom: var(--taglock-admin-space-lg);
 }
 
 .taglock-admin .components-card__header h2 {
 	margin: 0;
-	font-size: 1.3em;
+	font-size: var(--taglock-admin-h2-size);
 }
 
 .taglock-admin__card-header {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	gap: 12px;
+	gap: var(--taglock-admin-gap-sm);
 	width: 100%;
 }
 
@@ -28,29 +46,29 @@
 	display: flex;
 	align-items: center;
 	justify-content: flex-end;
-	flex: 0 0 20px;
-	width: 20px;
-	height: 20px;
+	flex: 0 0 var(--taglock-admin-spinner-size);
+	width: var(--taglock-admin-spinner-size);
+	height: var(--taglock-admin-spinner-size);
 }
 
 .taglock-admin__card-header-indicator .components-spinner {
 	margin: 0;
-	width: 20px;
-	height: 20px;
+	width: var(--taglock-admin-spinner-size);
+	height: var(--taglock-admin-spinner-size);
 }
 
 .taglock-admin__card--spaced {
-	margin-top: 20px;
+	margin-top: var(--taglock-admin-space-lg);
 }
 
 .taglock-admin .components-text-control {
-	margin-bottom: 15px;
+	margin-bottom: var(--taglock-admin-input-margin);
 }
 
 .taglock-admin__credentials {
 	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-	gap: 16px;
+	grid-template-columns: repeat(auto-fit, minmax(var(--taglock-admin-credentials-min-col), 1fr));
+	gap: var(--taglock-admin-gap-md);
 }
 
 .taglock-admin__credentials .components-text-control {
@@ -58,14 +76,14 @@
 }
 
 .taglock-admin__code {
-	padding: 10px;
-	background: #f0f0f0;
-	border-radius: 4px;
+	padding: var(--taglock-admin-code-padding);
+	background: var(--taglock-admin-code-bg);
+	border-radius: var(--taglock-admin-radius-xs);
 	overflow-x: auto;
 	font-family: monospace;
 }
 
 .taglock-admin ul {
 	list-style: disc;
-	margin-left: 20px;
+	margin-left: var(--taglock-admin-space-lg);
 }

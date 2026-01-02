@@ -111,6 +111,7 @@ const AdminApp = () => {
 			<div className="taglock-admin">
 				{notice && (
 					<Notice
+                        className="taglock-admin__notice"
 						status={notice.status}
 						isDismissible
 						onRemove={() => setNotice(null)}
