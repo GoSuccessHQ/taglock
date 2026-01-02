@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace GoSuccess\TagLock\Contract;
 
+use GoSuccess\TagLock\DTO\ApiMethodHandler;
+
 /**
  * API Route Interface
  *
@@ -12,21 +14,12 @@ namespace GoSuccess\TagLock\Contract;
 interface ApiRouteInterface {
 
 	/**
-	 * Register the REST API route.
-	 */
-	public function register(): void;
-
-	/**
-	 * Get the route namespace.
-	 *
-	 * @return string The namespace (e.g., 'taglock/v1').
-	 */
-	public function getNamespace(): string;
-
-	/**
-	 * Get the route path.
-	 *
-	 * @return string The route path (e.g., '/check-access').
+	 * Get the route path (e.g., '/check-access').
 	 */
 	public function getRoute(): string;
+
+	/**
+	 * @return array<int, ApiMethodHandler>
+	 */
+	public function getMethodHandlers(): array;
 }

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace GoSuccess\TagLock\Controller;
 
-use GoSuccess\TagLock\Service\RestApiService;
+use GoSuccess\TagLock\Service\Api\ApiRouteRegistrationService;
 
 use function add_action;
 use function did_action;
@@ -16,7 +16,7 @@ use function did_action;
 final class ApiController {
 
 	public function __construct(
-		private readonly RestApiService $routeRegistrationService
+		private readonly ApiRouteRegistrationService $routeRegistrationService
 	) {
 		add_action( 'rest_api_init', [ $this->routeRegistrationService, 'registerRoutes' ] );
 

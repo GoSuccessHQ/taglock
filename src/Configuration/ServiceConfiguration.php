@@ -36,7 +36,7 @@ return static function ( ContainerConfigurator $container ): void {
 		->exclude( __DIR__ . '/../{' . implode( ',', $excludedPaths ) . '}' )
 		->public();
 
-	// Ensure API routes are tagged so RestApiService receives them via tagged_iterator.
+	// Ensure API routes are tagged so ApiRouteRegistrationService receives them via tagged_iterator.
 	$services->get( \GoSuccess\TagLock\Route\AccessCheckRoute::class )
 		->tag( 'taglock.api_route' );
 

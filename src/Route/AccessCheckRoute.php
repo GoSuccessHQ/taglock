@@ -6,9 +6,11 @@ namespace GoSuccess\TagLock\Route;
 
 use GoSuccess\TagLock\Contract\ApiRouteInterface;
 use GoSuccess\TagLock\Contract\CRMProviderInterface;
+use GoSuccess\TagLock\DTO\ApiMethodHandler;
 use GoSuccess\TagLock\DTO\ApiResponse;
 use GoSuccess\TagLock\Enum\HookAction;
 use GoSuccess\TagLock\Enum\HookFilter;
+use GoSuccess\TagLock\Enum\HttpMethod;
 use GoSuccess\TagLock\Service\LoggerService;
 use GoSuccess\TagLock\Util\HookUtil;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
@@ -17,7 +19,6 @@ use WP_REST_Request;
 use WP_REST_Response;
 
 use function get_transient;
-use function register_rest_route;
 use function wp_verify_nonce;
 
 /**
@@ -29,7 +30,6 @@ use function wp_verify_nonce;
 #[AutoconfigureTag( 'taglock.api_route' )]
 final class AccessCheckRoute implements ApiRouteInterface {
 
-	private const string NAMESPACE = 'taglock/v1';
 	private const string ROUTE     = '/check-access';
 
 	public function __construct(
@@ -40,15 +40,20 @@ final class AccessCheckRoute implements ApiRouteInterface {
 	/**
 	 * @inheritDoc
 	 */
-	public function register(): void {
-		register_rest_route(
-			self::NAMESPACE,
-			self::ROUTE,
-			[
-				'methods'             => 'POST',
-				'callback'            => [ $this, 'handleRequest' ],
-				'permission_callback' => [ $this, 'checkPermissions' ],
-				'args'                => [
+	public function getRoute(): string {
+		return self::ROUTE;
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public function getMethodHandlers(): array {
+		return [
+			new ApiMethodHandler(
+				HttpMethod::POST,
+				fn( WP_REST_Request $request ) => $this->handleRequest( $request ),
+				fn( WP_REST_Request $request ) => $this->checkPermissions( $request ),
+				[
 					'subscriber_id' => [
 						'required'          => true,
 						'type'              => 'string',
@@ -72,23 +77,9 @@ final class AccessCheckRoute implements ApiRouteInterface {
 						'type'              => 'string',
 						'sanitize_callback' => 'sanitize_text_field',
 					],
-				],
-			]
-		);
-	}
-
-	/**
-	 * @inheritDoc
-	 */
-	public function getNamespace(): string {
-		return self::NAMESPACE;
-	}
-
-	/**
-	 * @inheritDoc
-	 */
-	public function getRoute(): string {
-		return self::ROUTE;
+				]
+			),
+		];
 	}
 
 	/**

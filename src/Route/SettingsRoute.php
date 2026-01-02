@@ -6,7 +6,9 @@ namespace GoSuccess\TagLock\Route;
 
 use GoSuccess\TagLock\Contract\ApiRouteInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
+use GoSuccess\TagLock\DTO\ApiMethodHandler;
 use GoSuccess\TagLock\DTO\ApiResponse;
+use GoSuccess\TagLock\Enum\HttpMethod;
 use GoSuccess\TagLock\Service\LoggerService;
 use GoSuccess\TagLock\Util\EncryptionUtil;
 use Throwable;
@@ -16,7 +18,6 @@ use WP_REST_Response;
 
 use function current_user_can;
 use function get_option;
-use function register_rest_route;
 use function sanitize_text_field;
 use function update_option;
 use function wp_unslash;
@@ -31,7 +32,6 @@ use function wp_unslash;
 #[AutoconfigureTag( 'taglock.api_route' )]
 final class SettingsRoute implements ApiRouteInterface {
 
-	private const string NAMESPACE = 'taglock/v1';
 	private const string ROUTE     = '/settings';
 
 	public function __construct(
@@ -41,27 +41,25 @@ final class SettingsRoute implements ApiRouteInterface {
 	/**
 	 * @inheritDoc
 	 */
-	public function register(): void {
-		// GET endpoint - retrieve settings
-		register_rest_route(
-			self::NAMESPACE,
-			self::ROUTE,
-			[
-				'methods'             => 'GET',
-				'callback'            => [ $this, 'getSettings' ],
-				'permission_callback' => [ $this, 'checkPermissions' ],
-			]
-		);
+	public function getRoute(): string {
+		return self::ROUTE;
+	}
 
-		// POST endpoint - save settings
-		register_rest_route(
-			self::NAMESPACE,
-			self::ROUTE,
-			[
-				'methods'             => 'POST',
-				'callback'            => [ $this, 'saveSettings' ],
-				'permission_callback' => [ $this, 'checkPermissions' ],
-				'args'                => [
+	/**
+	 * @inheritDoc
+	 */
+	public function getMethodHandlers(): array {
+		return [
+			new ApiMethodHandler(
+				HttpMethod::GET,
+				fn( WP_REST_Request $request ) => $this->getSettings( $request ),
+				fn( WP_REST_Request $request ) => $this->checkPermissions( $request )
+			),
+			new ApiMethodHandler(
+				HttpMethod::POST,
+				fn( WP_REST_Request $request ) => $this->saveSettings( $request ),
+				fn( WP_REST_Request $request ) => $this->checkPermissions( $request ),
+				[
 					'klicktipp_username' => [
 						'required'          => true,
 						'type'              => 'string',
@@ -73,23 +71,9 @@ final class SettingsRoute implements ApiRouteInterface {
 						// Do not sanitize like a normal text field; passwords must remain intact.
 						'sanitize_callback' => static fn( $value ) => is_string( $value ) ? $value : '',
 					],
-				],
-			]
-		);
-	}
-
-	/**
-	 * @inheritDoc
-	 */
-	public function getNamespace(): string {
-		return self::NAMESPACE;
-	}
-
-	/**
-	 * @inheritDoc
-	 */
-	public function getRoute(): string {
-		return self::ROUTE;
+				]
+			),
+		];
 	}
 
 	/**
