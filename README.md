@@ -1,23 +1,20 @@
 # TagLock - Instant Access for KlickTipp
 
-Protect WordPress content based on KlickTipp tags - no membership required, 100% cache compatible and secure.
+Protect WordPress content based on KlickTipp tags - no membership required, cache compatible, and secure.
 
 ## Features
 
-- ✅ **Shortcode-Based Protection**: Use `[taglock tag="123"]` to protect any content
-- ✅ **Cache Compatible**: Content loaded via React after server-side tag verification
-- ✅ **Secure**: Protected content never appears in page source
-- ✅ **KlickTipp Integration**: Seamlessly checks subscriber tags via API
-- ✅ **Modern Architecture**: Built with PHP 8.3, Symfony DI, React, and WordPress best practices
-- ✅ **Pro-Ready**: Filter hooks prepared for Pro addon features
+- ✅ **Shortcode-Based Protection**: Use `[taglock tag="123"]...[/taglock]` to protect content
+- ✅ **Cache Compatible**: Protected content is loaded client-side after verification
+- ✅ **Secure by Design**: Protected content is not rendered into the initial HTML
+- ✅ **KlickTipp Integration**: Checks subscriber tags via KlickTipp API
+- ✅ **Modern Architecture**: PHP 8.3, Symfony DI, React, WordPress REST API
+- ✅ **Extensible**: Filter/action hooks for customizations and add-ons
 
-## Installation
+## Installation (Production)
 
-1. Clone or download this plugin to `wp-content/plugins/taglock`
-2. Run `composer install` to install PHP dependencies
-3. Run `npm install` to install JavaScript dependencies
-4. Run `npm run build` to build React assets
-5. Activate the plugin in WordPress
+1. Upload the plugin to `wp-content/plugins/taglock`
+2. Activate it in WordPress
 
 ## Configuration
 
@@ -101,6 +98,13 @@ The plugin is designed with Pro addon support:
 
 ## Development
 
+### Install Dependencies
+
+```bash
+composer install
+npm install
+```
+
 ### Build Assets
 
 ```bash
@@ -118,7 +122,7 @@ npm run format       # Format code
 
 ## Requirements
 
-- WordPress 6.0+
+- WordPress 6.8+
 - PHP 8.3+
 - Composer
 - Node.js & npm

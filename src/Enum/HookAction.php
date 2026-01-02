@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace GoSuccess\TagLock\Enum;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * WordPress hook actions used by TagLock.
  *

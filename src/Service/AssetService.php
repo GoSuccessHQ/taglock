@@ -6,9 +6,12 @@ namespace GoSuccess\TagLock\Service;
 
 use RuntimeException;
 
+use function basename;
+use function esc_html;
 use function file_exists;
 use function plugin_dir_url;
 use function rtrim;
+use function sprintf;
 use function wp_enqueue_script;
 use function wp_enqueue_style;
 use function wp_register_script;
@@ -34,7 +37,12 @@ final class AssetService {
 	private function loadAssetMetadata( string $assetFile ): array {
 		if ( ! file_exists( $assetFile ) ) {
 			$this->logger->error( __( 'Missing asset metadata file', 'taglock' ), [ 'file' => $assetFile ] );
-			throw new RuntimeException( "TagLock asset metadata file is missing: {$assetFile}" );
+			throw new RuntimeException(
+				sprintf(
+					'TagLock asset metadata file is missing: %s',
+					esc_html( basename( $assetFile ) )
+				)
+			);
 		}
 
 		/** @var mixed $assetData */
@@ -47,7 +55,12 @@ final class AssetService {
 			! is_string( $assetData['version'] )
 		) {
 			$this->logger->error( __( 'Invalid asset metadata format', 'taglock' ), [ 'file' => $assetFile ] );
-			throw new RuntimeException( "TagLock asset metadata file is invalid: {$assetFile}" );
+			throw new RuntimeException(
+				sprintf(
+					'TagLock asset metadata file is invalid: %s',
+					esc_html( basename( $assetFile ) )
+				)
+			);
 		}
 
 		return $assetData;

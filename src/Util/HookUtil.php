@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace GoSuccess\TagLock\Util;
 
+defined( 'ABSPATH' ) || exit;
+
 use GoSuccess\TagLock\Enum\HookAction;
 use GoSuccess\TagLock\Enum\HookFilter;
 
@@ -24,6 +26,7 @@ final class HookUtil {
 	 * @param mixed      ...$args Optional arguments to pass to the action.
 	 */
 	public static function doAction( HookAction $action, mixed ...$args ): void {
+		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound
 		do_action( $action->value, ...$args );
 	}
 
@@ -37,6 +40,7 @@ final class HookUtil {
 	 * @return T The filtered value.
 	 */
 	public static function applyFilter( HookFilter $filter, mixed $value, mixed ...$args ): mixed {
+		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound
 		return apply_filters( $filter->value, $value, ...$args );
 	}
 }

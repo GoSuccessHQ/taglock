@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace GoSuccess\TagLock\Controller;
 
+defined( 'ABSPATH' ) || exit;
+
 use GoSuccess\TagLock\Service\AssetService;
 
 use function add_action;

@@ -1,8 +1,8 @@
-=== TagLock Lite - Instant Access for KlickTipp ===
+=== TagLock ===
 
 Contributors: gosuccess
-Requires at least: 6.0
-Tested up to: 6.7
+Requires at least: 6.8
+Tested up to: 6.9
 Requires PHP: 8.3
 Stable tag: 1.0.0
 License: GPL v3 or later
@@ -19,17 +19,17 @@ Unlike traditional solutions, TagLock uses a headless approach: Protected conten
 
 = 🔥 Features (Lite) =
 
-* **Tag-based Protection** - Simple shortcode [taglock tag="123"]....[/taglock] to protect any content.
-* **Cache Compatible** - Works seamlessly with caching plugins and CDNs.
-* **Maximum Security** - Protected content never appears in the source code (forget about insecure display: none CSS tricks).
-* **React-based Admin Interface** - Modern, responsive administration panel
-* **No User Accounts** - Your visitors don't need a WordPress account - validation happens directly via the KlickTipp Subscriber ID (GDPR compliant).
+* **Tag-based Protection** - Shortcode `[taglock tag="123"]...[/taglock]` protects any content.
+* **Cache Compatible** - Protected content is loaded only after verification.
+* **Secure by Design** - Protected content is not rendered in the initial HTML.
+* **React-based Admin Interface** - Modern settings UI using WordPress Components.
+* **No User Accounts Required** - Access is verified via a subscriber identifier.
 
-*Note: This is the Lite version. Advanced features like redirects upon access denial or engagement tagging (consumption tracking) are available in the Pro version.*
+Note: The plugin exposes filters/actions to support add-ons and customizations.
 
 = Requirements =
 
-* WordPress 6.0 or higher
+* WordPress 6.8 or higher
 * PHP 8.3 or higher
 * KlickTipp account with API access
 
@@ -39,12 +39,30 @@ For detailed documentation, API references, and integration guides, please visit
 
 == Installation ==
 
-1. Upload the plugin files to `/wp-content/plugins/taglock` directory, or install through WordPress plugins screen
-2. Activate the plugin through the 'Plugins' screen in WordPress
-3. Navigate to the TagLock settings page
-4. Enter your KlickTipp API credentials
-5. Configure settings for tag-based content protection
-6. Set up your access preferences
+1. Upload the plugin files to `/wp-content/plugins/taglock/`, or install through the WordPress Plugins screen
+2. Activate the plugin
+3. Go to Settings → TagLock
+4. Enter your KlickTipp API credentials and save
+
+== Usage ==
+
+Use the shortcode to protect content:
+
+`[taglock tag="123"]Protected content[/taglock]`
+
+Shortcode attributes:
+
+* `tag` (required): KlickTipp tag ID
+* `message` (optional): Custom denied message
+* `loader_text` (optional): Custom loading text
+
+== Access Links ==
+
+Users should open protected pages via links that include their subscriber identifier in the URL hash (not as a query parameter):
+
+`https://example.com/protected-page/#taglock_subscriber_id=12345`
+
+The frontend stores the identifier in LocalStorage and removes it from the address bar.
 
 == Frequently Asked Questions ==
 
@@ -58,35 +76,25 @@ Yes, this plugin requires an active KlickTipp account with API access enabled.
 
 = What PHP version is required? =
 
-This plugin requires PHP 8.3 or higher to take advantage of modern PHP features like Property Hooks and improved type safety.
+This plugin requires PHP 8.3 or higher.
 
 == Screenshots ==
 
-1. Main dashboard with overview statistics
-2. KlickTipp account configuration panel
-3. Tag-based content protection interface
-4. Access preferences settings
+1. TagLock settings screen
 
 == Changelog ==
-
 = 1.0.0 =
 * Initial release
-* Digistore24 API integration
-* Affiliate tracking system
-* IPN payment processing
-* React-based admin interface
-* Comprehensive reporting system
 
 == Upgrade Notice ==
-
 = 1.0.0 =
-Initial release of TagLock.
+Initial release.
 
 == Additional Info ==
 
 = Privacy Policy =
 
-This plugin stores information about KlickTipp tags and subscriber activities in your WordPress database. No data is sent to third parties except KlickTipp for API communication. Please ensure your privacy policy reflects this data processing.
+This plugin stores plugin settings in your WordPress database and communicates with KlickTipp for tag verification. Please ensure your privacy policy reflects this data processing.
 
 = Support =
 

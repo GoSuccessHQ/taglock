@@ -11,14 +11,14 @@ use Monolog\Logger;
 use Monolog\LogRecord;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
+use RuntimeException;
+use WP_Filesystem_Base;
 
 use function defined;
 use function function_exists;
-use function is_dir;
 use function is_numeric;
-use function touch;
 use function get_option;
-use function wp_mkdir_p;
+use function wp_normalize_path;
 
 /**
  * Logger Service
@@ -50,22 +50,24 @@ final class LoggerService {
 			return;
 		}
 
-		$logDir = WP_CONTENT_DIR . '/uploads/taglock/logs';
+		$filesystem = $this->getFilesystem();
+		$logDir = wp_normalize_path( WP_CONTENT_DIR . '/uploads/taglock/logs' );
 		$logFile = "{$logDir}/taglock.log";
 
-		if ( ! is_dir( $logDir ) ) {
-			wp_mkdir_p( $logDir );
+		if ( ! $filesystem->is_dir( $logDir ) ) {
+			$filesystem->mkdir( $logDir );
+		}
 
-			// Create index.php to prevent directory listing
-			file_put_contents(
-				"{$logDir}/index.php",
-				"<?php\n// Silence is golden.\n"
-			);
+		$indexFile = "{$logDir}/index.php";
+		if ( ! $filesystem->exists( $indexFile ) ) {
+			$filesystem->put_contents( $indexFile, "<?php\n// Silence is golden.\n" );
+		}
 
-			// Create .htaccess to deny direct access
-			file_put_contents(
-				"{$logDir}/.htaccess",
-				(string) "# Deny access to log files\n" .
+		$htaccessFile = "{$logDir}/.htaccess";
+		if ( ! $filesystem->exists( $htaccessFile ) ) {
+			$filesystem->put_contents(
+				$htaccessFile,
+				"# Deny access to log files\n" .
 				"<Files *.log>\n" .
 				"    Order allow,deny\n" .
 				"    Deny from all\n" .
@@ -73,12 +75,27 @@ final class LoggerService {
 			);
 		}
 
-		// Ensure the log file exists even if current log level suppresses writes.
-		if ( ! file_exists( $logFile ) ) {
-			touch( $logFile );
+		if ( ! $filesystem->exists( $logFile ) ) {
+			$filesystem->put_contents( $logFile, '' );
 		}
 
 		$this->initialized = true;
+	}
+
+	private function getFilesystem(): WP_Filesystem_Base {
+		global $wp_filesystem;
+
+		if ( ! function_exists( 'WP_Filesystem' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/file.php';
+		}
+
+		\WP_Filesystem();
+
+		if ( ! isset( $wp_filesystem ) || ! $wp_filesystem instanceof WP_Filesystem_Base ) {
+			throw new RuntimeException( 'TagLock filesystem is not available.' );
+		}
+
+		return $wp_filesystem;
 	}
 
 	/**
@@ -87,6 +104,8 @@ final class LoggerService {
 	 * @return LoggerInterface The configured logger instance.
 	 */
 	private function createLogger(): LoggerInterface {
+		$this->ensureLogDirectoryExists();
+
 		$logger = new Logger( 'taglock' );
 		$timezone = $this->getWordPressTimezone();
 
@@ -98,7 +117,7 @@ final class LoggerService {
 		);
 
 		// Get log directory
-		$logDir  = WP_CONTENT_DIR . '/uploads/taglock/logs';
+		$logDir  = wp_normalize_path( WP_CONTENT_DIR . '/uploads/taglock/logs' );
 		$logFile = "{$logDir}/taglock.log";
 
 		// Determine log level based on WP_DEBUG

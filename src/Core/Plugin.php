@@ -24,7 +24,7 @@ use function glob;
 use function is_dir;
 use function is_string;
 use function str_replace;
-use function unlink;
+use function wp_delete_file;
 use function wp_mkdir_p;
 
 /**
@@ -199,7 +199,7 @@ final class Plugin {
 		if ( $files !== false ) {
 			foreach ( $files as $file ) {
 				if ( basename( $file ) !== $currentCacheFile && file_exists( $file ) ) {
-					@unlink( $file );
+					wp_delete_file( $file );
 				}
 			}
 		}
@@ -213,7 +213,7 @@ final class Plugin {
 
 			foreach ( $metaFiles as $metaFile ) {
 				if ( ! in_array( basename( $metaFile ), $currentMetaFiles, true ) && file_exists( $metaFile ) ) {
-					@unlink( $metaFile );
+					wp_delete_file( $metaFile );
 				}
 			}
 		}

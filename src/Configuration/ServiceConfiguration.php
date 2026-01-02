@@ -10,6 +10,8 @@ declare(strict_types=1);
 
 namespace GoSuccess\TagLock\Configuration;
 
+defined( 'ABSPATH' ) || exit;
+
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
 use function Symfony\Component\DependencyInjection\Loader\Configurator\tagged_iterator;
