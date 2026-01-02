@@ -35,7 +35,14 @@ final class RestApiService {
 	 * Register WordPress hooks.
 	 */
 	private function registerHooks(): void {
+		error_log( 'TagLock RestApiService::registerHooks() - Adding rest_api_init action' );
 		add_action( 'rest_api_init', [ $this, 'registerRoutes' ] );
+		
+		// Also try immediate registration if rest_api_init already fired
+		if ( did_action( 'rest_api_init' ) ) {
+			error_log( 'TagLock rest_api_init already fired - registering routes immediately' );
+			$this->registerRoutes();
+		}
 	}
 
 	/**
