@@ -1,10 +1,6 @@
-.taglock-container {
+.taglock {
 	position: relative;
 	min-height: 50px;
-}
-
-.taglock-config {
-	display: none;
 }
 
 .taglock-loader {

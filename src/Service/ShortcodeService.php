@@ -12,7 +12,6 @@ use function esc_attr;
 use function esc_html;
 use function shortcode_atts;
 use function wp_create_nonce;
-use function wp_json_encode;
 use function set_transient;
 use function sprintf;
 use function time;
@@ -85,32 +84,16 @@ final class ShortcodeService {
 
 		$dataAttributes['data-content-id'] = esc_attr( $contentId );
 
-		$configJson = wp_json_encode( [
-			'tag'        => (string) $attributes['tag'],
-			'nonce'      => (string) $nonce,
-			'contentId'  => (string) $contentId,
-			'message'    => (string) $attributes['message'],
-			'loaderText' => (string) $attributes['loader_text'],
-		] );
-
 		$dataAttrString = implode( ' ', array_map(
 			fn( $key, $value ) => sprintf( '%s="%s"', $key, $value ),
 			array_keys( $dataAttributes ),
 			$dataAttributes
 		) );
 
-		// Build container HTML
+		// IMPORTANT: Keep shortcode output minimal. React renders everything else.
 		$html = sprintf(
-			'<div class="taglock-container" %s>
-				<span class="taglock-config">%s</span>
-				<div class="taglock-loader">
-					<span class="taglock-spinner"></span>
-					<span class="taglock-loader-text">%s</span>
-				</div>
-			</div>',
-			$dataAttrString,
-			esc_html( (string) $configJson ),
-			esc_html( $attributes['loader_text'] )
+			'<div class="taglock" %s></div>',
+			$dataAttrString
 		);
 
 		// Allow filtering final HTML (for Pro customizations)
