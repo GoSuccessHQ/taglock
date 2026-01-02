@@ -585,8 +585,10 @@ const AdminApp = () => {
 							<div className="taglock-admin__pro-toggle-list">
 								<ToggleControl
 									label={__('Enable teaser mode', 'taglock')}
+									disabled={true}
 									checked={false}
 									onChange={() => {}}
+									__nextHasNoMarginBottom
 									help={__(
 										'Show a teaser instead of a hard error when access is denied.',
 										'taglock'
@@ -595,8 +597,10 @@ const AdminApp = () => {
 
 								<ToggleControl
 									label={__('Enable redirect on access denied', 'taglock')}
+									disabled={true}
 									checked={false}
 									onChange={() => {}}
+									__nextHasNoMarginBottom
 									help={__(
 										'Redirect visitors to a URL instead of showing the default message.',
 										'taglock'
@@ -605,8 +609,10 @@ const AdminApp = () => {
 
 								<ToggleControl
 									label={__('Enable engagement tagging', 'taglock')}
+									disabled={true}
 									checked={false}
 									onChange={() => {}}
+									__nextHasNoMarginBottom
 									help={__(
 										'Automatically apply a tag after a visitor successfully views protected content.',
 										'taglock'
@@ -615,8 +621,10 @@ const AdminApp = () => {
 
 								<ToggleControl
 									label={__('Enable admin bypass (preview without subscriber ID)', 'taglock')}
+									disabled={true}
 									checked={false}
 									onChange={() => {}}
+									__nextHasNoMarginBottom
 									help={__(
 										'Allow administrators to view protected content without an access link.',
 										'taglock'
@@ -661,6 +669,7 @@ const AdminApp = () => {
 						onChange={(value) =>
 							setRuleForm({ ...ruleForm, is_active: value })
 						}
+						__nextHasNoMarginBottom
 					/>
 
 					<SelectControl
@@ -673,6 +682,8 @@ const AdminApp = () => {
 							{ label: __('Any tag (OR)', 'taglock'), value: 'tag_any' },
 							{ label: __('All tags (AND)', 'taglock'), value: 'tag_all' },
 						]}
+						__next40pxDefaultSize
+						__nextHasNoMarginBottom
 					/>
 
 					<TextControl
@@ -697,6 +708,8 @@ const AdminApp = () => {
 							{ label: __('Teaser', 'taglock'), value: 'teaser' },
 							{ label: __('Redirect', 'taglock'), value: 'redirect' },
 						]}
+						__next40pxDefaultSize
+						__nextHasNoMarginBottom
 					/>
 
 					{ruleForm.deny_mode === 'message' && (
@@ -722,6 +735,7 @@ const AdminApp = () => {
 								'Shortcodes are allowed and will be executed on the server.',
 								'taglock'
 							)}
+							__nextHasNoMarginBottom
 						/>
 					)}
 
@@ -747,6 +761,7 @@ const AdminApp = () => {
 								engagement_tagging_enabled: value,
 							})
 						}
+						__nextHasNoMarginBottom
 					/>
 
 					{ruleForm.engagement_tagging_enabled && (
@@ -768,6 +783,7 @@ const AdminApp = () => {
 						onChange={(value) =>
 							setRuleForm({ ...ruleForm, admin_bypass_enabled: value })
 						}
+						__nextHasNoMarginBottom
 					/>
 
 					<div className="taglock-admin__modal-actions">
