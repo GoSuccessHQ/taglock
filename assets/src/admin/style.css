@@ -107,6 +107,24 @@
 	gap: var(--taglock-admin-gap);
 }
 
+.taglock-admin__pagination {
+	display: flex;
+	align-items: center;
+	gap: var(--taglock-admin-gap);
+	margin-top: var(--taglock-admin-space);
+}
+
+.taglock-admin__pagination-label {
+	line-height: 1.4;
+}
+
+.taglock-admin__modal-actions {
+	display: flex;
+	justify-content: flex-end;
+	gap: var(--taglock-admin-gap);
+	margin-top: var(--taglock-admin-space);
+}
+
 .taglock-admin ul {
 	list-style: disc;
 	margin-left: var(--taglock-admin-space);

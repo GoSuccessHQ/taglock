@@ -56,10 +56,10 @@ domReady(() => {
 	const items = [];
 
 	containers.forEach((container) => {
-		const tag = container.getAttribute('data-tag');
+		const ruleId = container.getAttribute('data-rule-id');
 		const contentId = container.getAttribute('data-content-id');
-		if (tag && contentId) {
-			items.push({ tag, content_id: contentId });
+		if (ruleId && contentId) {
+			items.push({ rule_id: ruleId, content_id: contentId });
 		}
 	});
 

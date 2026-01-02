@@ -42,6 +42,42 @@ final class ApiResponse {
 	}
 
 	/**
+	 * Create a paginated success response.
+	 *
+	 * @param array<int, mixed> $items The page items.
+	 * @param int $page Current page (1-based).
+	 * @param int $perPage Items per page.
+	 * @param int $total Total number of items.
+	 * @param string $message Optional success message.
+	 * @param int $status HTTP status code (default: 200).
+	 * @return WP_REST_Response The WordPress REST response.
+	 */
+	public static function paginatedSuccess(
+		array $items,
+		int $page,
+		int $perPage,
+		int $total,
+		string $message = '',
+		int $status = 200
+	): WP_REST_Response {
+		$totalPages = $perPage > 0 ? (int) ceil( $total / $perPage ) : 0;
+
+		return self::success(
+			[
+				'items'      => $items,
+				'pagination' => [
+					'page'        => $page,
+					'per_page'    => $perPage,
+					'total'       => $total,
+					'total_pages' => $totalPages,
+				],
+			],
+			$message,
+			$status
+		);
+	}
+
+	/**
 	 * Create an error response.
 	 *
 	 * @param string $message Error message.

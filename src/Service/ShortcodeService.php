@@ -6,10 +6,12 @@ namespace GoSuccess\TagLock\Service;
 
 use GoSuccess\TagLock\Enum\HookAction;
 use GoSuccess\TagLock\Enum\HookFilter;
+use GoSuccess\TagLock\Service\Rule\RuleRepository;
 use GoSuccess\TagLock\Util\HookUtil;
 
 use function esc_attr;
 use function esc_html;
+use function ctype_digit;
 use function shortcode_atts;
 use function wp_create_nonce;
 use function set_transient;
@@ -19,6 +21,7 @@ use function implode;
 use function array_map;
 use function current_user_can;
 use function function_exists;
+use function trim;
 
 /**
  * Shortcode Service
@@ -29,6 +32,7 @@ use function function_exists;
 final class ShortcodeService {
 
 	public function __construct(
+		private readonly RuleRepository $ruleRepository,
 		private readonly LoggerService $logger,
 		private readonly AssetService $assetService
 	) {}
@@ -49,12 +53,15 @@ final class ShortcodeService {
 		// Ensure frontend assets are available for this shortcode instance.
 		$this->assetService->enqueueFrontendAssets( true );
 
-		// Parse attributes
+		// No backwards compatibility: only `id` is supported.
+		if ( is_array( $atts ) && isset( $atts['tag'] ) ) {
+			$this->logger->warning( __( 'TagLock shortcode uses unsupported "tag" attribute', 'taglock' ) );
+			return '<div class="taglock-error">' . esc_html__( 'Error: Please use the id attribute. Example: [taglock id="1"]...[/taglock]', 'taglock' ) . '</div>';
+		}
+
 		$attributes = shortcode_atts(
 			[
-				'tag'          => '',
-				'message'      => __( 'This content is protected. Please check your access.', 'taglock' ),
-				'loader_text'  => __( 'Checking access...', 'taglock' ),
+				'id' => '',
 			],
 			$atts,
 			'taglock'
@@ -63,25 +70,32 @@ final class ShortcodeService {
 		// Allow filtering attributes (for Pro features)
 		$attributes = HookUtil::applyFilter( HookFilter::SHORTCODE_ATTRIBUTES, $attributes, $content );
 
-		// Validate required attributes
-		if ( empty( $attributes['tag'] ) ) {
-			$this->logger->warning( __( 'TagLock shortcode missing required "tag" attribute', 'taglock' ) );
-			return '<div class="taglock-error">' . esc_html__( 'Error: Tag attribute is required.', 'taglock' ) . '</div>';
+		$ruleId = (string) ( $attributes['id'] ?? '' );
+		$ruleId = trim( $ruleId );
+		if ( $ruleId === '' || ! ctype_digit( $ruleId ) ) {
+			$this->logger->warning( __( 'TagLock shortcode missing or invalid rule id', 'taglock' ) );
+			return '<div class="taglock-error">' . esc_html__( 'Error: id attribute is required. Example: [taglock id="1"]...[/taglock]', 'taglock' ) . '</div>';
+		}
+
+		$rule = $this->ruleRepository->getRule( (int) $ruleId );
+		if ( $rule === null || empty( $rule['is_active'] ) ) {
+			$this->logger->warning( __( 'TagLock shortcode references missing/inactive rule', 'taglock' ), [ 'rule_id' => $ruleId ] );
+			return '<div class="taglock-error">' . esc_html__( 'Error: This TagLock rule does not exist or is disabled.', 'taglock' ) . '</div>';
 		}
 
 		// Generate nonce for REST API request
 		$nonce = wp_create_nonce( 'taglock_access_check' );
 		$adminBypassEnabled = false;
 		if ( function_exists( 'current_user_can' ) && current_user_can( 'manage_options' ) ) {
-			$adminBypassEnabled = (bool) HookUtil::applyFilter( HookFilter::ADMIN_BYPASS_ENABLED, false, $attributes, $content );
+			$adminBypassEnabled = ! empty( $rule['admin_bypass_enabled'] );
 		}
 
 		// Create data attributes for React
 		$dataAttributes = [
-			'data-tag'         => esc_attr( $attributes['tag'] ),
+			'data-rule-id'     => esc_attr( $ruleId ),
 			'data-nonce'       => esc_attr( $nonce ),
-			'data-message'     => esc_attr( $attributes['message'] ),
-			'data-loader-text' => esc_attr( $attributes['loader_text'] ),
+			'data-message'     => esc_attr( __( 'This content is protected. Please check your access.', 'taglock' ) ),
+			'data-loader-text' => esc_attr( __( 'Checking access...', 'taglock' ) ),
 		];
 
 		if ( $adminBypassEnabled ) {
@@ -89,7 +103,7 @@ final class ShortcodeService {
 		}
 
 		// Store protected content in a transient with unique ID
-		$contentId = 'taglock_' . md5( $content . $attributes['tag'] . time() );
+		$contentId = 'taglock_' . md5( (string) $content . $ruleId . time() );
 		set_transient( $contentId, $content, HOUR_IN_SECONDS );
 
 		$dataAttributes['data-content-id'] = esc_attr( $contentId );
@@ -112,7 +126,7 @@ final class ShortcodeService {
 		HookUtil::doAction( HookAction::AFTER_SHORTCODE_RENDER, $html, $attributes );
 
 		$this->logger->debug( __( 'TagLock shortcode rendered', 'taglock' ), [
-			'tag'        => $attributes['tag'],
+			'rule_id'    => $ruleId,
 			'content_id' => $contentId,
 		] );
 

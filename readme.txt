@@ -19,7 +19,7 @@ Unlike traditional solutions, TagLock uses a headless approach: Protected conten
 
 = 🔥 Features (Lite) =
 
-* **Tag-based Protection** - Shortcode `[taglock tag="123"]...[/taglock]` protects any content.
+* **TagLocker-based Protection** - Shortcode `[taglock id="1"]...[/taglock]` protects any content.
 * **Cache Compatible** - Protected content is loaded only after verification.
 * **Secure by Design** - Protected content is not rendered in the initial HTML.
 * **React-based Admin Interface** - Modern settings UI using WordPress Components.
@@ -48,11 +48,11 @@ For detailed documentation, API references, and integration guides, please visit
 
 Use the shortcode to protect content:
 
-`[taglock tag="123"]Protected content[/taglock]`
+`[taglock id="1"]Protected content[/taglock]`
 
 Shortcode attributes:
 
-* `tag` (required): KlickTipp tag ID
+* `id` (required): TagLocker ID (configured in WordPress admin)
 * `message` (optional): Custom denied message
 * `loader_text` (optional): Custom loading text
 

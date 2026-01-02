@@ -6,6 +6,7 @@ namespace GoSuccess\TagLock\Controller;
 
 use GoSuccess\TagLock\Enum\HookAction;
 use GoSuccess\TagLock\Service\LoggerService;
+use GoSuccess\TagLock\Service\Rule\RuleTableInstaller;
 use GoSuccess\TagLock\Util\HookUtil;
 
 use function register_activation_hook;
@@ -21,6 +22,7 @@ use function wp_mkdir_p;
 final class ActivationController {
 
 	public function __construct(
+		private readonly RuleTableInstaller $ruleTableInstaller,
 		private readonly LoggerService $logger
 	) {
 		register_activation_hook( TAGLOCK_FILE, [ $this, 'activate' ] );
@@ -33,6 +35,9 @@ final class ActivationController {
 		// Ensure required runtime directories exist.
 		wp_mkdir_p( WP_CONTENT_DIR . '/cache/taglock' );
 		wp_mkdir_p( WP_CONTENT_DIR . '/uploads/taglock/logs' );
+
+		// Ensure custom database tables exist.
+		$this->ruleTableInstaller->install();
 
 		// Store installed version for future update detection.
 		update_option( 'taglock_installed_version', $this->getPluginVersion() );

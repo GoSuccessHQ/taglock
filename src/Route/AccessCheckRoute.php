@@ -12,17 +12,24 @@ use GoSuccess\TagLock\Enum\HookAction;
 use GoSuccess\TagLock\Enum\HookFilter;
 use GoSuccess\TagLock\Enum\HttpMethod;
 use GoSuccess\TagLock\Service\LoggerService;
+use GoSuccess\TagLock\Service\Rule\RuleRepository;
 use GoSuccess\TagLock\Util\HookUtil;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
-
+use function array_filter;
+use function array_map;
+use function array_values;
 use function ctype_digit;
 use function current_user_can;
+use function do_shortcode;
 use function function_exists;
+use function get_permalink;
 use function get_transient;
 use function is_array;
+use function is_numeric;
+use function is_string;
 use function sanitize_text_field;
 use function wp_kses_post;
 use function wp_verify_nonce;
@@ -40,6 +47,7 @@ final class AccessCheckRoute implements ApiRouteInterface {
 
 	public function __construct(
 		private readonly CRMProviderInterface $crmProvider,
+		private readonly RuleRepository $ruleRepository,
 		private readonly LoggerService $logger
 	) {}
 
@@ -111,15 +119,12 @@ final class AccessCheckRoute implements ApiRouteInterface {
 	 */
 	public function handleRequest( WP_REST_Request $request ): WP_REST_Response {
 		$subscriberId = (string) $request->get_param( 'subscriber_id' );
-		$items = $request->get_param( 'items' );
+		$items        = $request->get_param( 'items' );
 
-		$adminBypassEnabled = false;
-		if ( function_exists( 'current_user_can' ) && current_user_can( 'manage_options' ) ) {
-			$adminBypassEnabled = (bool) HookUtil::applyFilter( HookFilter::ADMIN_BYPASS_ENABLED, false, $request );
-		}
+		$canBypassForSomeRule = function_exists( 'current_user_can' ) && current_user_can( 'manage_options' );
 
 		// Currently KlickTipp subscriber IDs are numeric; keep strict validation.
-		if ( ! $adminBypassEnabled && ( $subscriberId === '' || ! ctype_digit( $subscriberId ) ) ) {
+		if ( ( $subscriberId === '' || ! ctype_digit( $subscriberId ) ) && ! $canBypassForSomeRule ) {
 			$this->logger->warning( __( 'Invalid identifier', 'taglock' ), [ 'subscriber_id' => $subscriberId ] );
 			return ApiResponse::error(
 				__( 'Invalid identifier. Please use the link from your email.', 'taglock' ),
@@ -128,7 +133,7 @@ final class AccessCheckRoute implements ApiRouteInterface {
 			);
 		}
 
-		if ( $adminBypassEnabled && $subscriberId !== '' && ! ctype_digit( $subscriberId ) ) {
+		if ( $subscriberId !== '' && ! ctype_digit( $subscriberId ) ) {
 			$this->logger->warning( __( 'Invalid identifier', 'taglock' ), [ 'subscriber_id' => $subscriberId ] );
 			return ApiResponse::error(
 				__( 'Invalid identifier. Please use the link from your email.', 'taglock' ),
@@ -146,29 +151,12 @@ final class AccessCheckRoute implements ApiRouteInterface {
 		}
 
 		$this->logger->info( __( 'Access check requested', 'taglock' ), [
-			'subscriber_id'  => $subscriberId,
-			'count'         => count( $items ),
+			'subscriber_id' => $subscriberId,
+			'count'        => count( $items ),
 		] );
 
-		// Check if CRM provider is authenticated
-		if ( ! $this->crmProvider->isAuthenticated() ) {
-			$error = $this->crmProvider->getLastError();
-			$this->logger->error( __( 'CRM authentication failed', 'taglock' ), [ 'error' => $error ] );
-
-			HookUtil::doAction( HookAction::API_EXCEPTION_CAUGHT, 'authentication_failed', $error );
-
-			$data = [];
-			if ( function_exists( 'current_user_can' ) && current_user_can( 'manage_options' ) && ! empty( $error ) ) {
-				$data['details'] = $error;
-			}
-
-			return ApiResponse::error(
-				__( 'TagLock is currently unavailable (CRM connection failed or is not configured). Please contact the site administrator.', 'taglock' ),
-				'authentication_failed',
-				503,
-				$data
-			);
-		}
+		$crmAuthChecked   = false;
+		$crmAuthenticated = false;
 
 		$results = [];
 
@@ -180,7 +168,7 @@ final class AccessCheckRoute implements ApiRouteInterface {
 				continue;
 			}
 
-			$tagId = isset( $item['tag'] ) ? sanitize_text_field( (string) $item['tag'] ) : '';
+			$ruleId = isset( $item['rule_id'] ) ? sanitize_text_field( (string) $item['rule_id'] ) : '';
 			$contentId = isset( $item['content_id'] ) ? sanitize_text_field( (string) $item['content_id'] ) : '';
 
 			if ( $contentId === '' ) {
@@ -190,20 +178,103 @@ final class AccessCheckRoute implements ApiRouteInterface {
 				continue;
 			}
 
-			if ( $tagId === '' || ! ctype_digit( $tagId ) ) {
+			if ( $ruleId === '' || ! ctype_digit( $ruleId ) ) {
 				$results[ $contentId ] = [
 					'success' => false,
-					'code'    => 'invalid_tag_id',
+					'code'    => 'invalid_rule_id',
 					'status'  => 400,
-					'message' => __( 'Invalid tag configuration.', 'taglock' ),
+					'message' => __( 'Invalid rule configuration.', 'taglock' ),
 				];
 				continue;
 			}
 
-			HookUtil::doAction( HookAction::BEFORE_ACCESS_CHECK, $subscriberId, $tagId );
-			$hasAccess = $adminBypassEnabled ? true : $this->crmProvider->hasTag( $subscriberId, $tagId );
+			$rule = $this->ruleRepository->getRule( (int) $ruleId );
+			if ( $rule === null || empty( $rule['is_active'] ) ) {
+				$results[ $contentId ] = [
+					'success' => false,
+					'code'    => 'rule_not_found',
+					'status'  => 404,
+					'message' => __( 'This TagLock configuration is not available.', 'taglock' ),
+				];
+				continue;
+			}
 
-			HookUtil::doAction( HookAction::AFTER_ACCESS_CHECK, $subscriberId, $tagId, $hasAccess );
+			$requiredTagIds = isset( $rule['required_tag_ids'] ) && is_array( $rule['required_tag_ids'] ) ? $rule['required_tag_ids'] : [];
+			$requiredTagIds = array_values( array_filter( array_map( 'intval', $requiredTagIds ), static fn( int $v ) => $v > 0 ) );
+			if ( $requiredTagIds === [] ) {
+				$results[ $contentId ] = [
+					'success' => false,
+					'code'    => 'invalid_rule',
+					'status'  => 400,
+					'message' => __( 'This TagLock configuration is invalid.', 'taglock' ),
+				];
+				continue;
+			}
+
+			$adminBypassEnabled = false;
+			if ( $canBypassForSomeRule ) {
+				$adminBypassEnabled = ! empty( $rule['admin_bypass_enabled'] );
+			}
+
+			if ( ! $adminBypassEnabled && ( $subscriberId === '' || ! ctype_digit( $subscriberId ) ) ) {
+				$results[ $contentId ] = [
+					'success' => false,
+					'code'    => 'invalid_subscriber_id',
+					'status'  => 400,
+					'message' => __( 'Invalid identifier. Please use the link from your email.', 'taglock' ),
+				];
+				continue;
+			}
+
+			HookUtil::doAction( HookAction::BEFORE_ACCESS_CHECK, $subscriberId, (int) $ruleId, $requiredTagIds );
+
+			$hasAccess = false;
+			if ( $adminBypassEnabled ) {
+				$hasAccess = true;
+			} else {
+				if ( ! $crmAuthChecked ) {
+					$crmAuthChecked   = true;
+					$crmAuthenticated = $this->crmProvider->isAuthenticated();
+					if ( ! $crmAuthenticated ) {
+						$error = $this->crmProvider->getLastError();
+						$this->logger->error( __( 'CRM authentication failed', 'taglock' ), [ 'error' => $error ] );
+
+						HookUtil::doAction( HookAction::API_EXCEPTION_CAUGHT, 'authentication_failed', $error );
+
+						$data = [];
+						if ( function_exists( 'current_user_can' ) && current_user_can( 'manage_options' ) && ! empty( $error ) ) {
+							$data['details'] = $error;
+						}
+
+						return ApiResponse::error(
+							__( 'TagLock is currently unavailable (CRM connection failed or is not configured). Please contact the site administrator.', 'taglock' ),
+							'authentication_failed',
+							503,
+							$data
+						);
+					}
+				}
+
+				$accessMode = isset( $rule['access_mode'] ) ? (string) $rule['access_mode'] : 'tag_any';
+				if ( $accessMode === 'tag_all' ) {
+					$hasAccess = true;
+					foreach ( $requiredTagIds as $tagId ) {
+						if ( ! $this->crmProvider->hasTag( $subscriberId, (string) $tagId ) ) {
+							$hasAccess = false;
+							break;
+						}
+					}
+				} else {
+					foreach ( $requiredTagIds as $tagId ) {
+						if ( $this->crmProvider->hasTag( $subscriberId, (string) $tagId ) ) {
+							$hasAccess = true;
+							break;
+						}
+					}
+				}
+			}
+
+			HookUtil::doAction( HookAction::AFTER_ACCESS_CHECK, $subscriberId, (int) $ruleId, $requiredTagIds, $hasAccess );
 
 			if ( $hasAccess ) {
 				$content = get_transient( $contentId );
@@ -218,16 +289,24 @@ final class AccessCheckRoute implements ApiRouteInterface {
 					continue;
 				}
 
-				$content = HookUtil::applyFilter( HookFilter::PROTECTED_CONTENT, $content, $subscriberId, $tagId );
+				$content = HookUtil::applyFilter( HookFilter::PROTECTED_CONTENT, $content, $subscriberId, (int) $ruleId, $requiredTagIds );
 
-				HookUtil::doAction( HookAction::ACCESS_GRANTED, $subscriberId, $tagId, $content );
+				HookUtil::doAction( HookAction::ACCESS_GRANTED, $subscriberId, (int) $ruleId, $content );
+
+				if ( ! $adminBypassEnabled && ! empty( $rule['engagement_tagging_enabled'] ) ) {
+					$engagementTagIds = isset( $rule['engagement_tag_ids'] ) && is_array( $rule['engagement_tag_ids'] ) ? $rule['engagement_tag_ids'] : [];
+					$engagementTagIds = array_values( array_filter( array_map( 'intval', $engagementTagIds ), static fn( int $v ) => $v > 0 ) );
+					foreach ( $engagementTagIds as $engagementTagId ) {
+						$this->crmProvider->applyTag( $subscriberId, (string) $engagementTagId );
+					}
+				}
 
 				$data = [
 					'content' => $content,
 					'message' => __( 'Access granted', 'taglock' ),
 				];
 
-				$data = HookUtil::applyFilter( HookFilter::ACCESS_GRANTED_RESPONSE, $data, $subscriberId, $tagId );
+				$data = HookUtil::applyFilter( HookFilter::ACCESS_GRANTED_RESPONSE, $data, $subscriberId, (int) $ruleId, $requiredTagIds );
 
 				$results[ $contentId ] = [
 					'success' => true,
@@ -238,26 +317,40 @@ final class AccessCheckRoute implements ApiRouteInterface {
 				continue;
 			}
 
-			HookUtil::doAction( HookAction::ACCESS_DENIED, $subscriberId, $tagId );
+			HookUtil::doAction( HookAction::ACCESS_DENIED, $subscriberId, (int) $ruleId, $requiredTagIds );
 
 			$data = [
 				'success' => false,
 				'message' => __( 'You do not have access to this content. Please contact support if you believe this is an error.', 'taglock' ),
 			];
 
-			$data = HookUtil::applyFilter( HookFilter::ACCESS_DENIED_RESPONSE, $data, $subscriberId, $tagId );
+			$denyMode = isset( $rule['deny_mode'] ) ? (string) $rule['deny_mode'] : 'message';
+			$redirectUrl = null;
 			$teaserHtml = null;
-			if ( isset( $data['teaser_html'] ) ) {
-				$teaserCandidate = (string) $data['teaser_html'];
-				$teaserCandidate = wp_kses_post( $teaserCandidate );
-				$teaserHtml = $teaserCandidate !== '' ? $teaserCandidate : null;
+			$denyMessage = isset( $rule['deny_message'] ) && is_string( $rule['deny_message'] ) ? $rule['deny_message'] : '';
+			$denyMessage = $denyMessage !== '' ? $denyMessage : $data['message'];
+
+			if ( $denyMode === 'redirect' ) {
+				$postId = isset( $rule['redirect_post_id'] ) ? (int) $rule['redirect_post_id'] : 0;
+				if ( $postId > 0 ) {
+					$redirectUrl = get_permalink( $postId );
+				}
 			}
+
+			if ( $denyMode === 'teaser' ) {
+				$rawTeaser = isset( $rule['teaser_html'] ) && is_string( $rule['teaser_html'] ) ? $rule['teaser_html'] : '';
+				$rawTeaser = $rawTeaser !== '' ? do_shortcode( $rawTeaser ) : '';
+				$rawTeaser = $rawTeaser !== '' ? wp_kses_post( $rawTeaser ) : '';
+				$teaserHtml = $rawTeaser !== '' ? $rawTeaser : null;
+			}
+
+			$data = HookUtil::applyFilter( HookFilter::ACCESS_DENIED_RESPONSE, $data, $subscriberId, (int) $ruleId, $requiredTagIds, $rule );
 
 			$results[ $contentId ] = [
 				'success'      => false,
 				'status'       => 403,
-				'message'      => $data['message'] ?? __( 'You do not have access to this content. Please contact support if you believe this is an error.', 'taglock' ),
-				'redirect_url' => $data['redirect_url'] ?? null,
+				'message'      => $denyMessage,
+				'redirect_url' => $redirectUrl,
 				'teaser_html'  => $teaserHtml,
 			];
 		}

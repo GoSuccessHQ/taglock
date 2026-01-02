@@ -4,7 +4,7 @@ Protect WordPress content based on KlickTipp tags - no membership required, cach
 
 ## Features
 
-- ✅ **Shortcode-Based Protection**: Use `[taglock tag="123"]...[/taglock]` to protect content
+- ✅ **Shortcode-Based Protection**: Use `[taglock id="1"]...[/taglock]` to protect content
 - ✅ **Cache Compatible**: Protected content is loaded client-side after verification
 - ✅ **Secure by Design**: Protected content is not rendered into the initial HTML
 - ✅ **KlickTipp Integration**: Checks subscriber tags via KlickTipp API
@@ -27,14 +27,14 @@ Protect WordPress content based on KlickTipp tags - no membership required, cach
 Protect content with the shortcode:
 
 ```
-[taglock tag="123"]
-Your protected content here. Only subscribers with tag #123 can see this.
+[taglock id="1"]
+Your protected content here. Only subscribers matching TagLocker #1 can see this.
 [/taglock]
 ```
 
 ### Shortcode Attributes
 
-- `tag` (required): The KlickTipp tag ID to check
+- `id` (required): The TagLocker ID (configured in WordPress admin)
 - `message` (optional): Custom message for denied access
 - `loader_text` (optional): Custom loading text
 
