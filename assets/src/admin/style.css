@@ -58,28 +58,20 @@
 	height: var(--taglock-admin-spinner-size);
 }
 
-.taglock-admin__card-header-indicator .notice {
+.taglock-admin__connection-badge {
 	margin: 0;
 	padding: 2px 10px;
-	border-left-width: 0;
-	display: inline-flex;
-	align-items: center;
-	line-height: 1.4;
+	white-space: nowrap;
+	min-height: auto;
 }
 
-.taglock-admin__connection-badge {
-	white-space: nowrap;
+.taglock-admin__connection-badge .components-notice__content {
+	margin: 0;
+	padding: 0;
 }
 
 .taglock-admin__button--disabled {
 	opacity: 0.6;
-}
-
-.taglock-admin__popover {
-	max-width: 320px;
-	display: flex;
-	flex-direction: column;
-	gap: var(--taglock-admin-gap);
 }
 
 .taglock-admin__card-header-indicator .components-spinner {

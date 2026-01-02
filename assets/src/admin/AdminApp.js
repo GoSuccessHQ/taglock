@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	Card,
@@ -66,12 +66,11 @@ const AdminApp = () => {
 	const [rulesLoading, setRulesLoading] = useState(false);
 	const [rulesNotice, setRulesNotice] = useState(null);
 	const [newRulePopoverOpen, setNewRulePopoverOpen] = useState(false);
-	const newRuleButtonRef = useRef(null);
+	const [newRulePopoverAnchor, setNewRulePopoverAnchor] = useState(null);
 
 	const [tagsLoading, setTagsLoading] = useState(false);
 	const [tagOptions, setTagOptions] = useState([]);
 	const [tagsById, setTagsById] = useState({});
-	const [tagsNotice, setTagsNotice] = useState(null);
 	const [requiredTagPicker, setRequiredTagPicker] = useState('');
 	const [engagementTagPicker, setEngagementTagPicker] = useState('');
 
@@ -186,7 +185,6 @@ const AdminApp = () => {
 
 	const loadTags = async () => {
 		setTagsLoading(true);
-		setTagsNotice(null);
 		try {
 			const response = await apiFetch({
 				path: `/${apiNamespace}/tags`,
@@ -214,11 +212,6 @@ const AdminApp = () => {
 		} catch (error) {
 			setTagsById({});
 			setTagOptions([]);
-			setTagsNotice({
-				status: 'warning',
-				message:
-					error.message || __('Failed to load tags. Check your credentials.', 'taglock'),
-			});
 		} finally {
 			setTagsLoading(false);
 		}
@@ -416,6 +409,17 @@ const AdminApp = () => {
 				message: __('Settings saved successfully!', 'taglock'),
 			});
 			loadTags();
+			try {
+				const refreshed = await apiFetch({
+					path: `/${apiNamespace}/settings`,
+					method: 'GET',
+				});
+				if (refreshed?.success && refreshed?.data?.connection_status) {
+					setConnectionStatus(refreshed.data.connection_status);
+				}
+			} catch (error) {
+				// Ignore; the cron check and next page load will update the badge.
+			}
 		} catch (error) {
 			setNotice({
 				status: 'error',
@@ -435,10 +439,9 @@ const AdminApp = () => {
 	};
 
 	const isConnected = Boolean(connectionStatus?.is_connected);
-	const connectionBadgeText = isConnected ? 'Verbunden' : 'Getrennt';
-	const connectionBadgeClassName = isConnected
-		? 'taglock-admin__connection-badge notice notice-success'
-		: 'taglock-admin__connection-badge notice notice-error';
+	const connectionBadgeText = isConnected
+		? __('Connected', 'taglock')
+		: __('Disconnected', 'taglock');
 
 	const handleNewRuleClick = () => {
 		if (!isConnected) {
@@ -453,16 +456,6 @@ const AdminApp = () => {
 			<h1>{__('TagLock Settings', 'taglock')}</h1>
 			
 			<div className="taglock-admin">
-				{tagsNotice && (
-					<Notice
-						className="taglock-admin__notice"
-						status={tagsNotice.status}
-						isDismissible
-						onRemove={() => setTagsNotice(null)}
-					>
-						{tagsNotice.message}
-					</Notice>
-				)}
 				{notice && (
 					<Notice
                         className="taglock-admin__notice"
@@ -478,13 +471,17 @@ const AdminApp = () => {
 					<CardHeader>
 						<div className="taglock-admin__card-header">
 							<h2 className="taglock-admin__card-header-title">{__('KlickTipp Connection', 'taglock')}</h2>
-							<div className="taglock-admin__card-header-indicator" aria-hidden="true">
+							<div className="taglock-admin__card-header-indicator">
 								{isLoading ? (
 									<Spinner />
 								) : (
-									<span className={connectionBadgeClassName}>
+									<Notice
+										className="taglock-admin__connection-badge"
+										status={isConnected ? 'success' : 'error'}
+										isDismissible={false}
+									>
 										{connectionBadgeText}
-									</span>
+									</Notice>
 								)}
 							</div>
 						</div>
@@ -562,7 +559,7 @@ const AdminApp = () => {
 						<div className="taglock-admin__card-header">
 							<h2 className="taglock-admin__card-header-title">{__('TagLockers', 'taglock')}</h2>
 							<Button
-								ref={newRuleButtonRef}
+								ref={setNewRulePopoverAnchor}
 								variant="primary"
 								onClick={handleNewRuleClick}
 								aria-disabled={!isConnected}
@@ -575,16 +572,19 @@ const AdminApp = () => {
 					<CardBody>
 						{newRulePopoverOpen && !isConnected && (
 							<Popover
-								anchor={newRuleButtonRef.current}
+								anchor={newRulePopoverAnchor}
 								onClose={() => setNewRulePopoverOpen(false)}
 								placement="bottom-start"
 							>
-								<div className="taglock-admin__popover">
-									<strong>Keine Verbindung zu KlickTipp</strong>
+								<Notice status="warning" isDismissible={false}>
+									<strong>{__('No KlickTipp connection', 'taglock')}</strong>
 									<div>
-										Bitte speichere gültige Zugangsdaten. Solange keine Verbindung besteht, können keine TagLockers erstellt werden.
+										{__(
+											'Please save valid credentials first. While disconnected, you cannot create new TagLockers.',
+											'taglock'
+										)}
 									</div>
-								</div>
+								</Notice>
 							</Popover>
 						)}
 						{rulesNotice && (
