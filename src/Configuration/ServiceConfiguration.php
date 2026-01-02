@@ -40,4 +40,7 @@ return static function ( ContainerConfigurator $container ): void {
 	// Tag all Route classes as API routes
 	$services->instanceof( \GoSuccess\TagLock\Contract\ApiRouteInterface::class )
 		->tag( 'taglock.api_route' );
+
+	// Alias interface to implementation for autowiring
+	$services->alias( \GoSuccess\TagLock\Contract\CRMProviderInterface::class, \GoSuccess\TagLock\Provider\KlickTippProvider::class );
 };
