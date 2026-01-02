@@ -1,8 +1,7 @@
 import { useState, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import apiFetch from '@wordpress/api-fetch';
 
-const ContentLoader = ({ tag, nonce, contentId, message, loaderText }) => {
+const ContentLoader = ({ subscriberId, contentId, message, loaderText, batchRequest }) => {
 	const [state, setState] = useState({
 		loading: true,
 		content: null,
@@ -11,20 +10,6 @@ const ContentLoader = ({ tag, nonce, contentId, message, loaderText }) => {
 
 	useEffect(() => {
 		const checkAccess = async () => {
-			// Get subscriber ID from URL parameter (has priority)
-			const urlParams = new URLSearchParams(window.location.search);
-			let subscriberId = urlParams.get('subscriber_id');
-
-			// If no URL parameter, check localStorage
-			if (!subscriberId) {
-				subscriberId = localStorage.getItem('taglock_subscriber_id');
-			}
-
-			// If subscriber ID found in URL, save it to localStorage for future visits
-			if (urlParams.get('subscriber_id')) {
-				localStorage.setItem('taglock_subscriber_id', urlParams.get('subscriber_id'));
-			}
-
 			if (!subscriberId) {
 				setState({
 					loading: false,
@@ -35,35 +20,51 @@ const ContentLoader = ({ tag, nonce, contentId, message, loaderText }) => {
 			}
 
 			try {
-				const response = await apiFetch({
-					path: '/taglock/v1/check-access',
-					method: 'POST',
-					data: {
-						subscriber_id: subscriberId,
-						tag,
-						content_id: contentId,
-						nonce,
-					},
-				});
-
-				if (response.success) {
-					const content = response?.data?.content ?? null;
+				if (!batchRequest) {
 					setState({
 						loading: false,
-						content,
+						content: null,
+						error: __('An error occurred while checking access. Please try again later.', 'taglock'),
+					});
+					return;
+				}
+
+				const response = await batchRequest;
+				if (!response?.success) {
+					setState({
+						loading: false,
+						content: null,
+						error: response?.message || __('An error occurred while checking access. Please try again later.', 'taglock'),
+					});
+					return;
+				}
+
+				const result = response?.data?.results?.[contentId];
+				if (!result) {
+					setState({
+						loading: false,
+						content: null,
+						error: __('An error occurred while checking access. Please try again later.', 'taglock'),
+					});
+					return;
+				}
+
+				if (result.success) {
+					setState({
+						loading: false,
+						content: result?.content ?? null,
 						error: null,
 					});
 				} else {
-					// Check if redirect URL is provided (Pro feature)
-					if (response.redirect_url) {
-						window.location.href = response.redirect_url;
+					if (result.redirect_url) {
+						window.location.href = result.redirect_url;
 						return;
 					}
 
 					setState({
 						loading: false,
 						content: null,
-						error: response.message || message,
+						error: result.message || message,
 					});
 				}
 			} catch (error) {
@@ -76,7 +77,7 @@ const ContentLoader = ({ tag, nonce, contentId, message, loaderText }) => {
 		};
 
 		checkAccess();
-	}, [tag, nonce, contentId, message]);
+	}, [subscriberId, contentId, message, batchRequest]);
 
 	if (state.loading) {
 		return (

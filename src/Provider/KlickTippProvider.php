@@ -28,6 +28,8 @@ final class KlickTippProvider implements CRMProviderInterface {
 	private ?KlicktippConnector $connector = null;
 	private bool $isAuthenticated = false;
 	private string $lastError = '';
+	/** @var array<string, array<int, string>> */
+	private array $subscriberTagsCache = [];
 
 	public function __construct(
 		private readonly LoggerService $logger
@@ -141,6 +143,11 @@ final class KlickTippProvider implements CRMProviderInterface {
 	 * @inheritDoc
 	 */
 	public function hasTag( string $subscriberId, string $tagId ): bool {
+		if ( isset( $this->subscriberTagsCache[ $subscriberId ] ) ) {
+			$this->lastError = '';
+			return in_array( $tagId, $this->subscriberTagsCache[ $subscriberId ], true );
+		}
+
 		if ( ! $this->isAuthenticated() ) {
 			$this->lastError = __( 'Not authenticated', 'taglock' );
 			return false;
@@ -165,10 +172,16 @@ final class KlickTippProvider implements CRMProviderInterface {
 
 		// Check if subscriber has the tag
 		// KlickTipp returns tags as comma-separated string in 'tag' field
+		$tags = [];
 		if ( isset( $subscriber->tag ) ) {
 			$tags = explode( ',', $subscriber->tag );
 			$tags = array_map( 'trim', $tags );
+		}
 
+		$this->subscriberTagsCache[ $subscriberId ] = $tags;
+		$this->lastError = '';
+
+		if ( [] !== $tags ) {
 			$hasTag = in_array( $tagId, $tags, true );
 
 			$this->logger->debug( __( 'Tag check completed', 'taglock' ), [
