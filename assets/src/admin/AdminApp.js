@@ -13,7 +13,6 @@ import {
 	Notice,
 	Spinner,
 	Modal,
-	Popover,
 	Disabled,
 } from '@wordpress/components';
 import apiFetch from '@wordpress/api-fetch';
@@ -65,9 +64,6 @@ const AdminApp = () => {
 	const [rulesPage, setRulesPage] = useState(1);
 	const [rulesLoading, setRulesLoading] = useState(false);
 	const [rulesNotice, setRulesNotice] = useState(null);
-	const [newRulePopoverOpen, setNewRulePopoverOpen] = useState(false);
-	const [newRulePopoverAnchor, setNewRulePopoverAnchor] = useState(null);
-
 	const [tagsLoading, setTagsLoading] = useState(false);
 	const [tagOptions, setTagOptions] = useState([]);
 	const [tagsById, setTagsById] = useState({});
@@ -444,8 +440,7 @@ const AdminApp = () => {
 		: __('Disconnected', 'taglock');
 
 	const handleNewRuleClick = () => {
-		if (!isConnected) {
-			setNewRulePopoverOpen(true);
+		if (!isConnected || isLoading) {
 			return;
 		}
 		openCreateRuleModal();
@@ -475,13 +470,18 @@ const AdminApp = () => {
 								{isLoading ? (
 									<Spinner />
 								) : (
-									<Notice
-										className="taglock-admin__connection-badge"
-										status={isConnected ? 'success' : 'error'}
-										isDismissible={false}
+									<span
+										className={
+											'taglock-admin__status-badge taglock-admin__connection-badge ' +
+											(isConnected
+												? 'taglock-admin__status-badge--success'
+												: 'taglock-admin__status-badge--error')
+										}
+										role="status"
+										aria-live="polite"
 									>
 										{connectionBadgeText}
-									</Notice>
+									</span>
 								)}
 							</div>
 						</div>
@@ -559,33 +559,29 @@ const AdminApp = () => {
 						<div className="taglock-admin__card-header">
 							<h2 className="taglock-admin__card-header-title">{__('TagLockers', 'taglock')}</h2>
 							<Button
-								ref={setNewRulePopoverAnchor}
 								variant="primary"
 								onClick={handleNewRuleClick}
-								aria-disabled={!isConnected}
-								className={!isConnected ? 'taglock-admin__button--disabled' : undefined}
+								disabled={isLoading || !isConnected}
 							>
 								{__('New TagLocker', 'taglock')}
 							</Button>
 						</div>
 					</CardHeader>
 					<CardBody>
-						{newRulePopoverOpen && !isConnected && (
-							<Popover
-								anchor={newRulePopoverAnchor}
-								onClose={() => setNewRulePopoverOpen(false)}
-								placement="bottom-start"
+						{!isLoading && !isConnected && (
+							<Notice
+								className="taglock-admin__notice"
+								status="warning"
+								isDismissible={false}
 							>
-								<Notice status="warning" isDismissible={false}>
-									<strong>{__('No KlickTipp connection', 'taglock')}</strong>
-									<div>
-										{__(
-											'Please save valid credentials first. While disconnected, you cannot create new TagLockers.',
-											'taglock'
-										)}
-									</div>
-								</Notice>
-							</Popover>
+								<strong>{__('No KlickTipp connection', 'taglock')}</strong>
+								<div>
+									{__(
+										'Please save valid credentials first. While disconnected, you cannot create new TagLockers.',
+										'taglock'
+									)}
+								</div>
+							</Notice>
 						)}
 						{rulesNotice && (
 							<Notice
