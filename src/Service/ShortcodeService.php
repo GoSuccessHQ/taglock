@@ -21,6 +21,9 @@ use function implode;
 use function array_map;
 use function current_user_can;
 use function function_exists;
+use function array_diff;
+use function array_keys;
+use function count;
 use function trim;
 
 /**
@@ -53,10 +56,15 @@ final class ShortcodeService {
 		// Ensure frontend assets are available for this shortcode instance.
 		$this->assetService->enqueueFrontendAssets( true );
 
-		// No backwards compatibility: only `id` is supported.
-		if ( is_array( $atts ) && isset( $atts['tag'] ) ) {
-			$this->logger->warning( __( 'TagLock shortcode uses unsupported "tag" attribute', 'taglock' ) );
-			return '<div class="taglock-error">' . esc_html__( 'Error: Please use the id attribute. Example: [taglock id="1"]...[/taglock]', 'taglock' ) . '</div>';
+		// Strict: only `id` is supported.
+		if ( is_array( $atts ) ) {
+			$extraKeys = array_diff( array_keys( $atts ), [ 'id' ] );
+			if ( count( $extraKeys ) > 0 ) {
+				$this->logger->warning( __( 'TagLock shortcode uses unsupported attributes', 'taglock' ), [
+					'attributes' => $extraKeys,
+				] );
+				return '<div class="taglock-error">' . esc_html__( 'Error: Only the id attribute is supported.', 'taglock' ) . '</div>';
+			}
 		}
 
 		$attributes = shortcode_atts(
