@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace GoSuccess\TagLock\Service\Rule;
+namespace GoSuccess\TagLock\Repository;
 
 use GoSuccess\TagLock\Service\LoggerService;
 

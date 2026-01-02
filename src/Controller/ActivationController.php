@@ -6,7 +6,7 @@ namespace GoSuccess\TagLock\Controller;
 
 use GoSuccess\TagLock\Enum\HookAction;
 use GoSuccess\TagLock\Service\LoggerService;
-use GoSuccess\TagLock\Service\Rule\RuleTableInstaller;
+use GoSuccess\TagLock\Database\RuleTableInstaller;
 use GoSuccess\TagLock\Util\HookUtil;
 
 use function register_activation_hook;

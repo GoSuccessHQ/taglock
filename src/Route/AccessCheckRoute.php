@@ -12,7 +12,7 @@ use GoSuccess\TagLock\Enum\HookAction;
 use GoSuccess\TagLock\Enum\HookFilter;
 use GoSuccess\TagLock\Enum\HttpMethod;
 use GoSuccess\TagLock\Service\LoggerService;
-use GoSuccess\TagLock\Service\Rule\RuleRepository;
+use GoSuccess\TagLock\Repository\RuleRepository;
 use GoSuccess\TagLock\Util\HookUtil;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use WP_Error;

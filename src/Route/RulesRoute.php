@@ -9,7 +9,7 @@ use GoSuccess\TagLock\DTO\ApiMethodHandler;
 use GoSuccess\TagLock\DTO\ApiResponse;
 use GoSuccess\TagLock\Enum\HttpMethod;
 use GoSuccess\TagLock\Service\LoggerService;
-use GoSuccess\TagLock\Service\Rule\RuleRepository;
+use GoSuccess\TagLock\Repository\RuleRepository;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use WP_Error;
 use WP_REST_Request;

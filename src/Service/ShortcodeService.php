@@ -6,7 +6,7 @@ namespace GoSuccess\TagLock\Service;
 
 use GoSuccess\TagLock\Enum\HookAction;
 use GoSuccess\TagLock\Enum\HookFilter;
-use GoSuccess\TagLock\Service\Rule\RuleRepository;
+use GoSuccess\TagLock\Repository\RuleRepository;
 use GoSuccess\TagLock\Util\HookUtil;
 
 use function esc_attr;
