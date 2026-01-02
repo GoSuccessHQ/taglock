@@ -77,6 +77,14 @@ const AdminApp = () => {
 		}
 	};
 
+	const handleSubmit = (event) => {
+		event.preventDefault();
+		if (isSaving) {
+			return;
+		}
+		handleSave();
+	};
+
 	return (
 		<div className="wrap">
 			<h1>{__('TagLock Settings', 'taglock')}</h1>
@@ -97,35 +105,41 @@ const AdminApp = () => {
 						<h2>{__('KlickTipp Connection', 'taglock')}</h2>
 					</CardHeader>
 					<CardBody>
-					<p className="description">
-						{__(
-							'Enter your KlickTipp username and password to connect.',
-							'taglock'
-						)}
-					</p>
+						<form onSubmit={handleSubmit}>
+							<p className="description">
+								{__(
+									'Enter your KlickTipp username and password to connect.',
+									'taglock'
+								)}
+							</p>
 
-					<TextControl
-						label={__('Username', 'taglock')}
-						value={username}
-						onChange={setUsername}
-						required
-					/>
+							<TextControl
+								label={__('Username', 'taglock')}
+								value={username}
+								onChange={setUsername}
+								required
+								__next40pxDefaultSize
+								__nextHasNoMarginBottom
+							/>
 
-					<TextControl
-						label={__('Password', 'taglock')}
-						type="password"
-						value={password}
-						onChange={setPassword}
-						help={__(
-							'For security reasons, the password is not displayed after saving.',
-							'taglock'
-						)}
-						required
-					/>
+							<TextControl
+								label={__('Password', 'taglock')}
+								type="password"
+								value={password}
+								onChange={setPassword}
+								help={__(
+									'For security reasons, the password is not displayed after saving.',
+									'taglock'
+								)}
+								required
+								__next40pxDefaultSize
+								__nextHasNoMarginBottom
+							/>
 
-					<Button variant="primary" onClick={handleSave} isBusy={isSaving}>
-						{__('Save Settings', 'taglock')}
-					</Button>
+							<Button variant="primary" type="submit" isBusy={isSaving}>
+								{__('Save Settings', 'taglock')}
+							</Button>
+						</form>
 				</CardBody>
                 </Card>
 
