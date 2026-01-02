@@ -11,6 +11,7 @@ use Psr\Log\LogLevel;
 
 use function defined;
 use function is_dir;
+use function touch;
 use function wp_mkdir_p;
 
 /**
@@ -44,6 +45,7 @@ final class LoggerService {
 		}
 
 		$logDir = WP_CONTENT_DIR . '/uploads/taglock/logs';
+		$logFile = "{$logDir}/taglock.log";
 
 		if ( ! is_dir( $logDir ) ) {
 			wp_mkdir_p( $logDir );
@@ -63,6 +65,11 @@ final class LoggerService {
 				"    Deny from all\n" .
 				"</Files>\n"
 			);
+		}
+
+		// Ensure the log file exists even if current log level suppresses writes.
+		if ( ! file_exists( $logFile ) ) {
+			touch( $logFile );
 		}
 
 		$this->initialized = true;
