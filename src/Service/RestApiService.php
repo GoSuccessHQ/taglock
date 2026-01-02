@@ -7,8 +7,6 @@ namespace GoSuccess\TagLock\Service;
 use GoSuccess\TagLock\Enum\HookAction;
 use GoSuccess\TagLock\Util\HookUtil;
 
-use function add_action;
-
 /**
  * REST API Service
  *
@@ -26,20 +24,6 @@ final class RestApiService {
 		private readonly iterable $routes,
 		private readonly LoggerService $logger
 	) {
-		$this->registerHooks();
-	}
-
-	/**
-	 * Register WordPress hooks.
-	 */
-	private function registerHooks(): void {
-		add_action( 'rest_api_init', [ $this, 'registerRoutes' ] );
-		
-		// Also try immediate registration if rest_api_init already fired
-		if ( did_action( 'rest_api_init' ) ) {
-			$this->logger->debug( __( 'rest_api_init already fired - registering routes immediately', 'taglock' ) );
-			$this->registerRoutes();
-		}
 	}
 
 	/**
