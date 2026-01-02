@@ -24,6 +24,7 @@ use function function_exists;
 use function get_transient;
 use function is_array;
 use function sanitize_text_field;
+use function wp_kses_post;
 use function wp_verify_nonce;
 
 /**
@@ -60,9 +61,9 @@ final class AccessCheckRoute implements ApiRouteInterface {
 				fn( WP_REST_Request $request ) => $this->checkPermissions( $request ),
 				[
 					'subscriber_id'  => [
-						'required'          => true,
+						'required'          => false,
 						'type'              => 'string',
-						'validate_callback' => static fn( $param ) => ! empty( $param ),
+						'validate_callback' => static fn( $param ) => is_string( $param ) || is_numeric( $param ) || $param === null,
 						'sanitize_callback' => 'sanitize_text_field',
 					],
 					'items'         => [
@@ -112,8 +113,22 @@ final class AccessCheckRoute implements ApiRouteInterface {
 		$subscriberId = (string) $request->get_param( 'subscriber_id' );
 		$items = $request->get_param( 'items' );
 
+		$adminBypassEnabled = false;
+		if ( function_exists( 'current_user_can' ) && current_user_can( 'manage_options' ) ) {
+			$adminBypassEnabled = (bool) HookUtil::applyFilter( HookFilter::ADMIN_BYPASS_ENABLED, false, $request );
+		}
+
 		// Currently KlickTipp subscriber IDs are numeric; keep strict validation.
-		if ( $subscriberId === '' || ! ctype_digit( $subscriberId ) ) {
+		if ( ! $adminBypassEnabled && ( $subscriberId === '' || ! ctype_digit( $subscriberId ) ) ) {
+			$this->logger->warning( __( 'Invalid identifier', 'taglock' ), [ 'subscriber_id' => $subscriberId ] );
+			return ApiResponse::error(
+				__( 'Invalid identifier. Please use the link from your email.', 'taglock' ),
+				'invalid_subscriber_id',
+				400
+			);
+		}
+
+		if ( $adminBypassEnabled && $subscriberId !== '' && ! ctype_digit( $subscriberId ) ) {
 			$this->logger->warning( __( 'Invalid identifier', 'taglock' ), [ 'subscriber_id' => $subscriberId ] );
 			return ApiResponse::error(
 				__( 'Invalid identifier. Please use the link from your email.', 'taglock' ),
@@ -186,8 +201,7 @@ final class AccessCheckRoute implements ApiRouteInterface {
 			}
 
 			HookUtil::doAction( HookAction::BEFORE_ACCESS_CHECK, $subscriberId, $tagId );
-
-			$hasAccess = $this->crmProvider->hasTag( $subscriberId, $tagId );
+			$hasAccess = $adminBypassEnabled ? true : $this->crmProvider->hasTag( $subscriberId, $tagId );
 
 			HookUtil::doAction( HookAction::AFTER_ACCESS_CHECK, $subscriberId, $tagId, $hasAccess );
 
@@ -232,12 +246,19 @@ final class AccessCheckRoute implements ApiRouteInterface {
 			];
 
 			$data = HookUtil::applyFilter( HookFilter::ACCESS_DENIED_RESPONSE, $data, $subscriberId, $tagId );
+			$teaserHtml = null;
+			if ( isset( $data['teaser_html'] ) ) {
+				$teaserCandidate = (string) $data['teaser_html'];
+				$teaserCandidate = wp_kses_post( $teaserCandidate );
+				$teaserHtml = $teaserCandidate !== '' ? $teaserCandidate : null;
+			}
 
 			$results[ $contentId ] = [
 				'success'      => false,
 				'status'       => 403,
 				'message'      => $data['message'] ?? __( 'You do not have access to this content. Please contact support if you believe this is an error.', 'taglock' ),
 				'redirect_url' => $data['redirect_url'] ?? null,
+				'teaser_html'  => $teaserHtml,
 			];
 		}
 

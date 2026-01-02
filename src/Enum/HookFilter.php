@@ -20,6 +20,7 @@ enum HookFilter: string {
 	// Access Control
 	case ACCESS_DENIED_RESPONSE = 'taglock_access_denied_response';
 	case ACCESS_GRANTED_RESPONSE = 'taglock_access_granted_response';
+	case ADMIN_BYPASS_ENABLED = 'taglock_admin_bypass_enabled';
 	case PROTECTED_CONTENT = 'taglock_protected_content';
 
 	// Settings

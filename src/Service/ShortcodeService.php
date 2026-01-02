@@ -17,6 +17,8 @@ use function sprintf;
 use function time;
 use function implode;
 use function array_map;
+use function current_user_can;
+use function function_exists;
 
 /**
  * Shortcode Service
@@ -69,6 +71,10 @@ final class ShortcodeService {
 
 		// Generate nonce for REST API request
 		$nonce = wp_create_nonce( 'taglock_access_check' );
+		$adminBypassEnabled = false;
+		if ( function_exists( 'current_user_can' ) && current_user_can( 'manage_options' ) ) {
+			$adminBypassEnabled = (bool) HookUtil::applyFilter( HookFilter::ADMIN_BYPASS_ENABLED, false, $attributes, $content );
+		}
 
 		// Create data attributes for React
 		$dataAttributes = [
@@ -77,6 +83,10 @@ final class ShortcodeService {
 			'data-message'     => esc_attr( $attributes['message'] ),
 			'data-loader-text' => esc_attr( $attributes['loader_text'] ),
 		];
+
+		if ( $adminBypassEnabled ) {
+			$dataAttributes['data-admin-bypass'] = '1';
+		}
 
 		// Store protected content in a transient with unique ID
 		$contentId = 'taglock_' . md5( $content . $attributes['tag'] . time() );

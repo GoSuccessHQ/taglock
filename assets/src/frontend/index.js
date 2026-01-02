@@ -46,6 +46,10 @@ domReady(() => {
 		return;
 	}
 
+	const adminBypass = Array.from(containers).some(
+		(container) => container.getAttribute('data-admin-bypass') === '1'
+	);
+
 	const subscriberId = getSubscriberId();
 
 	const firstNonce = containers[0].getAttribute('data-nonce');
@@ -59,15 +63,20 @@ domReady(() => {
 		}
 	});
 
-	const batchRequest = subscriberId && firstNonce && items.length
+	const shouldRequest = firstNonce && items.length && (subscriberId || adminBypass);
+	const data = shouldRequest
+		? {
+			items,
+			nonce: firstNonce,
+			...(subscriberId ? { subscriber_id: subscriberId } : {}),
+		}
+		: null;
+
+	const batchRequest = data
 		? apiFetch({
 			path: '/taglock/v1/check-access',
 			method: 'POST',
-			data: {
-				subscriber_id: subscriberId,
-				items,
-				nonce: firstNonce,
-			},
+			data,
 		})
 		: null;
 
@@ -83,6 +92,7 @@ domReady(() => {
 					message={message}
 					loaderText={loaderText}
 					subscriberId={subscriberId}
+					adminBypass={adminBypass}
 					batchRequest={batchRequest}
 				/>
 			);

@@ -2,20 +2,22 @@ import { useState, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Spinner } from '@wordpress/components';
 
-const ContentLoader = ({ subscriberId, contentId, message, loaderText, batchRequest }) => {
+const ContentLoader = ({ subscriberId, adminBypass, contentId, message, loaderText, batchRequest }) => {
 	const [state, setState] = useState({
 		loading: true,
 		content: null,
 		error: null,
+		isTeaser: false,
 	});
 
 	useEffect(() => {
 		const checkAccess = async () => {
-			if (!subscriberId) {
+			if (!subscriberId && !adminBypass) {
 				setState({
 					loading: false,
 					content: null,
 					error: __('Access denied. This link is invalid or has expired. Please use the link from your email.', 'taglock'),
+					isTeaser: false,
 				});
 				return;
 			}
@@ -55,6 +57,7 @@ const ContentLoader = ({ subscriberId, contentId, message, loaderText, batchRequ
 						loading: false,
 						content: result?.content ?? null,
 						error: null,
+						isTeaser: false,
 					});
 				} else {
 					if (result.redirect_url) {
@@ -62,10 +65,21 @@ const ContentLoader = ({ subscriberId, contentId, message, loaderText, batchRequ
 						return;
 					}
 
+					if (result.teaser_html) {
+						setState({
+							loading: false,
+							content: result.teaser_html,
+							error: null,
+							isTeaser: true,
+						});
+						return;
+					}
+
 					setState({
 						loading: false,
 						content: null,
 						error: result.message || message,
+						isTeaser: false,
 					});
 				}
 			} catch (error) {
@@ -73,12 +87,13 @@ const ContentLoader = ({ subscriberId, contentId, message, loaderText, batchRequ
 					loading: false,
 					content: null,
 					error: error.message || __('An error occurred while checking access. Please try again later.', 'taglock'),
+					isTeaser: false,
 				});
 			}
 		};
 
 		checkAccess();
-	}, [subscriberId, contentId, message, batchRequest]);
+		}, [subscriberId, adminBypass, contentId, message, batchRequest]);
 
 	if (state.loading) {
 		return (
@@ -97,9 +112,11 @@ const ContentLoader = ({ subscriberId, contentId, message, loaderText, batchRequ
 		);
 	}
 
+	const contentClassName = state.isTeaser ? 'taglock-teaser' : 'taglock-content';
+
 	return (
 		<div
-			className="taglock-content"
+			className={contentClassName}
 			dangerouslySetInnerHTML={{ __html: state.content }}
 		/>
 	);
