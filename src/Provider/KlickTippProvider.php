@@ -13,6 +13,9 @@ use KlicktippConnector;
 use Throwable;
 
 use function get_option;
+use function class_exists;
+use function dirname;
+use function file_exists;
 
 /**
  * KlickTipp Provider
@@ -38,7 +41,20 @@ final class KlickTippProvider implements CRMProviderInterface {
 			return;
 		}
 
-		$this->connector = new KlicktippConnector();
+		if ( ! $this->ensureConnectorLoaded() ) {
+			return;
+		}
+
+		try {
+			$this->connector = new KlicktippConnector();
+		} catch ( Throwable $exception ) {
+			$this->lastError = __( 'KlickTipp connector could not be initialized. Please contact support.', 'taglock' );
+			$this->logger->error( __( 'Failed to initialize KlickTipp connector', 'taglock' ), [
+				'exception' => get_class( $exception ),
+				'message'   => $exception->getMessage(),
+			] );
+			return;
+		}
 
 		// Get credentials from WordPress options
 		$username = get_option( 'taglock_klicktipp_username', '' );
@@ -82,6 +98,32 @@ final class KlickTippProvider implements CRMProviderInterface {
 			$this->logger->error( __( 'KlickTipp authentication failed', 'taglock' ), [ 'error' => $this->lastError ] );
 			HookUtil::doAction( HookAction::CRM_API_ERROR, 'login', $this->lastError );
 		}
+	}
+
+	private function ensureConnectorLoaded(): bool {
+		if ( class_exists( KlicktippConnector::class ) ) {
+			return true;
+		}
+
+		$connectorFile = dirname( TAGLOCK_FILE ) . '/vendor/klicktipp/php-connector/klicktipp.api.inc';
+		if ( ! file_exists( $connectorFile ) ) {
+			$this->lastError = __( 'KlickTipp connector library is missing. Please reinstall the plugin.', 'taglock' );
+			$this->logger->error( __( 'KlickTipp connector library file missing', 'taglock' ), [ 'file' => $connectorFile ] );
+			return false;
+		}
+
+		require_once $connectorFile;
+
+		if ( ! class_exists( KlicktippConnector::class ) ) {
+			$this->lastError = __( 'KlickTipp connector library could not be loaded. Please reinstall the plugin.', 'taglock' );
+			$this->logger->error( __( 'KlickTipp connector class not found after include', 'taglock' ), [
+				'file'  => $connectorFile,
+				'class' => KlicktippConnector::class,
+			] );
+			return false;
+		}
+
+		return true;
 	}
 
 	/**
