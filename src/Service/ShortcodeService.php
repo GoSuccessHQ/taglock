@@ -99,7 +99,7 @@ final class ShortcodeService {
 
 		// Build container HTML
 		$html = sprintf(
-			'<div id="taglock-root" class="taglock-container" %s>
+			'<div class="taglock-container" %s>
 				<div class="taglock-loader">
 					<span class="taglock-spinner"></span>
 					<span class="taglock-loader-text">%s</span>

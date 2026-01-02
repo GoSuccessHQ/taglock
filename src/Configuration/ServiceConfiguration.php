@@ -36,7 +36,7 @@ return static function ( ContainerConfigurator $container ): void {
 		->exclude( __DIR__ . '/../{' . implode( ',', $excludedPaths ) . '}' )
 		->public();
 
-	// Manually tag Route services - AutoconfigureTag attributes don't work with current Symfony setup
+	// Ensure API routes are tagged so RestApiService receives them via tagged_iterator.
 	$services->get( \GoSuccess\TagLock\Route\AccessCheckRoute::class )
 		->tag( 'taglock.api_route' );
 

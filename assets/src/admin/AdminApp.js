@@ -1,4 +1,4 @@
-import { useState } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
 	Card,
@@ -11,12 +11,41 @@ import {
 import apiFetch from '@wordpress/api-fetch';
 
 const AdminApp = () => {
-	const [username, setUsername] = useState(
-		window.taglockAdmin?.settings?.klicktipp_username || ''
-	);
+	const [username, setUsername] = useState('');
 	const [password, setPassword] = useState('');
 	const [isSaving, setIsSaving] = useState(false);
 	const [notice, setNotice] = useState(null);
+
+	useEffect(() => {
+		let isMounted = true;
+
+		const loadSettings = async () => {
+			try {
+				const response = await apiFetch({
+					path: '/taglock/v1/settings',
+					method: 'GET',
+				});
+
+				if (isMounted && response?.success && response?.data) {
+					setUsername(response.data.klicktipp_username || '');
+				}
+			} catch (error) {
+				if (!isMounted) {
+					return;
+				}
+				setNotice({
+					status: 'error',
+					message: error.message || __('Failed to load settings.', 'taglock'),
+				});
+			}
+		};
+
+		loadSettings();
+
+		return () => {
+			isMounted = false;
+		};
+	}, []);
 
 	const handleSave = async () => {
 		setIsSaving(true);
@@ -31,6 +60,8 @@ const AdminApp = () => {
 					klicktipp_password: password,
 				},
 			});
+
+			setPassword('');
 
 			setNotice({
 				status: 'success',

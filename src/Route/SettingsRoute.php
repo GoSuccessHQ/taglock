@@ -9,6 +9,7 @@ use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use GoSuccess\TagLock\DTO\ApiResponse;
 use GoSuccess\TagLock\Service\LoggerService;
 use GoSuccess\TagLock\Util\EncryptionUtil;
+use Throwable;
 use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
@@ -18,6 +19,7 @@ use function get_option;
 use function register_rest_route;
 use function sanitize_text_field;
 use function update_option;
+use function wp_unslash;
 
 /**
  * Settings Route
@@ -68,7 +70,8 @@ final class SettingsRoute implements ApiRouteInterface {
 					'klicktipp_password' => [
 						'required'          => true,
 						'type'              => 'string',
-						'sanitize_callback' => 'sanitize_text_field',
+						// Do not sanitize like a normal text field; passwords must remain intact.
+						'sanitize_callback' => static fn( $value ) => is_string( $value ) ? $value : '',
 					],
 				],
 			]
@@ -130,8 +133,8 @@ final class SettingsRoute implements ApiRouteInterface {
 	 * @return WP_REST_Response|WP_Error The REST response.
 	 */
 	public function saveSettings( WP_REST_Request $request ): WP_REST_Response {
-		$username = $request->get_param( 'klicktipp_username' );
-		$password = $request->get_param( 'klicktipp_password' );
+		$username = (string) $request->get_param( 'klicktipp_username' );
+		$password = wp_unslash( (string) $request->get_param( 'klicktipp_password' ) );
 
 		// Validate
 		if ( empty( $username ) ) {
@@ -153,7 +156,20 @@ final class SettingsRoute implements ApiRouteInterface {
 		}
 
 		// Encrypt password before saving
-		$encryptedPassword = EncryptionUtil::encrypt( $password );
+		try {
+			$encryptedPassword = EncryptionUtil::encrypt( $password );
+		} catch ( Throwable $exception ) {
+			$this->logger->error( __( 'Failed to encrypt password', 'taglock' ), [
+				'exception' => get_class( $exception ),
+				'message'   => $exception->getMessage(),
+			] );
+
+			return ApiResponse::error(
+				__( 'Failed to save credentials. Please try again.', 'taglock' ),
+				'encryption_failed',
+				500
+			);
+		}
 
 		// Save settings
 		update_option( 'taglock_klicktipp_username', sanitize_text_field( $username ) );

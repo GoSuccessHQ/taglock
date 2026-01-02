@@ -10,6 +10,7 @@ use GoSuccess\TagLock\Service\LoggerService;
 use GoSuccess\TagLock\Util\EncryptionUtil;
 use GoSuccess\TagLock\Util\HookUtil;
 use KlicktippConnector;
+use Throwable;
 
 use function get_option;
 
@@ -50,7 +51,16 @@ final class KlickTippProvider implements CRMProviderInterface {
 		}
 
 		// Decrypt password
-		$password = EncryptionUtil::decrypt( $encryptedPassword );
+		try {
+			$password = EncryptionUtil::decrypt( $encryptedPassword );
+		} catch ( Throwable $exception ) {
+			$this->lastError = __( 'KlickTipp password could not be decrypted. Please re-save your credentials.', 'taglock' );
+			$this->logger->error( __( 'Failed to decrypt KlickTipp password', 'taglock' ), [
+				'exception' => get_class( $exception ),
+				'message'   => $exception->getMessage(),
+			] );
+			return;
+		}
 
 		if ( false === $password || empty( $password ) ) {
 			$this->lastError = __( 'Failed to decrypt KlickTipp password. Please re-save your credentials.', 'taglock' );

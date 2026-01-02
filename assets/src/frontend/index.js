@@ -21,8 +21,7 @@ domReady(() => {
 					contentId={contentId}
 					message={message}
 					loaderText={loaderText}
-				/>,
-				container
+				/>
 			);
 		}
 	});

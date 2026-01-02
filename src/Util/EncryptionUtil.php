@@ -4,14 +4,18 @@ declare(strict_types=1);
 
 namespace GoSuccess\TagLock\Util;
 
+use RuntimeException;
+
 use function base64_decode;
 use function base64_encode;
 use function defined;
 use function hash_hmac;
-use function mb_strlen;
 use function mb_substr;
 use function openssl_decrypt;
 use function openssl_encrypt;
+use function openssl_cipher_iv_length;
+use function random_bytes;
+use function strlen;
 
 /**
  * Encryption Utility
@@ -20,8 +24,8 @@ use function openssl_encrypt;
  * Uses WordPress AUTH_KEY as encryption key.
  */
 final class EncryptionUtil {
-
-	private const string CIPHER = 'aes-256-cbc';
+	private const string CIPHER_V2 = 'aes-256-gcm';
+	private const string PREFIX_V2 = 'v2:';
 
 	/**
 	 * Encrypt a string.
@@ -30,13 +34,18 @@ final class EncryptionUtil {
 	 * @return string The encrypted data (base64 encoded).
 	 */
 	public static function encrypt( string $data ): string {
-		$key = self::getEncryptionKey();
-		$iv  = openssl_random_pseudo_bytes( openssl_cipher_iv_length( self::CIPHER ) );
+		$key = self::getEncryptionKeyBytes();
+		$iv  = random_bytes( openssl_cipher_iv_length( self::CIPHER_V2 ) );
+		$tag = '';
 
-		$encrypted = openssl_encrypt( $data, self::CIPHER, $key, 0, $iv );
+		$ciphertext = openssl_encrypt( $data, self::CIPHER_V2, $key, OPENSSL_RAW_DATA, $iv, $tag );
+		if ( false === $ciphertext || '' === $tag ) {
+			throw new RuntimeException( 'Failed to encrypt data.' );
+		}
 
-		// Prepend IV to encrypted data
-		return base64_encode( "{$iv}{$encrypted}" );
+		$payload = base64_encode( $iv ) . ':' . base64_encode( $tag ) . ':' . base64_encode( $ciphertext );
+
+		return self::PREFIX_V2 . $payload;
 	}
 
 	/**
@@ -46,31 +55,38 @@ final class EncryptionUtil {
 	 * @return string|false The decrypted data or false on failure.
 	 */
 	public static function decrypt( string $data ): string|false {
-		$key  = self::getEncryptionKey();
-		$data = base64_decode( $data, true );
-
-		if ( false === $data ) {
+		if ( ! str_starts_with( $data, self::PREFIX_V2 ) ) {
 			return false;
 		}
 
-		$ivLength = openssl_cipher_iv_length( self::CIPHER );
-		$iv       = mb_substr( $data, 0, $ivLength, '8bit' );
-		$encrypted = mb_substr( $data, $ivLength, null, '8bit' );
+		$payload = substr( $data, strlen( self::PREFIX_V2 ) );
+		$parts   = explode( ':', $payload );
 
-		return openssl_decrypt( $encrypted, self::CIPHER, $key, 0, $iv );
+		if ( 3 !== count( $parts ) ) {
+			return false;
+		}
+
+		$iv         = base64_decode( $parts[0], true );
+		$tag        = base64_decode( $parts[1], true );
+		$ciphertext = base64_decode( $parts[2], true );
+
+		if ( false === $iv || false === $tag || false === $ciphertext ) {
+			return false;
+		}
+
+		$key = self::getEncryptionKeyBytes();
+
+		return openssl_decrypt( $ciphertext, self::CIPHER_V2, $key, OPENSSL_RAW_DATA, $iv, $tag );
 	}
 
 	/**
-	 * Get encryption key from WordPress constants.
-	 *
-	 * @return string The encryption key.
+	 * Get binary encryption key bytes for modern ciphers.
 	 */
-	private static function getEncryptionKey(): string {
-		if ( defined( 'AUTH_KEY' ) && AUTH_KEY ) {
-			return hash_hmac( 'sha256', 'taglock', AUTH_KEY );
+	private static function getEncryptionKeyBytes(): string {
+		if ( ! ( defined( 'AUTH_KEY' ) && is_string( AUTH_KEY ) && '' !== AUTH_KEY ) ) {
+			throw new RuntimeException( 'AUTH_KEY is required for encryption/decryption.' );
 		}
 
-		// Fallback (not recommended for production)
-		return hash( 'sha256', 'taglock_fallback_key' );
+		return hash_hmac( 'sha256', 'taglock', AUTH_KEY, true );
 	}
 }

@@ -47,9 +47,10 @@ const ContentLoader = ({ tag, nonce, contentId, message, loaderText }) => {
 				});
 
 				if (response.success) {
+					const content = response?.data?.content ?? null;
 					setState({
 						loading: false,
-						content: response.content,
+						content,
 						error: null,
 					});
 				} else {
