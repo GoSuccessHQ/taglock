@@ -8,6 +8,7 @@ import {
 	TextareaControl,
 	ToggleControl,
 	SelectControl,
+	FormTokenField,
 	Button,
 	Notice,
 	Spinner,
@@ -67,13 +68,13 @@ const AdminApp = () => {
 		name: '',
 		is_active: true,
 		access_mode: 'tag_any',
-		required_tag_ids: '',
+		required_tag_ids: [],
 		deny_mode: 'message',
 		deny_message: '',
 		teaser_html: '',
 		redirect_post_id: '',
 		engagement_tagging_enabled: false,
-		engagement_tag_ids: '',
+		engagement_tag_ids: [],
 		admin_bypass_enabled: false,
 	});
 
@@ -149,16 +150,52 @@ const AdminApp = () => {
 	}, [rulesPage]);
 
 	const parseIdList = (value) => {
-		if (!value) {
+		if (!value || (Array.isArray(value) && value.length === 0)) {
 			return [];
 		}
-		return value
-			.split(',')
-			.map((part) => part.trim())
-			.filter(Boolean)
+
+		const parts = Array.isArray(value)
+			? value
+			: String(value)
+					.split(',')
+					.map((part) => part.trim())
+					.filter(Boolean);
+
+		return parts
+			.map((part) => String(part).trim())
+			.filter((part) => /^\d+$/.test(part))
 			.map((part) => Number(part))
 			.filter((n) => Number.isInteger(n) && n > 0);
 	};
+
+	const normalizeTagIdTokens = (tokens) => {
+		const raw = Array.isArray(tokens) ? tokens : [];
+		const seen = new Set();
+		return raw
+			.map((t) => String(t).trim())
+			.filter((t) => /^\d+$/.test(t))
+			.filter((t) => t !== '0')
+			.filter((t) => {
+				if (seen.has(t)) {
+					return false;
+				}
+				seen.add(t);
+				return true;
+			});
+	};
+
+	const tagIdSuggestions = (() => {
+		const ids = new Set();
+		rules.forEach((rule) => {
+			if (Array.isArray(rule?.required_tag_ids)) {
+				rule.required_tag_ids.forEach((id) => ids.add(String(id)));
+			}
+			if (Array.isArray(rule?.engagement_tag_ids)) {
+				rule.engagement_tag_ids.forEach((id) => ids.add(String(id)));
+			}
+		});
+		return Array.from(ids).filter(Boolean).sort();
+	})();
 
 	const openCreateRuleModal = () => {
 		setRuleModalNotice(null);
@@ -167,13 +204,13 @@ const AdminApp = () => {
 			name: '',
 			is_active: true,
 			access_mode: 'tag_any',
-			required_tag_ids: '',
+			required_tag_ids: [],
 			deny_mode: 'message',
 			deny_message: '',
 			teaser_html: '',
 			redirect_post_id: '',
 			engagement_tagging_enabled: false,
-			engagement_tag_ids: '',
+			engagement_tag_ids: [],
 			admin_bypass_enabled: false,
 		});
 		setIsRuleModalOpen(true);
@@ -187,8 +224,8 @@ const AdminApp = () => {
 			is_active: Boolean(rule?.is_active),
 			access_mode: rule?.access_mode || 'tag_any',
 			required_tag_ids: Array.isArray(rule?.required_tag_ids)
-				? rule.required_tag_ids.join(', ')
-				: '',
+				? rule.required_tag_ids.map((id) => String(id))
+				: [],
 			deny_mode: rule?.deny_mode || 'message',
 			deny_message: rule?.deny_message || '',
 			teaser_html: rule?.teaser_html || '',
@@ -198,8 +235,8 @@ const AdminApp = () => {
 					: '',
 			engagement_tagging_enabled: Boolean(rule?.engagement_tagging_enabled),
 			engagement_tag_ids: Array.isArray(rule?.engagement_tag_ids)
-				? rule.engagement_tag_ids.join(', ')
-				: '',
+				? rule.engagement_tag_ids.map((id) => String(id))
+				: [],
 			admin_bypass_enabled: Boolean(rule?.admin_bypass_enabled),
 		});
 		setIsRuleModalOpen(true);
@@ -601,15 +638,17 @@ const AdminApp = () => {
 						__nextHasNoMarginBottom
 					/>
 
-					<TextControl
+					<FormTokenField
 						label={__('Required tag IDs', 'taglock')}
-						help={__('Comma-separated KlickTipp tag IDs.', 'taglock')}
+						help={__('Add one or more KlickTipp tag IDs (numbers only).', 'taglock')}
 						value={ruleForm.required_tag_ids}
-						onChange={(value) =>
-							setRuleForm({ ...ruleForm, required_tag_ids: value })
+						onChange={(tokens) =>
+							setRuleForm({
+								...ruleForm,
+								required_tag_ids: normalizeTagIdTokens(tokens),
+							})
 						}
-						__next40pxDefaultSize
-						__nextHasNoMarginBottom
+						suggestions={tagIdSuggestions}
 					/>
 
 					<SelectControl
@@ -707,7 +746,7 @@ const AdminApp = () => {
 					/>
 
 					{ruleForm.engagement_tagging_enabled && (
-						<TextControl
+						<FormTokenField
 							disabled={isProDisabled}
 							label={
 								<span className="taglock-admin__label-with-badge">
@@ -715,13 +754,18 @@ const AdminApp = () => {
 									{proBadge}
 								</span>
 							}
-							help={__('Comma-separated KlickTipp tag IDs.', 'taglock')}
+							help={__(
+								'Add one or more KlickTipp tag IDs to apply on access (numbers only).',
+								'taglock'
+							)}
 							value={ruleForm.engagement_tag_ids}
-							onChange={(value) =>
-								setRuleForm({ ...ruleForm, engagement_tag_ids: value })
+							onChange={(tokens) =>
+								setRuleForm({
+									...ruleForm,
+									engagement_tag_ids: normalizeTagIdTokens(tokens),
+								})
 							}
-							__next40pxDefaultSize
-							__nextHasNoMarginBottom
+							suggestions={tagIdSuggestions}
 						/>
 					)}
 
