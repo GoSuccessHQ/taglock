@@ -21,6 +21,7 @@ use function wp_mkdir_p;
 final class LoggerService {
 
 	private LoggerInterface $logger;
+	private bool $initialized = false;
 
 	/**
 	 * Constructor
@@ -29,6 +30,42 @@ final class LoggerService {
 	 */
 	public function __construct() {
 		$this->logger = $this->createLogger();
+	}
+
+	/**
+	 * Ensure log directory exists (lazy initialization).
+	 * Called before first log write to ensure WordPress functions are available.
+	 *
+	 * @return void
+	 */
+	private function ensureLogDirectoryExists(): void {
+		if ( $this->initialized ) {
+			return;
+		}
+
+		$logDir = WP_CONTENT_DIR . '/uploads/taglock/logs';
+
+		if ( ! is_dir( $logDir ) ) {
+			wp_mkdir_p( $logDir );
+
+			// Create index.php to prevent directory listing
+			file_put_contents(
+				"{$logDir}/index.php",
+				"<?php\n// Silence is golden.\n"
+			);
+
+			// Create .htaccess to deny direct access
+			file_put_contents(
+				"{$logDir}/.htaccess",
+				"# Deny access to log files\n" .
+				"<Files *.log>\n" .
+				"    Order allow,deny\n" .
+				"    Deny from all\n" .
+				"</Files>\n"
+			);
+		}
+
+		$this->initialized = true;
 	}
 
 	/**
@@ -42,27 +79,6 @@ final class LoggerService {
 		// Get log directory
 		$logDir  = WP_CONTENT_DIR . '/uploads/taglock/logs';
 		$logFile = "{$logDir}/taglock.log";
-
-		// Create log directory if it doesn't exist
-		if ( ! is_dir( $logDir ) ) {
-			wp_mkdir_p( $logDir );
-			
-			// Create index.php to prevent directory listing
-			file_put_contents( 
-				"{$logDir}/index.php", 
-				"<?php\n// Silence is golden.\n" 
-			);
-			
-			// Create .htaccess to deny direct access
-			file_put_contents(
-				"{$logDir}/.htaccess",
-				(string) "# Deny access to log files\n" .
-				"<Files *.log>\n" .
-				"    Order allow,deny\n" .
-				"    Deny from all\n" .
-				"</Files>\n"
-			);
-		}
 
 		// Determine log level based on WP_DEBUG
 		$isDebug = defined( 'WP_DEBUG' ) && WP_DEBUG;
@@ -81,6 +97,7 @@ final class LoggerService {
 	 * @param array<string, mixed> $context Additional context data.
 	 */
 	public function debug( string $message, array $context = [] ): void {
+		$this->ensureLogDirectoryExists();
 		$this->logger->debug( $message, $context );
 	}
 
@@ -91,6 +108,7 @@ final class LoggerService {
 	 * @param array<string, mixed> $context Additional context data.
 	 */
 	public function info( string $message, array $context = [] ): void {
+		$this->ensureLogDirectoryExists();
 		$this->logger->info( $message, $context );
 	}
 
@@ -101,6 +119,7 @@ final class LoggerService {
 	 * @param array<string, mixed> $context Additional context data.
 	 */
 	public function warning( string $message, array $context = [] ): void {
+		$this->ensureLogDirectoryExists();
 		$this->logger->warning( $message, $context );
 	}
 
@@ -111,6 +130,7 @@ final class LoggerService {
 	 * @param array<string, mixed> $context Additional context data.
 	 */
 	public function error( string $message, array $context = [] ): void {
+		$this->ensureLogDirectoryExists();
 		$this->logger->error( $message, $context );
 	}
 
