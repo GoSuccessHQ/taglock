@@ -10,6 +10,7 @@ use GoSuccess\TagLock\DTO\ApiMethodHandler;
 use GoSuccess\TagLock\DTO\ApiResponse;
 use GoSuccess\TagLock\Enum\HttpMethod;
 use GoSuccess\TagLock\Service\LoggerService;
+use GoSuccess\TagLock\Contract\CRMProviderInterface;
 use GoSuccess\TagLock\Util\EncryptionUtil;
 use Throwable;
 use WP_Error;
@@ -21,6 +22,7 @@ use function get_option;
 use function sanitize_text_field;
 use function update_option;
 use function wp_unslash;
+use function time;
 
 /**
  * Settings Route
@@ -33,9 +35,11 @@ use function wp_unslash;
 final class SettingsRoute implements ApiRouteInterface {
 
 	private const string ROUTE     = '/settings';
+	private const string CONNECTION_STATUS_OPTION = 'taglock_connection_status';
 
 	public function __construct(
-		private readonly LoggerService $logger
+		private readonly LoggerService $logger,
+		private readonly CRMProviderInterface $provider
 	) {}
 
 	/**
@@ -102,9 +106,16 @@ final class SettingsRoute implements ApiRouteInterface {
 	 * @return WP_REST_Response The REST response.
 	 */
 	public function getSettings( WP_REST_Request $request ): WP_REST_Response {
+		$connectionStatus = get_option( self::CONNECTION_STATUS_OPTION, [
+			'is_connected' => false,
+			'checked_at'   => 0,
+			'error'        => '',
+		] );
+
 		$settings = [
 			'klicktipp_username' => get_option( 'taglock_klicktipp_username', '' ),
 			'has_password'       => ! empty( get_option( 'taglock_klicktipp_password', '' ) ),
+			'connection_status'  => $connectionStatus,
 		];
 
 		return ApiResponse::success( $settings );
@@ -162,6 +173,13 @@ final class SettingsRoute implements ApiRouteInterface {
 		}
 
 		$this->logger->info( __( 'Settings saved successfully', 'taglock' ), [ 'username' => $username ] );
+
+		$isConnected = $this->provider->isAuthenticated();
+		update_option( self::CONNECTION_STATUS_OPTION, [
+			'is_connected' => $isConnected,
+			'checked_at'   => time(),
+			'error'        => $isConnected ? '' : $this->provider->getLastError(),
+		] );
 
 		return ApiResponse::success( null, __( 'Settings saved successfully', 'taglock' ) );
 	}
