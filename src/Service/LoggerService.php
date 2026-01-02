@@ -4,14 +4,20 @@ declare(strict_types=1);
 
 namespace GoSuccess\TagLock\Service;
 
+use DateTimeZone;
+use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
+use Monolog\LogRecord;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 
 use function defined;
+use function function_exists;
 use function is_dir;
+use function is_numeric;
 use function touch;
+use function get_option;
 use function wp_mkdir_p;
 
 /**
@@ -82,6 +88,14 @@ final class LoggerService {
 	 */
 	private function createLogger(): LoggerInterface {
 		$logger = new Logger( 'taglock' );
+		$timezone = $this->getWordPressTimezone();
+
+		// Ensure Monolog timestamps match the WordPress timezone (helps debugging).
+		$logger->pushProcessor(
+			static function ( LogRecord $record ) use ( $timezone ): LogRecord {
+				return $record->with( datetime: $record->datetime->setTimezone( $timezone ) );
+			}
+		);
 
 		// Get log directory
 		$logDir  = WP_CONTENT_DIR . '/uploads/taglock/logs';
@@ -92,9 +106,44 @@ final class LoggerService {
 		$level   = $isDebug ? Logger::DEBUG : Logger::WARNING;
 
 		// Add file handler
-		$logger->pushHandler( new StreamHandler( $logFile, $level ) );
+		$handler = new StreamHandler( $logFile, $level );
+		$handler->setFormatter( new LineFormatter( null, null, true, true ) );
+		$logger->pushHandler( $handler );
 
 		return $logger;
+	}
+
+	private function getWordPressTimezone(): DateTimeZone {
+		if ( function_exists( 'wp_timezone' ) ) {
+			return wp_timezone();
+		}
+
+		$timezoneString = function_exists( 'get_option' ) ? (string) get_option( 'timezone_string', '' ) : '';
+		if ( '' !== $timezoneString ) {
+			try {
+				return new DateTimeZone( $timezoneString );
+			} catch ( \Throwable ) {
+				// Fall through to offset/UTC.
+			}
+		}
+
+		$gmtOffset = function_exists( 'get_option' ) ? get_option( 'gmt_offset', 0 ) : 0;
+		if ( is_numeric( $gmtOffset ) ) {
+			$offsetHours = (float) $gmtOffset;
+			$sign = $offsetHours < 0 ? '-' : '+';
+			$abs = abs( $offsetHours );
+			$hours = (int) floor( $abs );
+			$minutes = (int) round( ( $abs - $hours ) * 60 );
+			$offset = sprintf( '%s%02d:%02d', $sign, $hours, $minutes );
+
+			try {
+				return new DateTimeZone( $offset );
+			} catch ( \Throwable ) {
+				// Fall through to UTC.
+			}
+		}
+
+		return new DateTimeZone( 'UTC' );
 	}
 
 	/**

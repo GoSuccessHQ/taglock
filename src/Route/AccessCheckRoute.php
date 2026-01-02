@@ -147,10 +147,16 @@ final class AccessCheckRoute implements ApiRouteInterface {
 
 			HookUtil::doAction( HookAction::API_EXCEPTION_CAUGHT, 'authentication_failed', $error );
 
+			$data = [];
+			if ( function_exists( 'current_user_can' ) && current_user_can( 'manage_options' ) && ! empty( $error ) ) {
+				$data['details'] = $error;
+			}
+
 			return ApiResponse::error(
-				__( 'Service temporarily unavailable. Please try again later or contact support.', 'taglock' ),
+				__( 'TagLock is currently unavailable (CRM connection failed or is not configured). Please contact the site administrator.', 'taglock' ),
 				'authentication_failed',
-				503
+				503,
+				$data
 			);
 		}
 
