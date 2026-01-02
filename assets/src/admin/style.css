@@ -1,28 +1,29 @@
 .taglock-admin {
+	container-type: inline-size;
+
 	--taglock-admin-max-width: 1200px;
-	--taglock-admin-space-lg: 20px;
-	--taglock-admin-gap-sm: 12px;
-	--taglock-admin-gap-md: 16px;
-	--taglock-admin-input-margin: 15px;
-	--taglock-admin-spinner-size: 20px;
-	--taglock-admin-credentials-min-col: 260px;
-	--taglock-admin-code-padding: 10px;
-	--taglock-admin-radius-sm: 0.4rem;
-	--taglock-admin-radius-xs: 4px;
+	--taglock-admin-space: clamp(12px, 2cqi, 20px);
+	--taglock-admin-gap: clamp(10px, 1.6cqi, 16px);
+	--taglock-admin-input-margin: clamp(12px, 1.8cqi, 15px);
+	--taglock-admin-spinner-size: clamp(16px, 2cqi, 20px);
+	--taglock-admin-credentials-min-col: min(260px, 100%);
+	--taglock-admin-code-padding: clamp(8px, 1.4cqi, 10px);
+	--taglock-admin-radius: 0.4rem;
+	--taglock-admin-radius-tight: 4px;
 	--taglock-admin-code-bg: #f0f0f0;
-	--taglock-admin-h2-size: 1.3em;
+	--taglock-admin-h2-size: clamp(1.1rem, 1.6cqi, 1.3rem);
 
 	max-width: var(--taglock-admin-max-width);
-	margin: var(--taglock-admin-space-lg) 0;
+	margin: var(--taglock-admin-space) 0;
 }
 
 .taglock-admin__notice {
-	margin-block-end: var(--taglock-admin-space-lg);
-	border-radius: var(--taglock-admin-radius-sm);
+	margin-block-end: var(--taglock-admin-space);
+	border-radius: var(--taglock-admin-radius);
 }
 
 .taglock-admin .components-card {
-	margin-bottom: var(--taglock-admin-space-lg);
+	margin-bottom: var(--taglock-admin-space);
 }
 
 .taglock-admin .components-card__header h2 {
@@ -34,7 +35,7 @@
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	gap: var(--taglock-admin-gap-sm);
+	gap: var(--taglock-admin-gap);
 	width: 100%;
 }
 
@@ -58,7 +59,7 @@
 }
 
 .taglock-admin__card--spaced {
-	margin-top: var(--taglock-admin-space-lg);
+	margin-top: var(--taglock-admin-space);
 }
 
 .taglock-admin .components-text-control {
@@ -68,7 +69,7 @@
 .taglock-admin__credentials {
 	display: grid;
 	grid-template-columns: repeat(auto-fit, minmax(var(--taglock-admin-credentials-min-col), 1fr));
-	gap: var(--taglock-admin-gap-md);
+	gap: var(--taglock-admin-gap);
 }
 
 .taglock-admin__credentials .components-text-control {
@@ -78,12 +79,12 @@
 .taglock-admin__code {
 	padding: var(--taglock-admin-code-padding);
 	background: var(--taglock-admin-code-bg);
-	border-radius: var(--taglock-admin-radius-xs);
+	border-radius: var(--taglock-admin-radius-tight);
 	overflow-x: auto;
 	font-family: monospace;
 }
 
 .taglock-admin ul {
 	list-style: disc;
-	margin-left: var(--taglock-admin-space-lg);
+	margin-left: var(--taglock-admin-space);
 }
