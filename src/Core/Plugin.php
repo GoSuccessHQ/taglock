@@ -138,7 +138,7 @@ final class Plugin {
 			$dumper = new PhpDumper( $container );
 			$dumpedContainer = $dumper->dump( [ 'class' => $containerClass ] );
 			if ( is_string( $dumpedContainer ) ) {
-				$containerConfigCache->write( $dumpedContainer );
+				$containerConfigCache->write( $dumpedContainer, $container->getResources() );
 			}
 		}
 
