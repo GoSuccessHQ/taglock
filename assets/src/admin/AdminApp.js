@@ -13,7 +13,7 @@ import apiFetch from '@wordpress/api-fetch';
 const AdminApp = () => {
 	const [username, setUsername] = useState('');
 	const [password, setPassword] = useState('');
-	const [hasPassword, setHasPassword] = useState(false);
+	const [hasPassword, setHasPassword] = useState(null);
 	const [isSaving, setIsSaving] = useState(false);
 	const [notice, setNotice] = useState(null);
 
@@ -27,14 +27,19 @@ const AdminApp = () => {
 					method: 'GET',
 				});
 
-				if (isMounted && response?.success && response?.data) {
-					setUsername(response.data.klicktipp_username || '');
-					setHasPassword(Boolean(response.data.has_password));
+				if (isMounted) {
+					if (response?.success && response?.data) {
+						setUsername(response.data.klicktipp_username || '');
+						setHasPassword(Boolean(response.data.has_password));
+					} else {
+						setHasPassword(false);
+					}
 				}
 			} catch (error) {
 				if (!isMounted) {
 					return;
 				}
+				setHasPassword(false);
 				setNotice({
 					status: 'error',
 					message: error.message || __('Failed to load settings.', 'taglock'),
@@ -137,13 +142,17 @@ const AdminApp = () => {
 									type="password"
 									value={password}
 									onChange={setPassword}
+									autoComplete="current-password"
+									autoCapitalize="none"
+									autoCorrect="off"
+									spellCheck={false}
 									placeholder={
-										hasPassword
+										hasPassword === true
 											? __('Saved. Enter a new password to update.', 'taglock')
 											: ''
 									}
 									help={
-										hasPassword
+										hasPassword === true
 											? __(
 												'Password is already saved. Enter a new one only if you want to change it.',
 												'taglock'
@@ -153,7 +162,7 @@ const AdminApp = () => {
 												'taglock'
 											)
 									}
-									required={!hasPassword}
+									required={hasPassword === false}
 									__next40pxDefaultSize
 									__nextHasNoMarginBottom
 								/>
