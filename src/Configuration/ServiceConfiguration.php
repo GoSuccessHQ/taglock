@@ -35,11 +35,4 @@ return static function ( ContainerConfigurator $container ): void {
 	$services->load( 'GoSuccess\\TagLock\\', __DIR__ . '/../*' )
 		->exclude( __DIR__ . '/../{' . implode( ',', $excludedPaths ) . '}' )
 		->public();
-
-	// Ensure API routes are tagged so ApiRouteRegistrationService receives them via tagged_iterator.
-	$services->get( \GoSuccess\TagLock\Route\AccessCheckRoute::class )
-		->tag( 'taglock.api_route' );
-
-	$services->get( \GoSuccess\TagLock\Route\SettingsRoute::class )
-		->tag( 'taglock.api_route' );
 };
