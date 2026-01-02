@@ -57,7 +57,7 @@ final class LoggerService {
 			// Create .htaccess to deny direct access
 			file_put_contents(
 				"{$logDir}/.htaccess",
-				"# Deny access to log files\n" .
+				(string) "# Deny access to log files\n" .
 				"<Files *.log>\n" .
 				"    Order allow,deny\n" .
 				"    Deny from all\n" .

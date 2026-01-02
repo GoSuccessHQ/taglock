@@ -35,4 +35,11 @@ return static function ( ContainerConfigurator $container ): void {
 	$services->load( 'GoSuccess\\TagLock\\', __DIR__ . '/../*' )
 		->exclude( __DIR__ . '/../{' . implode( ',', $excludedPaths ) . '}' )
 		->public();
+
+	// Manually tag Route services - AutoconfigureTag attributes don't work with current Symfony setup
+	$services->get( \GoSuccess\TagLock\Route\AccessCheckRoute::class )
+		->tag( 'taglock.api_route' );
+
+	$services->get( \GoSuccess\TagLock\Route\SettingsRoute::class )
+		->tag( 'taglock.api_route' );
 };
