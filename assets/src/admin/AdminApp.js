@@ -213,6 +213,23 @@ const AdminApp = () => {
 		}
 	};
 
+	const formatTagList = (ids) => {
+		if (!Array.isArray(ids) || ids.length === 0) {
+			return '';
+		}
+		return ids
+			.map((raw) => {
+				const id = Number(raw);
+				if (!Number.isInteger(id) || id <= 0) {
+					return '';
+				}
+				const name = tagsById[String(id)];
+				return name ? `${name} (#${id})` : `#${id}`;
+			})
+			.filter(Boolean)
+			.join(', ');
+	};
+
 	const openCreateRuleModal = () => {
 		setRuleModalNotice(null);
 		setEditingRuleId(null);
@@ -555,9 +572,7 @@ const AdminApp = () => {
 												<td>{rule.name}</td>
 												<td>{rule.is_active ? __('Yes', 'taglock') : __('No', 'taglock')}</td>
 												<td>
-													{Array.isArray(rule.required_tag_ids)
-														? rule.required_tag_ids.join(', ')
-														: ''}
+													{formatTagList(rule.required_tag_ids)}
 												</td>
 												<td>
 													<Button
