@@ -36,7 +36,7 @@ domReady(() => {
 
 	const batchRequest = subscriberId && firstNonce && items.length
 		? apiFetch({
-			path: '/taglock/v1/check-access-batch',
+			path: '/taglock/v1/check-access',
 			method: 'POST',
 			data: {
 				subscriber_id: subscriberId,
