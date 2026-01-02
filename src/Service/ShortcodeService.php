@@ -27,7 +27,8 @@ use function array_map;
 final class ShortcodeService {
 
 	public function __construct(
-		private readonly LoggerService $logger
+		private readonly LoggerService $logger,
+		private readonly AssetService $assetService
 	) {}
 
 	/**
@@ -42,6 +43,9 @@ final class ShortcodeService {
 	 */
 	public function renderShortcode( $atts, ?string $content = null ): string {
 		HookUtil::doAction( HookAction::BEFORE_SHORTCODE_RENDER, $atts, $content );
+
+		// Ensure frontend assets are available for this shortcode instance.
+		$this->assetService->enqueueFrontendAssets( true );
 
 		// Parse attributes
 		$attributes = shortcode_atts(

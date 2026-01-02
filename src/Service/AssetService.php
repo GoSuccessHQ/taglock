@@ -97,10 +97,12 @@ final class AssetService {
 
 	/**
 	 * Enqueue frontend assets.
+	 *
+	 * @param bool $force If true, enqueues even when hasShortcode() cannot detect it.
 	 */
-	public function enqueueFrontendAssets(): void {
-		// Only enqueue if shortcode is present
-		if ( ! $this->hasShortcode() ) {
+	public function enqueueFrontendAssets( bool $force = false ): void {
+		// Only enqueue if shortcode is present (unless forced).
+		if ( ! $force && ! $this->hasShortcode() ) {
 			return;
 		}
 
