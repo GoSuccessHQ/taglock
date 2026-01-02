@@ -203,11 +203,15 @@ final class Plugin {
 			}
 		}
 
-		$metaFiles = glob( "{$cacheDir}/container-*.php.meta" );
+		$metaFiles = glob( "{$cacheDir}/container-*.php.meta*" );
 		if ( $metaFiles !== false ) {
-			$currentMetaFile = "{$currentCacheFile}.meta";
+			$currentMetaFiles = [
+				"{$currentCacheFile}.meta",
+				"{$currentCacheFile}.meta.json",
+			];
+
 			foreach ( $metaFiles as $metaFile ) {
-				if ( basename( $metaFile ) !== $currentMetaFile && file_exists( $metaFile ) ) {
+				if ( ! in_array( basename( $metaFile ), $currentMetaFiles, true ) && file_exists( $metaFile ) ) {
 					@unlink( $metaFile );
 				}
 			}
