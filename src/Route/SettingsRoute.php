@@ -135,7 +135,7 @@ final class SettingsRoute implements ApiRouteInterface {
 		update_option( 'taglock_klicktipp_username', sanitize_text_field( $username ) );
 
 		// Only update password if a new one was provided.
-		if ( '' !== $password ) {
+		if ( $password !== '' ) {
 			try {
 				$encryptedPassword = EncryptionUtil::encrypt( $password );
 			} catch ( Throwable $exception ) {
@@ -152,7 +152,7 @@ final class SettingsRoute implements ApiRouteInterface {
 			}
 
 			update_option( 'taglock_klicktipp_password', $encryptedPassword );
-		} elseif ( '' === $existingEncryptedPassword ) {
+		} elseif ( $existingEncryptedPassword === '' ) {
 			$this->logger->warning( __( 'Settings save failed: empty password', 'taglock' ) );
 			return ApiResponse::error(
 				__( 'Password cannot be empty', 'taglock' ),

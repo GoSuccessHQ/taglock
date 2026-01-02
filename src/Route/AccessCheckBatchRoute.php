@@ -146,11 +146,11 @@ final class AccessCheckBatchRoute implements ApiRouteInterface {
 			$tagId = isset( $item['tag'] ) ? sanitize_text_field( (string) $item['tag'] ) : '';
 			$contentId = isset( $item['content_id'] ) ? sanitize_text_field( (string) $item['content_id'] ) : '';
 
-			if ( '' === $contentId ) {
+			if ( $contentId === '' ) {
 				continue;
 			}
 
-			if ( '' === $tagId || ! ctype_digit( $tagId ) ) {
+			if ( $tagId === '' || ! ctype_digit( $tagId ) ) {
 				$results[ $contentId ] = [
 					'success' => false,
 					'code'    => 'invalid_tag_id',
@@ -169,7 +169,7 @@ final class AccessCheckBatchRoute implements ApiRouteInterface {
 			if ( $hasAccess ) {
 				$content = get_transient( $contentId );
 
-				if ( false === $content ) {
+				if ( $content === false ) {
 					$results[ $contentId ] = [
 						'success' => false,
 						'code'    => 'content_not_found',

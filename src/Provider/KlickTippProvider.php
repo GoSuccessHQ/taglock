@@ -39,7 +39,7 @@ final class KlickTippProvider implements CRMProviderInterface {
 	 * Initialize the KlickTipp connector and authenticate.
 	 */
 	private function initialize(): void {
-		if ( null !== $this->connector ) {
+		if ( $this->connector !== null ) {
 			return;
 		}
 
@@ -80,7 +80,7 @@ final class KlickTippProvider implements CRMProviderInterface {
 			return;
 		}
 
-		if ( false === $password || empty( $password ) ) {
+		if ( $password === false || empty( $password ) ) {
 			$this->lastError = __( 'Failed to decrypt KlickTipp password. Please re-save your credentials.', 'taglock' );
 			$this->logger->error( __( 'Failed to decrypt KlickTipp password', 'taglock' ) );
 			return;
@@ -256,7 +256,7 @@ final class KlickTippProvider implements CRMProviderInterface {
 	 * Destructor - logout when object is destroyed
 	 */
 	public function __destruct() {
-		if ( $this->isAuthenticated && null !== $this->connector ) {
+		if ( $this->isAuthenticated && $this->connector !== null ) {
 			$this->connector->logout();
 			$this->logger->debug( __( 'KlickTipp session logged out', 'taglock' ) );
 		}

@@ -169,7 +169,7 @@ final class AccessCheckRoute implements ApiRouteInterface {
 			// Access granted - retrieve protected content
 			$content = get_transient( $contentId );
 
-			if ( false === $content ) {
+			if ( $content === false ) {
 				$this->logger->error( __( 'Content not found or expired', 'taglock' ), [ 'content_id' => $contentId ] );
 
 				return ApiResponse::error(
