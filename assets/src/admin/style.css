@@ -9,7 +9,6 @@
 	--taglock-admin-credentials-min-col: min(260px, 100%);
 	--taglock-admin-code-padding: clamp(8px, 1.4cqi, 10px);
 	--taglock-admin-radius: 0.4rem;
-	--taglock-admin-radius-tight: 4px;
 	--taglock-admin-code-bg: #f0f0f0;
 	--taglock-admin-h2-size: clamp(1.1rem, 1.6cqi, 1.3rem);
 
@@ -79,7 +78,7 @@
 .taglock-admin__code {
 	padding: var(--taglock-admin-code-padding);
 	background: var(--taglock-admin-code-bg);
-	border-radius: var(--taglock-admin-radius-tight);
+	border-radius: var(--taglock-admin-radius);
 	overflow-x: auto;
 	font-family: monospace;
 }
