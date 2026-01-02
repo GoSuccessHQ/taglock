@@ -155,9 +155,18 @@ final class AccessCheckRoute implements ApiRouteInterface {
 		}
 
 		$results = [];
+		$diagnostics = [];
+		$includeDiagnostics = function_exists( 'current_user_can' ) && current_user_can( 'manage_options' );
 
-		foreach ( $items as $item ) {
+		foreach ( $items as $index => $item ) {
 			if ( ! is_array( $item ) ) {
+				if ( $includeDiagnostics ) {
+					$diagnostics[] = [
+						'index'   => $index,
+						'code'    => 'invalid_item',
+						'message' => __( 'Item must be an object.', 'taglock' ),
+					];
+				}
 				continue;
 			}
 
@@ -165,6 +174,13 @@ final class AccessCheckRoute implements ApiRouteInterface {
 			$contentId = isset( $item['content_id'] ) ? sanitize_text_field( (string) $item['content_id'] ) : '';
 
 			if ( $contentId === '' ) {
+				if ( $includeDiagnostics ) {
+					$diagnostics[] = [
+						'index'   => $index,
+						'code'    => 'missing_content_id',
+						'message' => __( 'Item is missing content_id.', 'taglock' ),
+					];
+				}
 				continue;
 			}
 
@@ -234,6 +250,11 @@ final class AccessCheckRoute implements ApiRouteInterface {
 			];
 		}
 
-		return ApiResponse::success( [ 'results' => $results ] );
+		$data = [ 'results' => $results ];
+		if ( $includeDiagnostics && $diagnostics !== [] ) {
+			$data['errors'] = $diagnostics;
+		}
+
+		return ApiResponse::success( $data );
 	}
 }
