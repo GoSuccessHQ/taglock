@@ -9,6 +9,7 @@ use GoSuccess\TagLock\Service\LoggerService;
 use GoSuccess\TagLock\Database\RuleTableInstaller;
 use GoSuccess\TagLock\Util\HookUtil;
 
+use function add_action;
 use function register_activation_hook;
 use function register_deactivation_hook;
 use function update_option;
@@ -27,6 +28,9 @@ final class ActivationController {
 	) {
 		register_activation_hook( TAGLOCK_FILE, [ $this, 'activate' ] );
 		register_deactivation_hook( TAGLOCK_FILE, [ $this, 'deactivate' ] );
+
+		// Ensure custom database tables exist after plugin updates.
+		add_action( 'plugins_loaded', [ $this->ruleTableInstaller, 'install' ] );
 	}
 
 	public function activate(): void {
