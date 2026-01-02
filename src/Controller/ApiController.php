@@ -6,7 +6,7 @@ namespace GoSuccess\TagLock\Controller;
 
 defined( 'ABSPATH' ) || exit;
 
-use GoSuccess\TagLock\Service\Api\ApiRouteRegistrationService;
+use GoSuccess\TagLock\Service\ApiRouteRegistrationService;
 
 use function add_action;
 use function did_action;

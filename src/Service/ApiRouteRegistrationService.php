@@ -2,12 +2,11 @@
 
 declare(strict_types=1);
 
-namespace GoSuccess\TagLock\Service\Api;
+namespace GoSuccess\TagLock\Service;
 
 use GoSuccess\TagLock\Configuration\PluginConfiguration;
 use GoSuccess\TagLock\Contract\ApiRouteInterface;
 use GoSuccess\TagLock\Enum\HookAction;
-use GoSuccess\TagLock\Service\LoggerService;
 use GoSuccess\TagLock\Util\HookUtil;
 
 use function register_rest_route;

@@ -2,10 +2,9 @@
 
 declare(strict_types=1);
 
-namespace GoSuccess\TagLock\Service\Api;
+namespace GoSuccess\TagLock\Service;
 
 use GoSuccess\TagLock\DTO\ApiResponse;
-use GoSuccess\TagLock\Service\LoggerService;
 use Throwable;
 use WP_REST_Request;
 
