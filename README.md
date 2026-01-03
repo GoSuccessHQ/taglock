@@ -8,6 +8,7 @@ Protect WordPress content based on KlickTipp tags - no membership required, cach
 - ✅ **Cache Compatible**: Protected content is loaded client-side after verification
 - ✅ **Secure by Design**: Protected content is not rendered into the initial HTML
 - ✅ **KlickTipp Integration**: Checks subscriber tags via KlickTipp API
+- ✅ **Connection Health Monitoring**: The plugin periodically checks whether the KlickTipp connection is healthy and shows a connected/disconnected status in the admin UI
 - ✅ **Modern Architecture**: PHP 8.3, Symfony DI, React, WordPress REST API
 - ✅ **Extensible**: Filter/action hooks for customizations and add-ons
 
@@ -63,8 +64,20 @@ https://yoursite.com/page/#taglock_subscriber_id=12345
 - **Provider/KlickTippProvider**: KlickTipp API integration
 - **Service/ShortcodeService**: Shortcode registration
 - **Route/AccessCheckRoute**: REST API endpoint for tag verification
+- **Route/TagsRoute**: REST API endpoint that loads available KlickTipp tags for the admin UI
 - **Service/AdminMenuService**: Settings page
 - **Service/AssetService**: Asset management
+- **Controller/ActivationController**: Plugin activation and scheduled connection checks
+
+### REST API Endpoints (Internal)
+
+These endpoints are used by the admin UI and frontend loader:
+
+- `POST /wp-json/taglock/v1/check-access` - Batch access checks for protected content
+- `GET  /wp-json/taglock/v1/settings` - Read settings (also includes connection status)
+- `POST /wp-json/taglock/v1/settings` - Save settings
+- `GET  /wp-json/taglock/v1/rules` - Manage TagLockers
+- `GET  /wp-json/taglock/v1/tags` - Load available KlickTipp tags (id => name)
 
 ### React (Frontend)
 

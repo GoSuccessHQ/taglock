@@ -23,6 +23,7 @@ Unlike traditional solutions, TagLock uses a headless approach: Protected conten
 * **Cache Compatible** - Protected content is loaded only after verification.
 * **Secure by Design** - Protected content is not rendered in the initial HTML.
 * **React-based Admin Interface** - Modern settings UI using WordPress Components.
+* **Connection Health Monitoring** - Periodic connection checks and a connected/disconnected status in the admin UI.
 * **No User Accounts Required** - Access is verified via a subscriber identifier.
 
 Note: The plugin exposes filters/actions to support add-ons and customizations.
@@ -55,6 +56,10 @@ Shortcode attributes:
 * `id` (required): TagLocker ID (configured in WordPress admin)
 * `message` (optional): Custom denied message
 * `loader_text` (optional): Custom loading text
+
+== Admin UI ==
+
+After connecting your KlickTipp account, TagLock loads your available tags and lets you select them by name while storing their tag IDs internally.
 
 == Access Links ==
 
