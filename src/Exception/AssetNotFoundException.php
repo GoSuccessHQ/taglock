@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace GoSuccess\TagLock\Exception;
 
-use function defined;
+use function __;use function defined;
 use function sprintf;
 
 defined( 'ABSPATH' ) || exit;
@@ -22,7 +22,11 @@ final class AssetNotFoundException extends TagLockException {
 	 */
 	public static function forFile( string $filename ): self {
 		return new self(
-			sprintf( 'TagLock asset file is missing: %s', $filename )
+			sprintf(
+				/* translators: %s: asset filename */
+				__( 'TagLock asset file is missing: %s', 'taglock' ),
+				$filename
+			)
 		);
 	}
 
@@ -34,7 +38,11 @@ final class AssetNotFoundException extends TagLockException {
 	 */
 	public static function forMetadata( string $filename ): self {
 		return new self(
-			sprintf( 'TagLock asset metadata file is missing: %s', $filename )
+			sprintf(
+				/* translators: %s: metadata filename */
+				__( 'TagLock asset metadata file is missing: %s', 'taglock' ),
+				$filename
+			)
 		);
 	}
 }

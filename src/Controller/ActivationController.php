@@ -4,14 +4,15 @@ declare(strict_types=1);
 
 namespace GoSuccess\TagLock\Controller;
 
-use GoSuccess\TagLock\Enum\HookAction;
 use GoSuccess\TagLock\Contract\CrmProviderInterface;
+use GoSuccess\TagLock\Enum\HookAction;
+use GoSuccess\TagLock\Service\Database\DatabaseMigrationService;
 use GoSuccess\TagLock\Service\LoggerService;
-use GoSuccess\TagLock\Database\RuleTableInstaller;
 use GoSuccess\TagLock\Util\HookUtil;
 use GoSuccess\TagLock\Util\PluginUtil;
 
-use function __;use function add_action;
+use function __;
+use function add_action;
 use function defined;
 use function get_option;
 use function register_activation_hook;
@@ -36,7 +37,7 @@ final class ActivationController {
 	private const string CONNECTION_CRON_HOOK      = 'taglock_check_connection';
 
 	public function __construct(
-		private readonly RuleTableInstaller $ruleTableInstaller,
+		private readonly DatabaseMigrationService $databaseMigrationService,
 		private readonly CrmProviderInterface $provider,
 		private readonly LoggerService $logger
 	) {
@@ -44,7 +45,7 @@ final class ActivationController {
 		register_deactivation_hook( TAGLOCK_FILE, [ $this, 'deactivate' ] );
 
 		// Ensure custom database tables exist after plugin updates.
-		add_action( 'plugins_loaded', [ $this->ruleTableInstaller, 'install' ] );
+		add_action( 'plugins_loaded', [ $this->databaseMigrationService, 'install' ] );
 
 		// Cron: Check KlickTipp connection hourly.
 		add_action( self::CONNECTION_CRON_HOOK, [ $this, 'checkConnection' ] );
@@ -59,7 +60,7 @@ final class ActivationController {
 		wp_mkdir_p( WP_CONTENT_DIR . '/uploads/taglock/logs' );
 
 		// Ensure custom database tables exist.
-		$this->ruleTableInstaller->install();
+		$this->databaseMigrationService->install();
 
 		// Store installed version for future update detection.
 		update_option( 'taglock_installed_version', PluginUtil::getPluginVersion() );

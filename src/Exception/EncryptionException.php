@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace GoSuccess\TagLock\Exception;
 
-use function defined;
+use function __;use function defined;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -19,7 +19,7 @@ final class EncryptionException extends TagLockException {
 	 * @return self
 	 */
 	public static function encryptionFailed(): self {
-		return new self( 'Failed to encrypt data.' );
+		return new self( __( 'Failed to encrypt data.', 'taglock' ) );
 	}
 
 	/**
@@ -28,7 +28,7 @@ final class EncryptionException extends TagLockException {
 	 * @return self
 	 */
 	public static function decryptionFailed(): self {
-		return new self( 'Failed to decrypt data.' );
+		return new self( __( 'Failed to decrypt data.', 'taglock' ) );
 	}
 
 	/**
@@ -37,6 +37,6 @@ final class EncryptionException extends TagLockException {
 	 * @return self
 	 */
 	public static function missingKey(): self {
-		return new self( 'AUTH_KEY is required for encryption/decryption.' );
+		return new self( __( 'AUTH_KEY is required for encryption/decryption.', 'taglock' ) );
 	}
 }

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace GoSuccess\TagLock\Database;
+namespace GoSuccess\TagLock\Service\Database;
 
 use GoSuccess\TagLock\Service\LoggerService;
 
@@ -18,9 +18,11 @@ use function update_option;
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Installs and migrates TagLock custom tables.
+ * Database Migration Service
+ *
+ * Manages installation and migration of TagLock custom database tables.
  */
-final class RuleTableInstaller {
+final class DatabaseMigrationService {
 
 	private const string DB_VERSION_OPTION = 'taglock_db_version';
 	private const string DB_VERSION = '2';
@@ -29,6 +31,11 @@ final class RuleTableInstaller {
 		private readonly LoggerService $logger
 	) {}
 
+	/**
+	 * Install or migrate database tables.
+	 *
+	 * Runs on plugin activation and on plugins_loaded to handle updates.
+	 */
 	public function install(): void {
 		$installed = get_option( self::DB_VERSION_OPTION, '' );
 		$installed = is_string( $installed ) ? $installed : '';

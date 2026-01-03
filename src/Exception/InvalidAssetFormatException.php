@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace GoSuccess\TagLock\Exception;
 
-use function defined;
+use function __;use function defined;
 use function sprintf;
 
 defined( 'ABSPATH' ) || exit;
@@ -22,7 +22,11 @@ final class InvalidAssetFormatException extends TagLockException {
 	 */
 	public static function forMetadata( string $filename ): self {
 		return new self(
-			sprintf( 'TagLock asset metadata file is invalid: %s', $filename )
+			sprintf(
+				/* translators: %s: metadata filename */
+				__( 'TagLock asset metadata file is invalid: %s', 'taglock' ),
+				$filename
+			)
 		);
 	}
 }
