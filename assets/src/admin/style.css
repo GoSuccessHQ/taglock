@@ -16,6 +16,16 @@
 	margin: var(--taglock-admin-space) 0;
 }
 
+.taglock-admin__page-title {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--taglock-admin-gap);
+}
+
+.taglock-admin__page-title-icon {
+	line-height: 1;
+}
+
 /* The wp.components <Modal /> renders in a portal outside of .taglock-admin. */
 .taglock-admin__modal {
 	--taglock-admin-space: clamp(12px, 2cqi, 20px);

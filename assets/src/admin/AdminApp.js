@@ -10,6 +10,7 @@ import {
 	SelectControl,
 	ComboboxControl,
 	Button,
+	TabPanel,
 	Notice,
 	Spinner,
 	Modal,
@@ -47,6 +48,8 @@ const AdminApp = () => {
 	const [isLoading, setIsLoading] = useState(true);
 	const [isSaving, setIsSaving] = useState(false);
 	const [notice, setNotice] = useState(null);
+	const [activeTab, setActiveTab] = useState('taglockers');
+	const [tabPanelKey, setTabPanelKey] = useState(0);
 	const [connectionStatus, setConnectionStatus] = useState({
 		is_connected: false,
 		checked_at: 0,
@@ -446,9 +449,20 @@ const AdminApp = () => {
 		openCreateRuleModal();
 	};
 
+	const goToConnectionTab = () => {
+		setActiveTab('connection');
+		setTabPanelKey((key) => key + 1);
+	};
+
 	return (
 		<div className="wrap">
-			<h1>{__('TagLock Settings', 'taglock')}</h1>
+			<h1 className="taglock-admin__page-title">
+				<span
+					className="dashicons dashicons-lock taglock-admin__page-title-icon"
+					aria-hidden="true"
+				/>
+				<span>TagLock</span>
+			</h1>
 			
 			<div className="taglock-admin">
 				{notice && (
@@ -462,127 +476,148 @@ const AdminApp = () => {
 					</Notice>
 				)}
 
-				<Card>
-					<CardHeader>
-						<div className="taglock-admin__card-header">
-							<h2 className="taglock-admin__card-header-title">{__('KlickTipp Connection', 'taglock')}</h2>
-							<div className="taglock-admin__card-header-indicator">
-								{isLoading ? (
-									<Spinner />
-								) : (
-									<span
-										className={
-											'taglock-admin__status-badge taglock-admin__connection-badge ' +
-											(isConnected
-												? 'taglock-admin__status-badge--success'
-												: 'taglock-admin__status-badge--error')
-										}
-										role="status"
-										aria-live="polite"
-									>
-										{connectionBadgeText}
-									</span>
-								)}
-							</div>
-						</div>
-					</CardHeader>
-					<CardBody>
-						<form onSubmit={handleSubmit}>
-							<p className="description">
-								{__(
-									'Enter your KlickTipp username and password to connect.',
-									'taglock'
-								)}
-							</p>
-
-							<Disabled isDisabled={isLoading}>
-								<div className="taglock-admin__credentials">
-									<TextControl
-										label={__('Username', 'taglock')}
-										value={username}
-										onChange={setUsername}
-										autoComplete="username"
-										autoCapitalize="none"
-										autoCorrect="off"
-										spellCheck={false}
-										required
-										__next40pxDefaultSize
-										__nextHasNoMarginBottom
-									/>
-
-									<TextControl
-										label={__('Password', 'taglock')}
-										type="password"
-										value={password}
-										onChange={setPassword}
-										autoComplete="current-password"
-										autoCapitalize="none"
-										autoCorrect="off"
-										spellCheck={false}
-										placeholder={
-											hasPassword === true
-												? __('Saved. Enter a new password to update.', 'taglock')
-												: ''
-										}
-										help={
-											hasPassword === true
-												? __(
-													'Password is already saved. Enter a new one only if you want to change it.',
+				<TabPanel
+					key={tabPanelKey}
+					className="taglock-admin__tabs"
+					initialTabName={activeTab}
+					onSelect={setActiveTab}
+					tabs={[
+						{ name: 'taglockers', title: __('TagLockers', 'taglock') },
+						{ name: 'connection', title: __('KlickTipp Connection', 'taglock') },
+					]}
+				>
+					{(tab) => {
+						if (tab.name === 'connection') {
+							return (
+								<Card>
+									<CardHeader>
+										<div className="taglock-admin__card-header">
+											<h2 className="taglock-admin__card-header-title">
+												{__('KlickTipp Connection', 'taglock')}
+											</h2>
+											<div className="taglock-admin__card-header-indicator">
+												{isLoading ? (
+													<Spinner />
+												) : (
+													<span
+														className={
+															'taglock-admin__status-badge taglock-admin__connection-badge ' +
+															(isConnected
+																? 'taglock-admin__status-badge--success'
+																: 'taglock-admin__status-badge--error')
+														}
+														role="status"
+														aria-live="polite"
+													>
+														{connectionBadgeText}
+													</span>
+												)}
+											</div>
+										</div>
+									</CardHeader>
+									<CardBody>
+										<form onSubmit={handleSubmit}>
+											<p className="description">
+												{__(
+													'Enter your KlickTipp username and password to connect.',
 													'taglock'
-												)
-											: __(
-													'For security reasons, the password is not displayed after saving.',
+												)}
+											</p>
+
+											<Disabled isDisabled={isLoading}>
+												<div className="taglock-admin__credentials">
+													<TextControl
+														label={__('Username', 'taglock')}
+														value={username}
+														onChange={setUsername}
+														autoComplete="username"
+														autoCapitalize="none"
+														autoCorrect="off"
+														spellCheck={false}
+														required
+														__next40pxDefaultSize
+														__nextHasNoMarginBottom
+													/>
+
+													<TextControl
+														label={__('Password', 'taglock')}
+														type="password"
+														value={password}
+														onChange={setPassword}
+														autoComplete="current-password"
+														autoCapitalize="none"
+														autoCorrect="off"
+														spellCheck={false}
+														placeholder={
+															hasPassword === true
+																? __('Saved. Enter a new password to update.', 'taglock')
+																: ''
+														}
+														help={
+															hasPassword === true
+																? __(
+																	'Password is already saved. Enter a new one only if you want to change it.',
+																	'taglock'
+																)
+															: __(
+																	'For security reasons, the password is not displayed after saving.',
+																	'taglock'
+															)
+														}
+														required={hasPassword === false}
+														__next40pxDefaultSize
+														__nextHasNoMarginBottom
+													/>
+												</div>
+
+												<Button
+													variant="primary"
+													type="submit"
+													isBusy={isSaving}
+													disabled={isSaving}
+												>
+													{__('Save Settings', 'taglock')}
+												</Button>
+											</Disabled>
+										</form>
+									</CardBody>
+								</Card>
+							);
+						}
+
+						return (
+							<Card>
+								<CardHeader>
+									<div className="taglock-admin__card-header">
+										<h2 className="taglock-admin__card-header-title">{__('TagLockers', 'taglock')}</h2>
+										<Button
+											variant="primary"
+											onClick={handleNewRuleClick}
+											disabled={isLoading || !isConnected}
+										>
+											{__('New TagLocker', 'taglock')}
+										</Button>
+									</div>
+								</CardHeader>
+								<CardBody>
+									{!isLoading && !isConnected && (
+										<Notice
+											className="taglock-admin__notice"
+											status="warning"
+											isDismissible={false}
+										>
+											<strong>{__('No KlickTipp connection', 'taglock')}</strong>
+											<div>
+												{__(
+													'Please save valid credentials first. While disconnected, you cannot create new TagLockers.',
 													'taglock'
-												)
-									}
-									required={hasPassword === false}
-									__next40pxDefaultSize
-									__nextHasNoMarginBottom
-								/>
-								</div>
-
-								<Button
-									variant="primary"
-									type="submit"
-									isBusy={isSaving}
-									disabled={isSaving}
-								>
-									{__('Save Settings', 'taglock')}
-								</Button>
-							</Disabled>
-						</form>
-				</CardBody>
-                </Card>
-
-				<Card className="taglock-admin__card taglock-admin__card--spaced">
-					<CardHeader>
-						<div className="taglock-admin__card-header">
-							<h2 className="taglock-admin__card-header-title">{__('TagLockers', 'taglock')}</h2>
-							<Button
-								variant="primary"
-								onClick={handleNewRuleClick}
-								disabled={isLoading || !isConnected}
-							>
-								{__('New TagLocker', 'taglock')}
-							</Button>
-						</div>
-					</CardHeader>
-					<CardBody>
-						{!isLoading && !isConnected && (
-							<Notice
-								className="taglock-admin__notice"
-								status="warning"
-								isDismissible={false}
-							>
-								<strong>{__('No KlickTipp connection', 'taglock')}</strong>
-								<div>
-									{__(
-										'Please save valid credentials first. While disconnected, you cannot create new TagLockers.',
-										'taglock'
+												)}
+											</div>
+											<Button variant="link" onClick={goToConnectionTab}>
+												{__('Go to KlickTipp Connection', 'taglock')}
+											</Button>
+										</Notice>
 									)}
-								</div>
-							</Notice>
-						)}
 						{rulesNotice && (
 							<Notice
 								className="taglock-admin__notice"
@@ -675,8 +710,11 @@ const AdminApp = () => {
 								{__('Next', 'taglock')}
 							</Button>
 						</div>
-					</CardBody>
-				</Card>
+								</CardBody>
+							</Card>
+						);
+					}}
+				</TabPanel>
 
             </div>
 
