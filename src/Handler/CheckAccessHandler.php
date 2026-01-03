@@ -8,7 +8,7 @@
 
 declare(strict_types=1);
 
-namespace GoSuccess\TagLock\Handler\Access;
+namespace GoSuccess\TagLock\Handler;
 
 defined( 'ABSPATH' ) || exit;
 

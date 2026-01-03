@@ -14,7 +14,7 @@ namespace GoSuccess\TagLock\Route;
 defined( 'ABSPATH' ) || exit;
 
 use GoSuccess\TagLock\Contract\ApiRouteInterface;
-use GoSuccess\TagLock\Handler\Access\CheckAccessHandler;
+use GoSuccess\TagLock\Handler\CheckAccessHandler;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 /**
