@@ -4,13 +4,12 @@ declare(strict_types=1);
 
 namespace GoSuccess\TagLock\Util;
 
-use RuntimeException;
+use GoSuccess\TagLock\Exception\EncryptionException;
 
 use function base64_decode;
 use function base64_encode;
 use function defined;
 use function hash_hmac;
-use function mb_substr;
 use function openssl_decrypt;
 use function openssl_encrypt;
 use function openssl_cipher_iv_length;
@@ -32,6 +31,7 @@ final class EncryptionUtil {
 	 *
 	 * @param string $data The data to encrypt.
 	 * @return string The encrypted data (base64 encoded).
+	 * @throws EncryptionException If encryption fails or AUTH_KEY is missing.
 	 */
 	public static function encrypt( string $data ): string {
 		$key = self::getEncryptionKeyBytes();
@@ -40,7 +40,7 @@ final class EncryptionUtil {
 
 		$ciphertext = openssl_encrypt( $data, self::CIPHER_V2, $key, OPENSSL_RAW_DATA, $iv, $tag );
 		if ( false === $ciphertext || '' === $tag ) {
-			throw new RuntimeException( 'Failed to encrypt data.' );
+			throw EncryptionException::encryptionFailed();
 		}
 
 		$payload = base64_encode( $iv ) . ':' . base64_encode( $tag ) . ':' . base64_encode( $ciphertext );
@@ -81,10 +81,12 @@ final class EncryptionUtil {
 
 	/**
 	 * Get binary encryption key bytes for modern ciphers.
+	 *
+	 * @throws EncryptionException If AUTH_KEY is not defined.
 	 */
 	private static function getEncryptionKeyBytes(): string {
 		if ( ! ( defined( 'AUTH_KEY' ) && is_string( AUTH_KEY ) && '' !== AUTH_KEY ) ) {
-			throw new RuntimeException( 'AUTH_KEY is required for encryption/decryption.' );
+			throw EncryptionException::missingKey();
 		}
 
 		return hash_hmac( 'sha256', 'taglock', AUTH_KEY, true );

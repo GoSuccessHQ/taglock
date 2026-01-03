@@ -5,14 +5,13 @@ declare(strict_types=1);
 namespace GoSuccess\TagLock\Service;
 
 use GoSuccess\TagLock\Configuration\PluginConfiguration;
-use RuntimeException;
+use GoSuccess\TagLock\Exception\AssetNotFoundException;
+use GoSuccess\TagLock\Exception\InvalidAssetFormatException;
 
 use function basename;
-use function esc_html;
 use function file_exists;
 use function plugin_dir_url;
 use function rtrim;
-use function sprintf;
 use function wp_add_inline_script;
 use function wp_enqueue_script;
 use function wp_enqueue_style;
@@ -38,16 +37,13 @@ final class AssetService {
 	 *
 	 * @param string $assetFile Absolute path to the *.asset.php file.
 	 * @return array{dependencies: array<int, string>, version: string}
+	 * @throws AssetNotFoundException If the asset file does not exist.
+	 * @throws InvalidAssetFormatException If the asset metadata format is invalid.
 	 */
 	private function loadAssetMetadata( string $assetFile ): array {
 		if ( ! file_exists( $assetFile ) ) {
 			$this->logger->error( __( 'Missing asset metadata file', 'taglock' ), [ 'file' => $assetFile ] );
-			throw new RuntimeException(
-				sprintf(
-					'TagLock asset metadata file is missing: %s',
-					esc_html( basename( $assetFile ) )
-				)
-			);
+			throw AssetNotFoundException::forMetadata( basename( $assetFile ) );
 		}
 
 		/** @var mixed $assetData */
@@ -60,12 +56,7 @@ final class AssetService {
 			! is_string( $assetData['version'] )
 		) {
 			$this->logger->error( __( 'Invalid asset metadata format', 'taglock' ), [ 'file' => $assetFile ] );
-			throw new RuntimeException(
-				sprintf(
-					'TagLock asset metadata file is invalid: %s',
-					esc_html( basename( $assetFile ) )
-				)
-			);
+			throw InvalidAssetFormatException::forMetadata( basename( $assetFile ) );
 		}
 
 		return $assetData;
