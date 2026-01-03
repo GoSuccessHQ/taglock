@@ -40,16 +40,19 @@ import {
 const AdminApp = () => {
 	const config = useAdminConfig();
 	const {
-		settings,
-		setSettings,
+		username,
+		password,
+		hasPassword,
 		isLoading: settingsLoading,
 		isSaving: settingsSaving,
 		isConnected,
 		notice: settingsNotice,
-		setNotice: setSettingsNotice,
+		setUsername,
+		setPassword,
 		saveSettings,
-		refreshConnectionStatus,
-	} = useSettings(config.apiNamespace);
+		clearNotice: clearSettingsNotice,
+		refreshSettings,
+	} = useSettings();
 
 	const {
 		rules,
@@ -71,7 +74,7 @@ const AdminApp = () => {
 		saveRule,
 		deleteRule,
 		reloadRules,
-	} = useRules(config.apiNamespace);
+	} = useRules();
 
 	const {
 		tagOptions,
@@ -79,7 +82,7 @@ const AdminApp = () => {
 		isLoading: tagsLoading,
 		loadTags,
 		formatTagList,
-	} = useTags(config.apiNamespace);
+	} = useTags();
 
 	// Local state for UI.
 	const [activeTab, setActiveTab] = useState('taglockers');
@@ -96,12 +99,10 @@ const AdminApp = () => {
 	 * Handle saving settings and refreshing connection.
 	 */
 	const handleSaveSettings = useCallback(async () => {
-		const success = await saveSettings();
-		if (success) {
-			await refreshConnectionStatus();
+		await saveSettings(async () => {
 			await loadTags();
-		}
-	}, [saveSettings, refreshConnectionStatus, loadTags]);
+		});
+	}, [saveSettings, loadTags]);
 
 	/**
 	 * Handle form submission.
@@ -199,10 +200,8 @@ const AdminApp = () => {
 								<div className="taglock-admin__credentials">
 									<TextControl
 										label={__('Username', 'taglock')}
-										value={settings.username}
-										onChange={(value) =>
-											setSettings((prev) => ({ ...prev, username: value }))
-										}
+										value={username}
+										onChange={setUsername}
 										autoComplete="username"
 										autoCapitalize="none"
 										autoCorrect="off"
@@ -215,21 +214,19 @@ const AdminApp = () => {
 									<TextControl
 										label={__('Password', 'taglock')}
 										type="password"
-										value={settings.password}
-										onChange={(value) =>
-											setSettings((prev) => ({ ...prev, password: value }))
-										}
+										value={password}
+										onChange={setPassword}
 										autoComplete="current-password"
 										autoCapitalize="none"
 										autoCorrect="off"
 										spellCheck={false}
 										placeholder={
-											settings.hasPassword
+											hasPassword
 												? __('Saved. Enter a new password to update.', 'taglock')
 												: ''
 										}
 										help={
-											settings.hasPassword
+											hasPassword
 												? __(
 													'Password is already saved. Enter a new one only if you want to change it.',
 													'taglock'
@@ -239,7 +236,7 @@ const AdminApp = () => {
 													'taglock'
 												)
 										}
-										required={!settings.hasPassword}
+										required={!hasPassword}
 										__next40pxDefaultSize
 										__nextHasNoMarginBottom
 									/>
@@ -314,7 +311,7 @@ const AdminApp = () => {
 						className="taglock-admin__notice"
 						status={settingsNotice.status}
 						isDismissible
-						onRemove={() => setSettingsNotice(null)}
+						onRemove={clearSettingsNotice}
 					>
 						{settingsNotice.message}
 					</Notice>

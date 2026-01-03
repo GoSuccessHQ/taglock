@@ -148,6 +148,7 @@ const useSettings = () => {
 		// Setters
 		setUsername,
 		setPassword,
+		setNotice,
 		
 		// Actions
 		saveSettings: saveSettingsData,
