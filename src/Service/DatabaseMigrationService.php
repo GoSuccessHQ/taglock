@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace GoSuccess\TagLock\Service\Database;
+namespace GoSuccess\TagLock\Service;
 
-use GoSuccess\TagLock\Service\LoggerService;
+use GoSuccess\TagLock\Configuration\PluginConfiguration;
 
 use function __;
 use function current_time;
@@ -24,10 +24,8 @@ defined( 'ABSPATH' ) || exit;
  */
 final class DatabaseMigrationService {
 
-	private const string DB_VERSION_OPTION = 'taglock_db_version';
-	private const string DB_VERSION = '2';
-
 	public function __construct(
+		private readonly PluginConfiguration $config,
 		private readonly LoggerService $logger
 	) {}
 
@@ -37,10 +35,10 @@ final class DatabaseMigrationService {
 	 * Runs on plugin activation and on plugins_loaded to handle updates.
 	 */
 	public function install(): void {
-		$installed = get_option( self::DB_VERSION_OPTION, '' );
+		$installed = get_option( $this->config->dbVersionOption, '' );
 		$installed = is_string( $installed ) ? $installed : '';
 
-		if ( $installed === self::DB_VERSION ) {
+		if ( $installed === $this->config->dbVersion ) {
 			return;
 		}
 
@@ -51,9 +49,9 @@ final class DatabaseMigrationService {
 		}
 
 		$charsetCollate = $wpdb->get_charset_collate();
-		$rulesTable = $wpdb->prefix . 'taglock_rule';
-		$requiredTagsTable = $wpdb->prefix . 'taglock_rule_required_tag';
-		$engagementTagsTable = $wpdb->prefix . 'taglock_rule_engagement_tag';
+		$rulesTable = $wpdb->prefix . $this->config->ruleTableName;
+		$requiredTagsTable = $wpdb->prefix . $this->config->requiredTagTableName;
+		$engagementTagsTable = $wpdb->prefix . $this->config->engagementTagTableName;
 
 		$sqlRules = "CREATE TABLE {$rulesTable} (
 			id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
@@ -116,7 +114,7 @@ final class DatabaseMigrationService {
 			)
 		);
 
-		update_option( self::DB_VERSION_OPTION, self::DB_VERSION );
-		$this->logger->info( __( 'Database tables installed/updated', 'taglock' ), [ 'version' => self::DB_VERSION ] );
+		update_option( $this->config->dbVersionOption, $this->config->dbVersion );
+		$this->logger->info( __( 'Database tables installed/updated', 'taglock' ), [ 'version' => $this->config->dbVersion ] );
 	}
 }

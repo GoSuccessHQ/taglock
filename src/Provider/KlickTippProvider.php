@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace GoSuccess\TagLock\Provider;
 
+use GoSuccess\TagLock\Configuration\PluginConfiguration;
 use GoSuccess\TagLock\Contract\CrmProviderInterface;
 use GoSuccess\TagLock\Enum\HookAction;
 use GoSuccess\TagLock\Service\LoggerService;
@@ -12,10 +13,12 @@ use GoSuccess\TagLock\Util\HookUtil;
 use KlicktippConnector;
 use Throwable;
 
-use function __;use function class_exists;
+use function __;
+use function class_exists;
 use function defined;
 use function dirname;
 use function file_exists;
+use function get_class;
 use function get_option;
 
 defined( 'ABSPATH' ) || exit;
@@ -35,6 +38,7 @@ final class KlickTippProvider implements CrmProviderInterface {
 	private array $subscriberTagsCache = [];
 
 	public function __construct(
+		private readonly PluginConfiguration $config,
 		private readonly LoggerService $logger
 	) {}
 
@@ -62,8 +66,8 @@ final class KlickTippProvider implements CrmProviderInterface {
 		}
 
 		// Get credentials from WordPress options
-		$username = get_option( 'taglock_klicktipp_username', '' );
-		$encryptedPassword = get_option( 'taglock_klicktipp_password', '' );
+		$username = get_option( $this->config->klicktippUsernameOption, '' );
+		$encryptedPassword = get_option( $this->config->klicktippPasswordOption, '' );
 
 		if ( empty( $username ) || empty( $encryptedPassword ) ) {
 			$this->lastError = __( 'KlickTipp credentials not configured. Please configure them in Settings > TagLock.', 'taglock' );

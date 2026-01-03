@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 namespace GoSuccess\TagLock\Handler;
 
+use GoSuccess\TagLock\Configuration\PluginConfiguration;
 use GoSuccess\TagLock\Dto\ApiResponse;
 use GoSuccess\TagLock\Enum\HttpMethod;
 use GoSuccess\TagLock\Handler\AbstractApiHandler;
@@ -18,7 +19,8 @@ use GoSuccess\TagLock\Service\LoggerService;
 use WP_REST_Request;
 use WP_REST_Response;
 
-use function __;use function count;
+use function __;
+use function count;
 use function ctype_digit;
 use function defined;
 use function is_array;
@@ -35,6 +37,7 @@ defined( 'ABSPATH' ) || exit;
 final class CheckAccessHandler extends AbstractApiHandler {
 
 	public function __construct(
+		private readonly PluginConfiguration $config,
 		private readonly AccessValidationService $accessValidation,
 		private readonly LoggerService $logger
 	) {}
@@ -241,6 +244,6 @@ final class CheckAccessHandler extends AbstractApiHandler {
 	 * @inheritDoc
 	 */
 	protected function getNonceAction(): string {
-		return 'taglock_access_check';
+		return $this->config->accessCheckNonce;
 	}
 }

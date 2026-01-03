@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace GoSuccess\TagLock\Controller;
 
+use GoSuccess\TagLock\Configuration\PluginConfiguration;
 use GoSuccess\TagLock\Contract\CrmProviderInterface;
 use GoSuccess\TagLock\Enum\HookAction;
-use GoSuccess\TagLock\Service\Database\DatabaseMigrationService;
+use GoSuccess\TagLock\Service\DatabaseMigrationService;
 use GoSuccess\TagLock\Service\LoggerService;
 use GoSuccess\TagLock\Util\HookUtil;
 use GoSuccess\TagLock\Util\PluginUtil;
@@ -33,10 +34,8 @@ defined( 'ABSPATH' ) || exit;
  */
 final class ActivationController {
 
-	private const string CONNECTION_STATUS_OPTION = 'taglock_connection_status';
-	private const string CONNECTION_CRON_HOOK      = 'taglock_check_connection';
-
 	public function __construct(
+		private readonly PluginConfiguration $config,
 		private readonly DatabaseMigrationService $databaseMigrationService,
 		private readonly CrmProviderInterface $provider,
 		private readonly LoggerService $logger
@@ -48,7 +47,7 @@ final class ActivationController {
 		add_action( 'plugins_loaded', [ $this->databaseMigrationService, 'install' ] );
 
 		// Cron: Check KlickTipp connection hourly.
-		add_action( self::CONNECTION_CRON_HOOK, [ $this, 'checkConnection' ] );
+		add_action( $this->config->connectionCronHook, [ $this, 'checkConnection' ] );
 		add_action( 'plugins_loaded', [ $this, 'ensureConnectionCronScheduled' ] );
 	}
 
@@ -63,7 +62,7 @@ final class ActivationController {
 		$this->databaseMigrationService->install();
 
 		// Store installed version for future update detection.
-		update_option( 'taglock_installed_version', PluginUtil::getPluginVersion() );
+		update_option( $this->config->installedVersionOption, PluginUtil::getPluginVersion() );
 
 		// Schedule and run initial connection check.
 		$this->ensureConnectionCronScheduled();
@@ -77,7 +76,7 @@ final class ActivationController {
 	public function deactivate(): void {
 		HookUtil::doAction( HookAction::BEFORE_DEACTIVATION );
 
-		wp_clear_scheduled_hook( self::CONNECTION_CRON_HOOK );
+		wp_clear_scheduled_hook( $this->config->connectionCronHook );
 
 		$this->logger->info( __( 'Plugin deactivated', 'taglock' ) );
 
@@ -85,11 +84,11 @@ final class ActivationController {
 	}
 
 	public function ensureConnectionCronScheduled(): void {
-		if ( wp_next_scheduled( self::CONNECTION_CRON_HOOK ) ) {
+		if ( wp_next_scheduled( $this->config->connectionCronHook ) ) {
 			return;
 		}
 
-		wp_schedule_event( time() + 60, 'hourly', self::CONNECTION_CRON_HOOK );
+		wp_schedule_event( time() + 60, 'hourly', $this->config->connectionCronHook );
 	}
 
 	public function checkConnection(): void {
@@ -101,7 +100,7 @@ final class ActivationController {
 			'error'        => $error,
 		];
 
-		update_option( self::CONNECTION_STATUS_OPTION, $payload );
+		update_option( $this->config->connectionStatusOption, $payload );
 
 		$this->logger->debug( __( 'Connection status updated', 'taglock' ), [
 			'payload' => $payload,

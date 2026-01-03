@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace GoSuccess\TagLock\Route;
 
+use GoSuccess\TagLock\Configuration\PluginConfiguration;
 use GoSuccess\TagLock\Contract\ApiRouteInterface;
 use GoSuccess\TagLock\Contract\CrmProviderInterface;
 use GoSuccess\TagLock\Dto\ApiMethodHandler;
@@ -17,8 +18,10 @@ use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
 
-use function __;use function current_user_can;
+use function __;
+use function current_user_can;
 use function defined;
+use function get_class;
 use function get_option;
 use function is_string;
 use function sanitize_text_field;
@@ -38,10 +41,10 @@ defined( 'ABSPATH' ) || exit;
 #[AutoconfigureTag( 'taglock.api_route' )]
 final class SettingsRoute implements ApiRouteInterface {
 
-	private const string ROUTE     = '/settings';
-	private const string CONNECTION_STATUS_OPTION = 'taglock_connection_status';
+	private const string ROUTE = '/settings';
 
 	public function __construct(
+		private readonly PluginConfiguration $config,
 		private readonly LoggerService $logger,
 		private readonly CrmProviderInterface $provider
 	) {}
@@ -110,15 +113,15 @@ final class SettingsRoute implements ApiRouteInterface {
 	 * @return WP_REST_Response The REST response.
 	 */
 	public function getSettings( WP_REST_Request $request ): WP_REST_Response {
-		$connectionStatus = get_option( self::CONNECTION_STATUS_OPTION, [
+		$connectionStatus = get_option( $this->config->connectionStatusOption, [
 			'is_connected' => false,
 			'checked_at'   => 0,
 			'error'        => '',
 		] );
 
 		$settings = [
-			'klicktipp_username' => get_option( 'taglock_klicktipp_username', '' ),
-			'has_password'       => ! empty( get_option( 'taglock_klicktipp_password', '' ) ),
+			'klicktipp_username' => get_option( $this->config->klicktippUsernameOption, '' ),
+			'has_password'       => ! empty( get_option( $this->config->klicktippPasswordOption, '' ) ),
 			'connection_status'  => $connectionStatus,
 		];
 
@@ -134,7 +137,7 @@ final class SettingsRoute implements ApiRouteInterface {
 	public function saveSettings( WP_REST_Request $request ): WP_REST_Response {
 		$username = (string) $request->get_param( 'klicktipp_username' );
 		$password = wp_unslash( (string) $request->get_param( 'klicktipp_password' ) );
-		$existingEncryptedPassword = (string) get_option( 'taglock_klicktipp_password', '' );
+		$existingEncryptedPassword = (string) get_option( $this->config->klicktippPasswordOption, '' );
 
 		// Validate
 		if ( empty( $username ) ) {
@@ -147,7 +150,7 @@ final class SettingsRoute implements ApiRouteInterface {
 		}
 
 		// Save settings
-		update_option( 'taglock_klicktipp_username', sanitize_text_field( $username ) );
+		update_option( $this->config->klicktippUsernameOption, sanitize_text_field( $username ) );
 
 		// Only update password if a new one was provided.
 		if ( $password !== '' ) {
@@ -166,7 +169,7 @@ final class SettingsRoute implements ApiRouteInterface {
 				);
 			}
 
-			update_option( 'taglock_klicktipp_password', $encryptedPassword );
+			update_option( $this->config->klicktippPasswordOption, $encryptedPassword );
 		} elseif ( $existingEncryptedPassword === '' ) {
 			$this->logger->warning( __( 'Settings save failed: empty password', 'taglock' ) );
 			return ApiResponse::error(
@@ -179,7 +182,7 @@ final class SettingsRoute implements ApiRouteInterface {
 		$this->logger->info( __( 'Settings saved successfully', 'taglock' ), [ 'username' => $username ] );
 
 		$isConnected = $this->provider->isAuthenticated();
-		update_option( self::CONNECTION_STATUS_OPTION, [
+		update_option( $this->config->connectionStatusOption, [
 			'is_connected' => $isConnected,
 			'checked_at'   => time(),
 			'error'        => $isConnected ? '' : $this->provider->getLastError(),

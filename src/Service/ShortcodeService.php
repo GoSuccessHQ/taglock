@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace GoSuccess\TagLock\Service;
 
+use GoSuccess\TagLock\Configuration\PluginConfiguration;
 use GoSuccess\TagLock\Enum\HookAction;
 use GoSuccess\TagLock\Enum\HookFilter;
 use GoSuccess\TagLock\Repository\RuleRepository;
 use GoSuccess\TagLock\Util\HookUtil;
 
-use function __;use function array_map;
+use function __;
+use function array_map;
 use function ctype_digit;
 use function current_user_can;
 use function defined;
@@ -18,6 +20,7 @@ use function esc_html;
 use function esc_html__;
 use function function_exists;
 use function implode;
+use function md5;
 use function set_transient;
 use function shortcode_atts;
 use function sprintf;
@@ -36,6 +39,7 @@ defined( 'ABSPATH' ) || exit;
 final class ShortcodeService {
 
 	public function __construct(
+		private readonly PluginConfiguration $config,
 		private readonly RuleRepository $ruleRepository,
 		private readonly LoggerService $logger,
 		private readonly AssetService $assetService
@@ -82,7 +86,7 @@ final class ShortcodeService {
 		}
 
 		// Generate nonce for REST API request
-		$nonce = wp_create_nonce( 'taglock_access_check' );
+		$nonce = wp_create_nonce( $this->config->accessCheckNonce );
 		$adminBypassEnabled = false;
 		if ( function_exists( 'current_user_can' ) && current_user_can( 'manage_options' ) ) {
 			$adminBypassEnabled = ! empty( $rule['admin_bypass_enabled'] );

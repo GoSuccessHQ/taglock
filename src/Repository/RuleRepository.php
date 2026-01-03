@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace GoSuccess\TagLock\Repository;
 
+use GoSuccess\TagLock\Configuration\PluginConfiguration;
 use GoSuccess\TagLock\Enum\CrmProvider;
 use GoSuccess\TagLock\Service\LoggerService;
 use GoSuccess\TagLock\Util\ArrayUtil;
 
-use function __;use function count;
+use function __;
+use function count;
 use function current_time;
 use function defined;
 use function intval;
@@ -29,19 +31,19 @@ defined( 'ABSPATH' ) || exit;
  * Persists and queries TagLock rules.
  */
 final class RuleRepository {
-	private const string CACHE_GROUP = 'taglock';
 	private const int CACHE_TTL_SECONDS = 60;
 
 	public function __construct(
+		private readonly PluginConfiguration $config,
 		private readonly LoggerService $logger
 	) {}
 
 	private function getRulesCacheVersion(): int {
-		$version = wp_cache_get( 'rules_cache_version', self::CACHE_GROUP );
+		$version = wp_cache_get( 'rules_cache_version', $this->config->cacheGroup );
 		$version = is_numeric( $version ) ? (int) $version : 0;
 		if ( $version < 1 ) {
 			$version = 1;
-			wp_cache_set( 'rules_cache_version', $version, self::CACHE_GROUP, self::CACHE_TTL_SECONDS );
+			wp_cache_set( 'rules_cache_version', $version, $this->config->cacheGroup, self::CACHE_TTL_SECONDS );
 		}
 		return $version;
 	}
@@ -49,16 +51,16 @@ final class RuleRepository {
 	private function bumpRulesCacheVersion(): void {
 		$version = $this->getRulesCacheVersion();
 		$version++;
-		wp_cache_set( 'rules_cache_version', $version, self::CACHE_GROUP, self::CACHE_TTL_SECONDS );
+		wp_cache_set( 'rules_cache_version', $version, $this->config->cacheGroup, self::CACHE_TTL_SECONDS );
 	}
 
 	private function getTagTableName( string $tableName ): string {
 		global $wpdb;
 
 		return match ( $tableName ) {
-			'taglock_rule_required_tag' => $wpdb->prefix . 'taglock_rule_required_tag',
-			'taglock_rule_engagement_tag' => $wpdb->prefix . 'taglock_rule_engagement_tag',
-			default => $wpdb->prefix . 'taglock_rule_required_tag',
+			'required' => $wpdb->prefix . $this->config->requiredTagTableName,
+			'engagement' => $wpdb->prefix . $this->config->engagementTagTableName,
+			default => $wpdb->prefix . $this->config->requiredTagTableName,
 		};
 	}
 
@@ -74,7 +76,7 @@ final class RuleRepository {
 		$offset = ( $page - 1 ) * $perPage;
 
 		$search = trim( $search );
-		$table = $wpdb->prefix . 'taglock_rule';
+		$table = $wpdb->prefix . $this->config->ruleTableName;
 
 		$cacheVersion = $this->getRulesCacheVersion();
 		$cacheKey = 'rules_list_' . md5( wp_json_encode( [
@@ -84,7 +86,7 @@ final class RuleRepository {
 			'per_page' => $perPage,
 		] ) ?: (string) time() );
 
-		$cached = wp_cache_get( $cacheKey, self::CACHE_GROUP );
+		$cached = wp_cache_get( $cacheKey, $this->config->cacheGroup );
 		if ( is_array( $cached ) && isset( $cached['items'], $cached['total'] ) ) {
 			return $cached;
 		}
@@ -143,7 +145,7 @@ final class RuleRepository {
 			'total' => $total,
 		];
 
-		wp_cache_set( $cacheKey, $result, self::CACHE_GROUP, self::CACHE_TTL_SECONDS );
+		wp_cache_set( $cacheKey, $result, $this->config->cacheGroup, self::CACHE_TTL_SECONDS );
 		return $result;
 	}
 
@@ -155,22 +157,22 @@ final class RuleRepository {
 
 		$cacheVersion = $this->getRulesCacheVersion();
 		$cacheKey = 'rule_' . $id . '_' . $cacheVersion;
-		$cached = wp_cache_get( $cacheKey, self::CACHE_GROUP );
+		$cached = wp_cache_get( $cacheKey, $this->config->cacheGroup );
 		if ( is_array( $cached ) ) {
 			return $cached;
 		}
 
-		$table = $wpdb->prefix . 'taglock_rule';
+		$table = $wpdb->prefix . $this->config->ruleTableName;
 		$row = $wpdb->get_row( $wpdb->prepare( 'SELECT * FROM %i WHERE id = %d', $table, $id ), ARRAY_A ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		if ( ! is_array( $row ) ) {
 			return null;
 		}
 
 		$rule = $this->normalizeRuleRow( $row );
-		$rule['required_tag_ids'] = $this->getTagIds( $id, 'taglock_rule_required_tag' );
-		$rule['engagement_tag_ids'] = $this->getTagIds( $id, 'taglock_rule_engagement_tag' );
+		$rule['required_tag_ids'] = $this->getTagIds( $id, 'required' );
+		$rule['engagement_tag_ids'] = $this->getTagIds( $id, 'engagement' );
 
-		wp_cache_set( $cacheKey, $rule, self::CACHE_GROUP, self::CACHE_TTL_SECONDS );
+		wp_cache_set( $cacheKey, $rule, $this->config->cacheGroup, self::CACHE_TTL_SECONDS );
 
 		return $rule;
 	}
@@ -178,7 +180,7 @@ final class RuleRepository {
 	public function createRule( array $data ): int {
 		global $wpdb;
 
-		$table = $wpdb->prefix . 'taglock_rule';
+		$table = $wpdb->prefix . $this->config->ruleTableName;
 		$now = current_time( 'mysql' );
 
 		$insert = $this->sanitizeRuleWrite( $data, true );
@@ -193,8 +195,8 @@ final class RuleRepository {
 
 		$ruleId = (int) $wpdb->insert_id;
 
-		$this->syncTagIds( $ruleId, $data['required_tag_ids'] ?? [], 'taglock_rule_required_tag' );
-		$this->syncTagIds( $ruleId, $data['engagement_tag_ids'] ?? [], 'taglock_rule_engagement_tag' );
+		$this->syncTagIds( $ruleId, $data['required_tag_ids'] ?? [], 'required' );
+		$this->syncTagIds( $ruleId, $data['engagement_tag_ids'] ?? [], 'engagement' );
 		$this->bumpRulesCacheVersion();
 
 		return $ruleId;
@@ -203,7 +205,7 @@ final class RuleRepository {
 	public function updateRule( int $id, array $data ): bool {
 		global $wpdb;
 
-		$table = $wpdb->prefix . 'taglock_rule';
+		$table = $wpdb->prefix . $this->config->ruleTableName;
 		$update = $this->sanitizeRuleWrite( $data, false );
 		$update['updated_at'] = current_time( 'mysql' );
 
@@ -213,8 +215,8 @@ final class RuleRepository {
 			return false;
 		}
 
-		$this->syncTagIds( $id, $data['required_tag_ids'] ?? [], 'taglock_rule_required_tag' );
-		$this->syncTagIds( $id, $data['engagement_tag_ids'] ?? [], 'taglock_rule_engagement_tag' );
+		$this->syncTagIds( $id, $data['required_tag_ids'] ?? [], 'required' );
+		$this->syncTagIds( $id, $data['engagement_tag_ids'] ?? [], 'engagement' );
 		$this->bumpRulesCacheVersion();
 
 		return true;
@@ -223,10 +225,10 @@ final class RuleRepository {
 	public function deleteRule( int $id ): bool {
 		global $wpdb;
 
-		$this->deleteTags( $id, 'taglock_rule_required_tag' );
-		$this->deleteTags( $id, 'taglock_rule_engagement_tag' );
+		$this->deleteTags( $id, 'required' );
+		$this->deleteTags( $id, 'engagement' );
 
-		$table = $wpdb->prefix . 'taglock_rule';
+		$table = $wpdb->prefix . $this->config->ruleTableName;
 		$ok = $wpdb->delete( $table, [ 'id' => $id ] ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$this->bumpRulesCacheVersion();
 		return $ok !== false;
@@ -259,7 +261,7 @@ final class RuleRepository {
 
 		$cacheVersion = $this->getRulesCacheVersion();
 		$cacheKey = 'rule_tag_ids_' . md5( $tableName . '_' . $ruleId . '_' . $cacheVersion );
-		$cached = wp_cache_get( $cacheKey, self::CACHE_GROUP );
+		$cached = wp_cache_get( $cacheKey, $this->config->cacheGroup );
 		if ( is_array( $cached ) ) {
 			return $cached;
 		}
@@ -273,7 +275,7 @@ final class RuleRepository {
 		}
 
 		$ids = ArrayUtil::normalizePositiveIntegers( $rows );
-		wp_cache_set( $cacheKey, $ids, self::CACHE_GROUP, self::CACHE_TTL_SECONDS );
+		wp_cache_set( $cacheKey, $ids, $this->config->cacheGroup, self::CACHE_TTL_SECONDS );
 		return $ids;
 	}
 
