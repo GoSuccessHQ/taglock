@@ -149,6 +149,44 @@ final class KlickTippProvider implements CrmProviderInterface {
 	/**
 	 * @inheritDoc
 	 */
+	public function testCredentials( string $username, string $password ): bool {
+		if ( ! $this->ensureConnectorLoaded() ) {
+			return false;
+		}
+
+		try {
+			$connector = new KlicktippConnector();
+		} catch ( Throwable $exception ) {
+			$this->lastError = __( 'KlickTipp connector could not be initialized.', 'taglock' );
+			$this->logger->error( __( 'Failed to initialize KlickTipp connector for credential test', 'taglock' ), [
+				'exception' => get_class( $exception ),
+				'message'   => $exception->getMessage(),
+			] );
+			return false;
+		}
+
+		HookUtil::doAction( HookAction::BEFORE_CRM_API_CALL, 'login_test' );
+
+		$result = $connector->login( $username, $password );
+
+		HookUtil::doAction( HookAction::AFTER_CRM_API_CALL, 'login_test', $result );
+
+		if ( ! $result ) {
+			$this->lastError = $connector->get_last_error() ?: __( 'Login failed. Please check your credentials.', 'taglock' );
+			$this->logger->warning( __( 'KlickTipp credential test failed', 'taglock' ), [ 'error' => $this->lastError ] );
+			return false;
+		}
+
+		// Logout the test connection
+		$connector->logout();
+
+		$this->logger->debug( __( 'KlickTipp credential test successful', 'taglock' ) );
+		return true;
+	}
+
+	/**
+	 * @inheritDoc
+	 */
 	public function hasTag( string $subscriberId, string $tagId ): bool {
 		if ( isset( $this->subscriberTagsCache[ $subscriberId ] ) ) {
 			$this->lastError = '';

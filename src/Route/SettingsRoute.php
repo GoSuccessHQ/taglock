@@ -139,7 +139,7 @@ final class SettingsRoute implements ApiRouteInterface {
 		$password = wp_unslash( (string) $request->get_param( 'klicktipp_password' ) );
 		$existingEncryptedPassword = (string) get_option( $this->config->klicktippPasswordOption, '' );
 
-		// Validate
+		// Validate username
 		if ( empty( $username ) ) {
 			$this->logger->warning( __( 'Settings save failed: empty username', 'taglock' ) );
 			return ApiResponse::error(
@@ -149,10 +149,53 @@ final class SettingsRoute implements ApiRouteInterface {
 			);
 		}
 
-		// Save settings
+		// Determine the password to use for testing
+		$testPassword = $password;
+		if ( $password === '' ) {
+			if ( $existingEncryptedPassword === '' ) {
+				$this->logger->warning( __( 'Settings save failed: empty password', 'taglock' ) );
+				return ApiResponse::error(
+					__( 'Password cannot be empty', 'taglock' ),
+					'invalid_password',
+					400
+				);
+			}
+
+			// Use existing password for test
+			try {
+				$testPassword = EncryptionUtil::decrypt( $existingEncryptedPassword );
+			} catch ( Throwable $exception ) {
+				$this->logger->error( __( 'Failed to decrypt existing password for test', 'taglock' ), [
+					'exception' => get_class( $exception ),
+					'message'   => $exception->getMessage(),
+				] );
+				return ApiResponse::error(
+					__( 'Failed to verify existing password. Please enter your password again.', 'taglock' ),
+					'decryption_failed',
+					500
+				);
+			}
+		}
+
+		// Test credentials before saving
+		if ( ! $this->provider->testCredentials( $username, $testPassword ) ) {
+			$error = $this->provider->getLastError() ?: __( 'Connection failed. Please check your credentials.', 'taglock' );
+			$this->logger->warning( __( 'Settings save failed: invalid credentials', 'taglock' ), [ 'error' => $error ] );
+
+			// Update connection status to reflect the failed test
+			update_option( $this->config->connectionStatusOption, [
+				'is_connected' => false,
+				'checked_at'   => time(),
+				'error'        => $error,
+			] );
+
+			return ApiResponse::error( $error, 'invalid_credentials', 401 );
+		}
+
+		// Credentials are valid, now save them
 		update_option( $this->config->klicktippUsernameOption, sanitize_text_field( $username ) );
 
-		// Only update password if a new one was provided.
+		// Only update password if a new one was provided
 		if ( $password !== '' ) {
 			try {
 				$encryptedPassword = EncryptionUtil::encrypt( $password );
@@ -170,23 +213,16 @@ final class SettingsRoute implements ApiRouteInterface {
 			}
 
 			update_option( $this->config->klicktippPasswordOption, $encryptedPassword );
-		} elseif ( $existingEncryptedPassword === '' ) {
-			$this->logger->warning( __( 'Settings save failed: empty password', 'taglock' ) );
-			return ApiResponse::error(
-				__( 'Password cannot be empty', 'taglock' ),
-				'invalid_password',
-				400
-			);
 		}
 
-		$this->logger->info( __( 'Settings saved successfully', 'taglock' ), [ 'username' => $username ] );
-
-		$isConnected = $this->provider->isAuthenticated();
+		// Update connection status to reflect successful connection
 		update_option( $this->config->connectionStatusOption, [
-			'is_connected' => $isConnected,
+			'is_connected' => true,
 			'checked_at'   => time(),
-			'error'        => $isConnected ? '' : $this->provider->getLastError(),
+			'error'        => '',
 		] );
+
+		$this->logger->info( __( 'Settings saved successfully', 'taglock' ), [ 'username' => $username ] );
 
 		return ApiResponse::success( null, __( 'Settings saved successfully', 'taglock' ) );
 	}

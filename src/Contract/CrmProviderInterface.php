@@ -53,4 +53,13 @@ interface CrmProviderInterface {
 	 * @return string The last error message, or empty string if no error.
 	 */
 	public function getLastError(): string;
+
+	/**
+	 * Test if the given credentials are valid without saving them.
+	 *
+	 * @param string $username The username to test.
+	 * @param string $password The password to test.
+	 * @return bool True if credentials are valid, false otherwise.
+	 */
+	public function testCredentials( string $username, string $password ): bool;
 }
