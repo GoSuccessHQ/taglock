@@ -12,8 +12,11 @@ namespace GoSuccess\TagLock\Configuration;
 
 defined( 'ABSPATH' ) || exit;
 
+use GoSuccess\TagLock\Contract\CrmProviderInterface;
+use GoSuccess\TagLock\Provider\CrmProviderFactory;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
+use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\tagged_iterator;
 
 return static function ( ContainerConfigurator $container ): void {
@@ -36,5 +39,10 @@ return static function ( ContainerConfigurator $container ): void {
 
 	$services->load( 'GoSuccess\\TagLock\\', __DIR__ . '/../*' )
 		->exclude( __DIR__ . '/../{' . implode( ',', $excludedPaths ) . '}' )
+		->public();
+
+	// Register CrmProviderInterface alias to use the factory
+	$services->set( CrmProviderInterface::class )
+		->factory( [ service( CrmProviderFactory::class ), 'getProvider' ] )
 		->public();
 };

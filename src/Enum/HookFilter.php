@@ -33,5 +33,10 @@ enum HookFilter: string {
 
 	// CRM Provider
 	case CRM_PROVIDER = 'taglock_crm_provider';
+	case CRM_PROVIDER_CLASS = 'taglock_crm_provider_class';
 	case API_CREDENTIALS = 'taglock_api_credentials';
+
+	// Rules
+	case RULE_ACCESS_MODES = 'taglock_rule_access_modes';
+	case RULE_DENY_MODES = 'taglock_rule_deny_modes';
 }
