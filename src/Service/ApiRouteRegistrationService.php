@@ -9,7 +9,7 @@ use GoSuccess\TagLock\Contract\ApiRouteInterface;
 use GoSuccess\TagLock\Enum\HookAction;
 use GoSuccess\TagLock\Util\HookUtil;
 
-use function defined;
+use function __;use function defined;
 use function register_rest_route;
 
 defined( 'ABSPATH' ) || exit;

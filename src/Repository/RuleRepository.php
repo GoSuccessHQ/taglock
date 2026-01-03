@@ -8,7 +8,7 @@ use GoSuccess\TagLock\Enum\CrmProvider;
 use GoSuccess\TagLock\Service\LoggerService;
 use GoSuccess\TagLock\Util\ArrayUtil;
 
-use function count;
+use function __;use function count;
 use function current_time;
 use function defined;
 use function intval;

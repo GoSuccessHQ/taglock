@@ -6,7 +6,9 @@ namespace GoSuccess\TagLock\Database;
 
 use GoSuccess\TagLock\Service\LoggerService;
 
+use function __;
 use function current_time;
+use function dbDelta;
 use function defined;
 use function function_exists;
 use function get_option;

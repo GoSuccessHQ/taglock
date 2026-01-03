@@ -11,7 +11,7 @@ use GoSuccess\TagLock\Database\RuleTableInstaller;
 use GoSuccess\TagLock\Util\HookUtil;
 use GoSuccess\TagLock\Util\PluginUtil;
 
-use function add_action;
+use function __;use function add_action;
 use function defined;
 use function get_option;
 use function register_activation_hook;

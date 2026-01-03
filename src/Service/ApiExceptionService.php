@@ -8,7 +8,7 @@ use GoSuccess\TagLock\Dto\ApiResponse;
 use Throwable;
 use WP_REST_Request;
 
-use function defined;
+use function __;use function defined;
 use function get_class;
 
 defined( 'ABSPATH' ) || exit;

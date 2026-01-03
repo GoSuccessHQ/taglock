@@ -17,7 +17,7 @@ use GoSuccess\TagLock\Repository\RuleRepository;
 use GoSuccess\TagLock\Util\ArrayUtil;
 use GoSuccess\TagLock\Util\HookUtil;
 
-use function ctype_digit;
+use function __;use function ctype_digit;
 use function current_user_can;
 use function defined;
 use function do_shortcode;

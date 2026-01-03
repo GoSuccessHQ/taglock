@@ -9,12 +9,13 @@ use GoSuccess\TagLock\Enum\HookFilter;
 use GoSuccess\TagLock\Repository\RuleRepository;
 use GoSuccess\TagLock\Util\HookUtil;
 
-use function array_map;
+use function __;use function array_map;
 use function ctype_digit;
 use function current_user_can;
 use function defined;
 use function esc_attr;
 use function esc_html;
+use function esc_html__;
 use function function_exists;
 use function implode;
 use function set_transient;

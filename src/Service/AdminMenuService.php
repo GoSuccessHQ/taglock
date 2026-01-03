@@ -8,7 +8,7 @@ use GoSuccess\TagLock\Configuration\PluginConfiguration;
 use GoSuccess\TagLock\Enum\HookAction;
 use GoSuccess\TagLock\Util\HookUtil;
 
-use function add_options_page;
+use function __;use function add_options_page;
 use function admin_url;
 use function array_merge;
 use function defined;

@@ -8,7 +8,7 @@ use GoSuccess\TagLock\Configuration\PluginConfiguration;
 use GoSuccess\TagLock\Exception\AssetNotFoundException;
 use GoSuccess\TagLock\Exception\InvalidAssetFormatException;
 
-use function basename;
+use function __;use function basename;
 use function defined;
 use function dirname;
 use function file_exists;

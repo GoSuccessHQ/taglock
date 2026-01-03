@@ -18,7 +18,7 @@ use GoSuccess\TagLock\Service\LoggerService;
 use WP_REST_Request;
 use WP_REST_Response;
 
-use function count;
+use function __;use function count;
 use function ctype_digit;
 use function defined;
 use function is_array;

@@ -15,7 +15,7 @@ use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
 
-use function current_user_can;
+use function __;use function current_user_can;
 use function defined;
 use function is_array;
 use function is_numeric;
