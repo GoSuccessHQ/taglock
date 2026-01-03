@@ -42,7 +42,7 @@ final class AdminMenuService {
 		];
 
 		if ( ! $this->proStatusService->isProInstalled() ) {
-			$actionLinks['upgrade'] = '<a href="' . esc_url( $proUrl ) . '" target="_blank" rel="noopener noreferrer"><strong>' . esc_html__( 'Upgrade to Pro', 'taglock' ) . '</strong></a>';
+			$actionLinks['upgrade'] = '<a href="' . esc_url( $proUrl ) . '" target="_blank" rel="noopener noreferrer" style="font-weight: bold;">' . esc_html__( 'Upgrade to Pro', 'taglock' ) . '</a>';
 		}
 
 		return array_merge( $actionLinks, $links );
