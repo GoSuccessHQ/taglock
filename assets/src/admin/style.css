@@ -1,21 +1,16 @@
 .taglock-admin {
 	color-scheme: light dark;
 
-	/* "Has me" query - sets container-type on parent */
-	:has(> &) {
-		container-type: inline-size;
-	}
-
 	/* Spacing */
 	--taglock-admin-max-width: 1200px;
-	--taglock-admin-space: clamp(12px, 2cqi, 20px);
-	--taglock-admin-gap: clamp(10px, 1.6cqi, 16px);
-	--taglock-admin-input-margin: clamp(12px, 1.8cqi, 15px);
-	--taglock-admin-spinner-size: clamp(16px, 2cqi, 20px);
+	--taglock-admin-space: 16px;
+	--taglock-admin-gap: 12px;
+	--taglock-admin-input-margin: 12px;
+	--taglock-admin-spinner-size: 18px;
 	--taglock-admin-credentials-min-col: min(260px, 100%);
-	--taglock-admin-code-padding: clamp(8px, 1.4cqi, 10px);
+	--taglock-admin-code-padding: 10px;
 	--taglock-admin-radius: 0.4rem;
-	--taglock-admin-h2-size: clamp(1.1rem, 1.6cqi, 1.3rem);
+	--taglock-admin-h2-size: 1.2rem;
 
 	/* Colors with light-dark() */
 	--taglock-admin-code-bg: light-dark(#f0f0f0, #2c3338);
@@ -87,9 +82,9 @@
 
 /* The wp.components <Modal /> renders in a portal outside of .taglock-admin. */
 .taglock-admin__modal {
-	--taglock-admin-space: clamp(12px, 2cqi, 20px);
-	--taglock-admin-gap: clamp(10px, 1.6cqi, 16px);
-	--taglock-admin-input-margin: clamp(12px, 1.8cqi, 15px);
+	--taglock-admin-space: 16px;
+	--taglock-admin-gap: 12px;
+	--taglock-admin-input-margin: 12px;
 }
 
 .taglock-admin__notice {
@@ -332,54 +327,6 @@
 .taglock-admin .wp-list-table .components-button:focus {
 	outline: 2px solid var(--wp-admin-theme-color);
 	outline-offset: 2px;
-}
-
-/* Responsive: Stack table on small screens */
-@container (max-width: 600px) {
-	.taglock-admin .wp-list-table,
-	.taglock-admin .wp-list-table thead,
-	.taglock-admin .wp-list-table tbody,
-	.taglock-admin .wp-list-table th,
-	.taglock-admin .wp-list-table td,
-	.taglock-admin .wp-list-table tr {
-		display: block;
-	}
-
-	.taglock-admin .wp-list-table thead {
-		position: absolute;
-		width: 1px;
-		height: 1px;
-		padding: 0;
-		margin: -1px;
-		overflow: hidden;
-		clip: rect(0, 0, 0, 0);
-		white-space: nowrap;
-		border: 0;
-	}
-
-	.taglock-admin .wp-list-table tbody tr {
-		margin-bottom: var(--taglock-admin-gap);
-		border: 1px solid var(--taglock-admin-border);
-		border-radius: var(--taglock-admin-radius);
-	}
-
-	.taglock-admin .wp-list-table td {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		padding: var(--taglock-admin-gap);
-		border-bottom: 1px solid var(--taglock-admin-border);
-	}
-
-	.taglock-admin .wp-list-table td:last-child {
-		border-bottom: 0;
-	}
-
-	.taglock-admin .wp-list-table td::before {
-		content: attr(data-label);
-		font-weight: 600;
-		margin-right: var(--taglock-admin-gap);
-	}
 }
 
 .taglock-admin ul {
