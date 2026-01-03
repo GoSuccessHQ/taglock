@@ -43,7 +43,7 @@ For detailed documentation, API references, and integration guides, please visit
 1. Upload the plugin files to `/wp-content/plugins/taglock/`, or install through the WordPress Plugins screen
 2. Activate the plugin
 3. Go to Settings → TagLock
-4. Enter your KlickTipp API credentials and save
+4. Enter your KlickTipp login credentials and connect
 
 == Usage ==
 
