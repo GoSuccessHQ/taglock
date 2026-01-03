@@ -201,7 +201,7 @@ final class RuleRepository {
 		$update = $this->sanitizeRuleWrite( $data );
 		$update['updated_at'] = current_time( 'mysql' );
 
-		$ok = $wpdb->update( $table, $update, [ 'id' => $id ] ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+		$ok = $wpdb->update( $table, $update, [ 'id' => $id ] ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		if ( $ok === false ) {
 			$this->logger->error( __( 'Failed to update rule', 'taglock' ), [ 'id' => $id, 'error' => $wpdb->last_error ] );
 			return false;
@@ -221,7 +221,7 @@ final class RuleRepository {
 		$this->deleteTags( $id, 'taglock_rule_engagement_tag' );
 
 		$table = $wpdb->prefix . 'taglock_rule';
-		$ok = $wpdb->delete( $table, [ 'id' => $id ] ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+		$ok = $wpdb->delete( $table, [ 'id' => $id ] ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$this->bumpRulesCacheVersion();
 		return $ok !== false;
 	}
@@ -272,7 +272,7 @@ final class RuleRepository {
 	private function deleteTags( int $ruleId, string $tableName ): void {
 		global $wpdb;
 		$table = $this->getTagTableName( $tableName );
-		$wpdb->delete( $table, [ 'rule_id' => $ruleId ] ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+		$wpdb->delete( $table, [ 'rule_id' => $ruleId ] ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 	}
 
 	/**
