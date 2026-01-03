@@ -16,6 +16,7 @@
 
 declare(strict_types=1);
 
+use GoSuccess\TagLock\Core\Plugin;
 use GoSuccess\TagLock\Enum\HookAction;
 use GoSuccess\TagLock\Util\HookUtil;
 
@@ -31,7 +32,7 @@ require_once __DIR__ . '/vendor/autoload.php';
 function taglock(): void {
 	HookUtil::doAction( HookAction::BEFORE_INIT );
 
-	\GoSuccess\TagLock\Core\Plugin::getInstance();
+	Plugin::getInstance();
 
 	HookUtil::doAction( HookAction::AFTER_INIT );
 }
