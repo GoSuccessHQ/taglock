@@ -139,49 +139,97 @@ const TagLockersTab = ({
 				{isLoading ? (
 					<Spinner />
 				) : (
-					<table className="wp-list-table widefat fixed striped">
+					<table className="wp-list-table widefat fixed striped table-view-list taglockers">
 						<thead>
 							<tr>
-								<th scope="col">{__('ID', 'taglock')}</th>
-								<th scope="col">{__('Name', 'taglock')}</th>
-								<th scope="col">{__('Active', 'taglock')}</th>
-								<th scope="col">{__('Required Tags', 'taglock')}</th>
-								<th scope="col">{__('Actions', 'taglock')}</th>
+								<th
+									scope="col"
+									className="manage-column column-id"
+								>
+									{__('ID', 'taglock')}
+								</th>
+								<th
+									scope="col"
+									className="manage-column column-name column-primary"
+								>
+									{__('Name', 'taglock')}
+								</th>
+								<th scope="col" className="manage-column column-active">
+									{__('Active', 'taglock')}
+								</th>
+								<th scope="col" className="manage-column column-tags">
+									{__('Required Tags', 'taglock')}
+								</th>
 							</tr>
 						</thead>
 						<tbody>
 							{rules.length === 0 ? (
 								<tr>
-									<td colSpan="5">
+									<td colSpan="4">
 										{__('No TagLockers found.', 'taglock')}
 									</td>
 								</tr>
 							) : (
 								rules.map((rule) => (
 									<tr key={rule.id}>
-										<td data-label={__('ID', 'taglock')}>{rule.id}</td>
-										<td data-label={__('Name', 'taglock')}>{rule.name}</td>
-										<td data-label={__('Active', 'taglock')}>
+										<td
+											className="column-id"
+											data-colname={__('ID', 'taglock')}
+										>
+											{rule.id}
+										</td>
+										<td
+											className="column-name column-primary has-row-actions"
+											data-colname={__('Name', 'taglock')}
+										>
+											<strong>{rule.name}</strong>
+											<div className="row-actions">
+												<span className="edit">
+													<a
+														href="#"
+														onClick={(e) => {
+															e.preventDefault();
+															onEditRule(rule);
+														}}
+													>
+														{__('Edit', 'taglock')}
+													</a>{' '}
+													|{' '}
+												</span>
+												<span className="delete">
+													<a
+														href="#"
+														onClick={(e) => {
+															e.preventDefault();
+															onDeleteRule(rule);
+														}}
+													>
+														{__('Delete', 'taglock')}
+													</a>
+												</span>
+											</div>
+											<button
+												type="button"
+												className="toggle-row"
+											>
+												<span className="screen-reader-text">
+													{__('Show more details', 'taglock')}
+												</span>
+											</button>
+										</td>
+										<td
+											className="column-active"
+											data-colname={__('Active', 'taglock')}
+										>
 											{rule.is_active
 												? __('Yes', 'taglock')
 												: __('No', 'taglock')}
 										</td>
-										<td data-label={__('Required Tags', 'taglock')}>
+										<td
+											className="column-tags"
+											data-colname={__('Required Tags', 'taglock')}
+										>
 											{formatTagList(rule.required_tag_ids)}
-										</td>
-										<td data-label={__('Actions', 'taglock')}>
-											<Button
-												variant="secondary"
-												onClick={() => onEditRule(rule)}
-											>
-												{__('Edit', 'taglock')}
-											</Button>{' '}
-											<Button
-												variant="tertiary"
-												onClick={() => onDeleteRule(rule)}
-											>
-												{__('Delete', 'taglock')}
-											</Button>
 										</td>
 									</tr>
 								))
