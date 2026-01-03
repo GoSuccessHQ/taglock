@@ -25,6 +25,18 @@ define( 'TAGLOCK_FILE', __FILE__ );
 
 require_once __DIR__ . '/vendor/autoload.php';
 
+add_filter( 'plugin_action_links_' . plugin_basename( TAGLOCK_FILE ), static function ( array $links ): array {
+	$settingsUrl = admin_url( 'options-general.php?page=taglock-settings' );
+	$proUrl = 'https://gosuccess.io/taglock';
+
+	$actionLinks = [
+		'settings' => '<a href="' . esc_url( $settingsUrl ) . '">' . esc_html__( 'Settings', 'taglock' ) . '</a>',
+		'upgrade'  => '<a href="' . esc_url( $proUrl ) . '" target="_blank" rel="noopener noreferrer"><strong>' . esc_html__( 'Upgrade to Pro', 'taglock' ) . '</strong></a>',
+	];
+
+	return array_merge( $actionLinks, $links );
+} );
+
 /**
  * Initialize the TagLock plugin
  */
