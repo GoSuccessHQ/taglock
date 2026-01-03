@@ -6,8 +6,8 @@ namespace GoSuccess\TagLock\Route;
 
 use GoSuccess\TagLock\Contract\ApiRouteInterface;
 use GoSuccess\TagLock\Contract\CRMProviderInterface;
-use GoSuccess\TagLock\DTO\ApiMethodHandler;
-use GoSuccess\TagLock\DTO\ApiResponse;
+use GoSuccess\TagLock\Dto\ApiMethodHandler;
+use GoSuccess\TagLock\Dto\ApiResponse;
 use GoSuccess\TagLock\Enum\HttpMethod;
 use GoSuccess\TagLock\Service\LoggerService;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;

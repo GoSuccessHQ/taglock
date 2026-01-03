@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace GoSuccess\TagLock\DTO;
+namespace GoSuccess\TagLock\Dto;
 
 use WP_REST_Response;
 

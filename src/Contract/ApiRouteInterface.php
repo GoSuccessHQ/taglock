@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace GoSuccess\TagLock\Contract;
 
-use GoSuccess\TagLock\DTO\ApiMethodHandler;
+use GoSuccess\TagLock\Dto\ApiMethodHandler;
 
 /**
  * API Route Interface

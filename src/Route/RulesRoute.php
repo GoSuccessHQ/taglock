@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace GoSuccess\TagLock\Route;
 
 use GoSuccess\TagLock\Contract\ApiRouteInterface;
-use GoSuccess\TagLock\DTO\ApiMethodHandler;
-use GoSuccess\TagLock\DTO\ApiResponse;
+use GoSuccess\TagLock\Dto\ApiMethodHandler;
+use GoSuccess\TagLock\Dto\ApiResponse;
 use GoSuccess\TagLock\Enum\HttpMethod;
 use GoSuccess\TagLock\Service\LoggerService;
 use GoSuccess\TagLock\Repository\RuleRepository;

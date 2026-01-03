@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace GoSuccess\TagLock\Service;
 
-use GoSuccess\TagLock\DTO\ApiResponse;
+use GoSuccess\TagLock\Dto\ApiResponse;
 use Throwable;
 use WP_REST_Request;
 
