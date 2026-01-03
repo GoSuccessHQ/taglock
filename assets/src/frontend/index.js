@@ -1,9 +1,17 @@
 import { createRoot } from '@wordpress/element';
 import domReady from '@wordpress/dom-ready';
 import apiFetch from '@wordpress/api-fetch';
-import ContentLoader from './ContentLoader';
+import FrontendApp from './FrontendApp';
+import ErrorBoundary from './ErrorBoundary';
 import './style.css';
 
+/**
+ * Get subscriber ID from URL hash.
+ *
+ * Persists to localStorage and removes from URL.
+ *
+ * @return {string|null} Subscriber ID or null.
+ */
 const getSubscriberIdFromHash = () => {
 	const rawHash = window.location.hash || '';
 	if (!rawHash.includes('taglock_subscriber_id=')) {
@@ -32,6 +40,11 @@ const getSubscriberIdFromHash = () => {
 	return subscriberId;
 };
 
+/**
+ * Get subscriber ID from hash or localStorage.
+ *
+ * @return {string|null} Subscriber ID or null.
+ */
 const getSubscriberId = () => {
 	const fromHash = getSubscriberIdFromHash();
 	if (fromHash) {
@@ -40,6 +53,9 @@ const getSubscriberId = () => {
 	return localStorage.getItem('taglock_subscriber_id');
 };
 
+/**
+ * Initialize TagLock frontend.
+ */
 domReady(() => {
 	const containers = document.querySelectorAll('.taglock');
 	if (!containers.length) {
@@ -87,14 +103,16 @@ domReady(() => {
 
 		if (contentId) {
 			createRoot(container).render(
-				<ContentLoader
-					contentId={contentId}
-					message={message}
-					loaderText={loaderText}
-					subscriberId={subscriberId}
-					adminBypass={adminBypass}
-					batchRequest={batchRequest}
-				/>
+				<ErrorBoundary>
+					<FrontendApp
+						contentId={contentId}
+						message={message}
+						loaderText={loaderText}
+						subscriberId={subscriberId}
+						adminBypass={adminBypass}
+						batchRequest={batchRequest}
+					/>
+				</ErrorBoundary>
 			);
 		}
 	});
