@@ -247,8 +247,9 @@ const AdminApp = () => {
 									type="submit"
 									isBusy={settingsSaving}
 									disabled={settingsSaving}
+									className="taglock-admin__connect-button"
 								>
-									{__('Save Settings', 'taglock')}
+									{__('Connect', 'taglock')}
 								</Button>
 							</Disabled>
 						</form>

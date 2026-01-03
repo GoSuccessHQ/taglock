@@ -176,6 +176,11 @@
 	margin-bottom: 0;
 }
 
+/* Connect Button */
+.taglock-admin__connect-button {
+	margin-top: var(--taglock-admin-gap);
+}
+
 /* Selected Tags */
 .taglock-admin__selected-tags {
 	display: flex;
