@@ -13,14 +13,13 @@ use GoSuccess\TagLock\Enum\HookFilter;
 use GoSuccess\TagLock\Enum\HttpMethod;
 use GoSuccess\TagLock\Service\LoggerService;
 use GoSuccess\TagLock\Repository\RuleRepository;
+use GoSuccess\TagLock\Util\ArrayUtil;
 use GoSuccess\TagLock\Util\HookUtil;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
-use function array_filter;
-use function array_map;
-use function array_values;
+use function count;
 use function ctype_digit;
 use function current_user_can;
 use function do_shortcode;
@@ -200,7 +199,7 @@ final class AccessCheckRoute implements ApiRouteInterface {
 			}
 
 			$requiredTagIds = isset( $rule['required_tag_ids'] ) && is_array( $rule['required_tag_ids'] ) ? $rule['required_tag_ids'] : [];
-			$requiredTagIds = array_values( array_filter( array_map( 'intval', $requiredTagIds ), static fn( int $v ) => $v > 0 ) );
+			$requiredTagIds = ArrayUtil::normalizePositiveIntegers( $requiredTagIds );
 			if ( $requiredTagIds === [] ) {
 				$results[ $contentId ] = [
 					'success' => false,
@@ -295,7 +294,7 @@ final class AccessCheckRoute implements ApiRouteInterface {
 
 				if ( ! $adminBypassEnabled && ! empty( $rule['engagement_tagging_enabled'] ) ) {
 					$engagementTagIds = isset( $rule['engagement_tag_ids'] ) && is_array( $rule['engagement_tag_ids'] ) ? $rule['engagement_tag_ids'] : [];
-					$engagementTagIds = array_values( array_filter( array_map( 'intval', $engagementTagIds ), static fn( int $v ) => $v > 0 ) );
+					$engagementTagIds = ArrayUtil::normalizePositiveIntegers( $engagementTagIds );
 					foreach ( $engagementTagIds as $engagementTagId ) {
 						$this->crmProvider->applyTag( $subscriberId, (string) $engagementTagId );
 					}

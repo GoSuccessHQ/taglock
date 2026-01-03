@@ -6,10 +6,8 @@ namespace GoSuccess\TagLock\Repository;
 
 use GoSuccess\TagLock\Enum\CrmProvider;
 use GoSuccess\TagLock\Service\LoggerService;
+use GoSuccess\TagLock\Util\ArrayUtil;
 
-use function array_filter;
-use function array_map;
-use function array_values;
 use function count;
 use function current_time;
 use function intval;
@@ -271,8 +269,7 @@ final class RuleRepository {
 			return [];
 		}
 
-		$ids = array_map( 'intval', $rows );
-		$ids = array_values( array_filter( $ids, static fn( int $v ) => $v > 0 ) );
+		$ids = ArrayUtil::normalizePositiveIntegers( $rows );
 		wp_cache_set( $cacheKey, $ids, self::CACHE_GROUP, self::CACHE_TTL_SECONDS );
 		return $ids;
 	}
@@ -292,8 +289,7 @@ final class RuleRepository {
 		$this->deleteTags( $ruleId, $tableName );
 
 		$table = $this->getTagTableName( $tableName );
-		$tagIds = array_map( 'intval', $tagIds );
-		$tagIds = array_values( array_filter( $tagIds, static fn( int $v ) => $v > 0 ) );
+		$tagIds = ArrayUtil::normalizePositiveIntegers( $tagIds );
 
 		foreach ( $tagIds as $tagId ) {
 			$wpdb->insert( $table, [ // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
