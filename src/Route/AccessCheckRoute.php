@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace GoSuccess\TagLock\Route;
 
 use GoSuccess\TagLock\Contract\ApiRouteInterface;
-use GoSuccess\TagLock\Contract\CRMProviderInterface;
+use GoSuccess\TagLock\Contract\CrmProviderInterface;
 use GoSuccess\TagLock\Dto\ApiMethodHandler;
 use GoSuccess\TagLock\Dto\ApiResponse;
 use GoSuccess\TagLock\Enum\HookAction;
@@ -46,7 +46,7 @@ final class AccessCheckRoute implements ApiRouteInterface {
 	private const string ROUTE     = '/check-access';
 
 	public function __construct(
-		private readonly CRMProviderInterface $crmProvider,
+		private readonly CrmProviderInterface $crmProvider,
 		private readonly RuleRepository $ruleRepository,
 		private readonly LoggerService $logger
 	) {}

@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use GoSuccess\TagLock\Enum\HookAction;
-use GoSuccess\TagLock\Contract\CRMProviderInterface;
+use GoSuccess\TagLock\Contract\CrmProviderInterface;
 use GoSuccess\TagLock\Service\LoggerService;
 use GoSuccess\TagLock\Database\RuleTableInstaller;
 use GoSuccess\TagLock\Util\HookUtil;
@@ -37,7 +37,7 @@ final class ActivationController {
 
 	public function __construct(
 		private readonly RuleTableInstaller $ruleTableInstaller,
-		private readonly CRMProviderInterface $provider,
+		private readonly CrmProviderInterface $provider,
 		private readonly LoggerService $logger
 	) {
 		register_activation_hook( TAGLOCK_FILE, [ $this, 'activate' ] );

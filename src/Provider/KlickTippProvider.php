@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace GoSuccess\TagLock\Provider;
 
-use GoSuccess\TagLock\Contract\CRMProviderInterface;
+use GoSuccess\TagLock\Contract\CrmProviderInterface;
 use GoSuccess\TagLock\Enum\HookAction;
 use GoSuccess\TagLock\Service\LoggerService;
 use GoSuccess\TagLock\Util\EncryptionUtil;
@@ -23,7 +23,7 @@ use function file_exists;
  * Implements CRM provider for KlickTipp using the PHP connector.
  * Handles authentication and tag checking via username/password session.
  */
-final class KlickTippProvider implements CRMProviderInterface {
+final class KlickTippProvider implements CrmProviderInterface {
 
 	private ?KlicktippConnector $connector = null;
 	private bool $isAuthenticated = false;

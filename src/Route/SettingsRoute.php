@@ -10,7 +10,7 @@ use GoSuccess\TagLock\Dto\ApiMethodHandler;
 use GoSuccess\TagLock\Dto\ApiResponse;
 use GoSuccess\TagLock\Enum\HttpMethod;
 use GoSuccess\TagLock\Service\LoggerService;
-use GoSuccess\TagLock\Contract\CRMProviderInterface;
+use GoSuccess\TagLock\Contract\CrmProviderInterface;
 use GoSuccess\TagLock\Util\EncryptionUtil;
 use Throwable;
 use WP_Error;
@@ -39,7 +39,7 @@ final class SettingsRoute implements ApiRouteInterface {
 
 	public function __construct(
 		private readonly LoggerService $logger,
-		private readonly CRMProviderInterface $provider
+		private readonly CrmProviderInterface $provider
 	) {}
 
 	/**

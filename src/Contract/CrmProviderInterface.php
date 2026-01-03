@@ -9,7 +9,7 @@ namespace GoSuccess\TagLock\Contract;
  *
  * Defines the contract for CRM providers (e.g., KlickTipp) to check subscriber tags.
  */
-interface CRMProviderInterface {
+interface CrmProviderInterface {
 
 	/**
 	 * Check if the provider is authenticated and ready to use.

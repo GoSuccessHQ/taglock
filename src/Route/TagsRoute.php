@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace GoSuccess\TagLock\Route;
 
 use GoSuccess\TagLock\Contract\ApiRouteInterface;
-use GoSuccess\TagLock\Contract\CRMProviderInterface;
+use GoSuccess\TagLock\Contract\CrmProviderInterface;
 use GoSuccess\TagLock\Dto\ApiMethodHandler;
 use GoSuccess\TagLock\Dto\ApiResponse;
 use GoSuccess\TagLock\Enum\HttpMethod;
@@ -29,7 +29,7 @@ final class TagsRoute implements ApiRouteInterface {
 	private const string ROUTE = '/tags';
 
 	public function __construct(
-		private readonly CRMProviderInterface $provider,
+		private readonly CrmProviderInterface $provider,
 		private readonly LoggerService $logger
 	) {}
 
