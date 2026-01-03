@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace GoSuccess\TagLock\Contract;
 
 use GoSuccess\TagLock\Enum\HttpMethod;
+use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
 
@@ -33,10 +34,15 @@ interface ApiEndpointMethodHandlerInterface {
 	/**
 	 * Check if the current user has permission to access this endpoint.
 	 *
+	 * WordPress REST API permission callbacks can return:
+	 * - true: Permission granted
+	 * - false: Permission denied (returns 401 or 403 based on authentication)
+	 * - WP_Error: Permission denied with custom error message
+	 *
 	 * @param WP_REST_Request<array<string, mixed>> $request The REST API request object.
-	 * @return bool True if the user has permission, false otherwise.
+	 * @return bool|WP_Error True if permission granted, false or WP_Error otherwise.
 	 */
-	public function permissionCallback( WP_REST_Request $request ): bool;
+	public function permissionCallback( WP_REST_Request $request ): bool|WP_Error;
 
 	/**
 	 * Get the argument schema for this handler.

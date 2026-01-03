@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace GoSuccess\TagLock\Handler;
 
 use GoSuccess\TagLock\Contract\ApiEndpointMethodHandlerInterface;
+use WP_Error;
 use WP_REST_Request;
 
 use function current_user_can;
@@ -25,9 +26,9 @@ abstract class AbstractApiHandler implements ApiEndpointMethodHandlerInterface {
 	 * Override this method in subclasses for public endpoints.
 	 *
 	 * @param WP_REST_Request<array<string, mixed>> $request The REST API request object.
-	 * @return bool True if the user has permission, false otherwise.
+	 * @return bool|WP_Error True if the user has permission, false or WP_Error otherwise.
 	 */
-	public function permissionCallback( WP_REST_Request $request ): bool {
+	public function permissionCallback( WP_REST_Request $request ): bool|WP_Error {
 		return current_user_can( 'manage_options' );
 	}
 
@@ -40,5 +41,16 @@ abstract class AbstractApiHandler implements ApiEndpointMethodHandlerInterface {
 	 */
 	public function getArgs(): array {
 		return [];
+	}
+
+	/**
+	 * Get the nonce action for this handler.
+	 *
+	 * Override this method for nonce-protected endpoints.
+	 *
+	 * @return string|null The nonce action or null if not used.
+	 */
+	protected function getNonceAction(): ?string {
+		return null;
 	}
 }
