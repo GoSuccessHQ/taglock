@@ -9,18 +9,7 @@
 
 import { useState, useCallback, useMemo, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import {
-	Card,
-	CardBody,
-	CardHeader,
-	TextControl,
-	Button,
-	TabPanel,
-	Notice,
-	Spinner,
-	Disabled,
-} from '@wordpress/components';
-import PropTypes from 'prop-types';
+import { TabPanel, Notice } from '@wordpress/components';
 import {
 	useAdminConfig,
 	useSettings,
@@ -28,6 +17,7 @@ import {
 	useTags,
 } from './hooks';
 import {
+	ConnectionTab,
 	TagLockersTab,
 	RuleModal,
 } from './components';
@@ -105,19 +95,6 @@ const AdminApp = () => {
 	}, [saveSettings, loadTags]);
 
 	/**
-	 * Handle form submission.
-	 *
-	 * @param {Event} event - Form submit event.
-	 */
-	const handleSubmit = useCallback((event) => {
-		event.preventDefault();
-		if (settingsLoading || settingsSaving) {
-			return;
-		}
-		handleSaveSettings();
-	}, [settingsLoading, settingsSaving, handleSaveSettings]);
-
-	/**
 	 * Handle new rule click.
 	 */
 	const handleNewRuleClick = useCallback(() => {
@@ -136,15 +113,6 @@ const AdminApp = () => {
 	}, []);
 
 	/**
-	 * Connection status badge text.
-	 */
-	const connectionBadgeText = useMemo(() => {
-		return isConnected
-			? __('Connected', 'taglock')
-			: __('Disconnected', 'taglock');
-	}, [isConnected]);
-
-	/**
 	 * Tab definitions.
 	 */
 	const tabs = useMemo(() => [
@@ -161,100 +129,17 @@ const AdminApp = () => {
 	const renderTab = useCallback((tab) => {
 		if (tab.name === 'connection') {
 			return (
-				<Card>
-					<CardHeader>
-						<div className="taglock-admin__card-header">
-							<h2 className="taglock-admin__card-header-title">
-								{__('KlickTipp Connection', 'taglock')}
-							</h2>
-							<div className="taglock-admin__card-header-indicator">
-								{settingsLoading ? (
-									<Spinner />
-								) : (
-									<span
-										className={
-											'taglock-admin__status-badge taglock-admin__connection-badge ' +
-											(isConnected
-												? 'taglock-admin__status-badge--success'
-												: 'taglock-admin__status-badge--error')
-										}
-										role="status"
-										aria-live="polite"
-									>
-										{connectionBadgeText}
-									</span>
-								)}
-							</div>
-						</div>
-					</CardHeader>
-					<CardBody>
-						<form onSubmit={handleSubmit}>
-							<p className="description">
-								{__(
-									'Enter your KlickTipp username and password to connect.',
-									'taglock'
-								)}
-							</p>
-
-							<Disabled isDisabled={settingsLoading}>
-								<div className="taglock-admin__credentials">
-									<TextControl
-										label={__('Username', 'taglock')}
-										value={username}
-										onChange={setUsername}
-										autoComplete="username"
-										autoCapitalize="none"
-										autoCorrect="off"
-										spellCheck={false}
-										required
-										__next40pxDefaultSize
-										__nextHasNoMarginBottom
-									/>
-
-									<TextControl
-										label={__('Password', 'taglock')}
-										type="password"
-										value={password}
-										onChange={setPassword}
-										autoComplete="current-password"
-										autoCapitalize="none"
-										autoCorrect="off"
-										spellCheck={false}
-										placeholder={
-											hasPassword
-												? __('Saved. Enter a new password to update.', 'taglock')
-												: ''
-										}
-										help={
-											hasPassword
-												? __(
-													'Password is already saved. Enter a new one only if you want to change it.',
-													'taglock'
-												)
-												: __(
-													'For security reasons, the password is not displayed after saving.',
-													'taglock'
-												)
-										}
-										required={!hasPassword}
-										__next40pxDefaultSize
-										__nextHasNoMarginBottom
-									/>
-								</div>
-
-								<Button
-									variant="primary"
-									type="submit"
-									isBusy={settingsSaving}
-									disabled={settingsSaving}
-									className="taglock-admin__connect-button"
-								>
-									{__('Connect', 'taglock')}
-								</Button>
-							</Disabled>
-						</form>
-					</CardBody>
-				</Card>
+				<ConnectionTab
+					username={username}
+					password={password}
+					hasPassword={hasPassword}
+					isLoading={settingsLoading}
+					isSaving={settingsSaving}
+					isConnected={isConnected}
+					onUsernameChange={setUsername}
+					onPasswordChange={setPassword}
+					onSave={handleSaveSettings}
+				/>
 			);
 		}
 
@@ -276,16 +161,15 @@ const AdminApp = () => {
 			/>
 		);
 	}, [
-		settingsLoading,
-		settingsSaving,
-		isConnected,
-		connectionBadgeText,
 		username,
 		password,
 		hasPassword,
+		settingsLoading,
+		settingsSaving,
+		isConnected,
 		setUsername,
 		setPassword,
-		handleSubmit,
+		handleSaveSettings,
 		rules,
 		rulesLoading,
 		rulesPagination,
