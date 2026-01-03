@@ -1,5 +1,6 @@
 .taglock-admin {
 	container-type: inline-size;
+	color-scheme: light dark;
 
 	/* Spacing */
 	--taglock-admin-max-width: 1200px;
@@ -12,25 +13,16 @@
 	--taglock-admin-radius: 0.4rem;
 	--taglock-admin-h2-size: clamp(1.1rem, 1.6cqi, 1.3rem);
 
-	/* Colors - Light Mode */
-	--taglock-admin-code-bg: #f0f0f0;
+	/* Colors with light-dark() */
+	--taglock-admin-code-bg: light-dark(#f0f0f0, #2c3338);
 	--taglock-admin-success: #00a32a;
 	--taglock-admin-error: #d63638;
 	--taglock-admin-warning: #dba617;
-	--taglock-admin-border: #ddd;
-	--taglock-admin-table-stripe: #f6f7f7;
+	--taglock-admin-border: light-dark(#ddd, #3c434a);
+	--taglock-admin-table-stripe: light-dark(#f6f7f7, #2c3338);
 
 	max-width: var(--taglock-admin-max-width);
 	margin: var(--taglock-admin-space) 0;
-}
-
-/* Dark Mode Support */
-@media (prefers-color-scheme: dark) {
-	.taglock-admin {
-		--taglock-admin-code-bg: #2c3338;
-		--taglock-admin-border: #3c434a;
-		--taglock-admin-table-stripe: #2c3338;
-	}
 }
 
 .taglock-admin__tabs {
