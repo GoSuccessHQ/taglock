@@ -4,11 +4,15 @@ declare(strict_types=1);
 
 namespace GoSuccess\TagLock\Service;
 
+use GoSuccess\TagLock\Configuration\PluginConfiguration;
 use GoSuccess\TagLock\Enum\HookAction;
 use GoSuccess\TagLock\Util\HookUtil;
 
 use function add_options_page;
+use function admin_url;
+use function array_merge;
 use function esc_html__;
+use function esc_url;
 
 /**
  * Admin Menu Service
@@ -18,8 +22,27 @@ use function esc_html__;
 final class AdminMenuService {
 
 	public function __construct(
-		private readonly LoggerService $logger
+		private readonly LoggerService $logger,
+		private readonly PluginConfiguration $pluginConfiguration
 	) {}
+
+	/**
+	 * Adds plugin action links on the Plugins screen.
+	 *
+	 * @param array<string, string> $links
+	 * @return array<string, string>
+	 */
+	public function addPluginActionLinks( array $links ): array {
+		$settingsUrl = admin_url( 'options-general.php?page=taglock-settings' );
+		$proUrl = $this->pluginConfiguration->proLandingUrl;
+
+		$actionLinks = [
+			'settings' => '<a href="' . esc_url( $settingsUrl ) . '">' . esc_html__( 'Settings', 'taglock' ) . '</a>',
+			'upgrade'  => '<a href="' . esc_url( $proUrl ) . '" target="_blank" rel="noopener noreferrer"><strong>' . esc_html__( 'Upgrade to Pro', 'taglock' ) . '</strong></a>',
+		];
+
+		return array_merge( $actionLinks, $links );
+	}
 
 	/**
 	 * Add the settings page to WordPress admin.
