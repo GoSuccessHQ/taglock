@@ -7,6 +7,7 @@ namespace GoSuccess\TagLock\Core;
 use GoSuccess\TagLock\Enum\HookAction;
 use GoSuccess\TagLock\Enum\HookFilter;
 use GoSuccess\TagLock\Util\HookUtil;
+use GoSuccess\TagLock\Util\PluginUtil;
 use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -19,7 +20,6 @@ use function basename;
 use function class_exists;
 use function defined;
 use function file_exists;
-use function function_exists;
 use function glob;
 use function is_dir;
 use function is_string;
@@ -76,7 +76,7 @@ final class Plugin {
 	 * @return ContainerInterface The compiled dependency injection container.
 	 */
 	private function buildContainer(): ContainerInterface {
-		$version    = $this->getPluginVersion();
+		$version    = PluginUtil::getPluginVersion();
 		$cacheDir   = WP_CONTENT_DIR . '/cache/taglock';
 		$cacheFile  = "{$cacheDir}/container-{$version}.php";
 		$isDebug    = defined( 'WP_DEBUG' ) && WP_DEBUG;
@@ -154,21 +154,6 @@ final class Plugin {
 		HookUtil::doAction( HookAction::CONTAINER_COMPILED, $runtimeContainer );
 
 		return $runtimeContainer;
-	}
-
-	/**
-	 * Get the plugin version from the main plugin file.
-	 *
-	 * @return string The plugin version.
-	 */
-	private function getPluginVersion(): string {
-		if ( ! function_exists( 'get_plugin_data' ) ) {
-			require_once ABSPATH . 'wp-admin/includes/plugin.php';
-		}
-
-		$pluginData = get_plugin_data( TAGLOCK_FILE );
-
-		return $pluginData['Version'] ?? '1.0.0';
 	}
 
 	/**

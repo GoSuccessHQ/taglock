@@ -13,6 +13,7 @@ use GoSuccess\TagLock\Contract\CrmProviderInterface;
 use GoSuccess\TagLock\Service\LoggerService;
 use GoSuccess\TagLock\Database\RuleTableInstaller;
 use GoSuccess\TagLock\Util\HookUtil;
+use GoSuccess\TagLock\Util\PluginUtil;
 
 use function add_action;
 use function register_activation_hook;
@@ -62,7 +63,7 @@ final class ActivationController {
 		$this->ruleTableInstaller->install();
 
 		// Store installed version for future update detection.
-		update_option( 'taglock_installed_version', $this->getPluginVersion() );
+		update_option( 'taglock_installed_version', PluginUtil::getPluginVersion() );
 
 		// Schedule and run initial connection check.
 		$this->ensureConnectionCronScheduled();
@@ -105,15 +106,5 @@ final class ActivationController {
 		$this->logger->debug( __( 'Connection status updated', 'taglock' ), [
 			'payload' => $payload,
 		] );
-	}
-
-	private function getPluginVersion(): string {
-		if ( ! function_exists( 'get_plugin_data' ) ) {
-			require_once ABSPATH . 'wp-admin/includes/plugin.php';
-		}
-
-		$pluginData = get_plugin_data( TAGLOCK_FILE, false, false );
-
-		return $pluginData['Version'] ?? '0.0.0';
 	}
 }
