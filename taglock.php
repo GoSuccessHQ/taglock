@@ -22,6 +22,20 @@ use GoSuccess\TagLock\Util\HookUtil;
 
 defined( 'ABSPATH' ) || exit;
 
+// Check PHP version before loading the plugin.
+if ( version_compare( PHP_VERSION, '8.3.0', '<' ) ) {
+	add_action( 'admin_notices', static function (): void {
+		printf(
+			'<div class="notice notice-error"><p>%s</p></div>',
+			esc_html__(
+				'TagLock requires PHP 8.3 or higher. Please upgrade your PHP version.',
+				'taglock'
+			)
+		);
+	} );
+	return;
+}
+
 define( 'TAGLOCK_FILE', __FILE__ );
 
 require_once __DIR__ . '/vendor/autoload.php';

@@ -4,7 +4,7 @@
  * Modal dialog for creating and editing TagLocker rules.
  */
 
-import { useCallback, useState, useMemo } from '@wordpress/element';
+import { useCallback, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
 	Modal,

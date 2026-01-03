@@ -17,6 +17,13 @@ import PropTypes from 'prop-types';
  */
 class ErrorBoundary extends Component {
 	/**
+	 * Default props.
+	 */
+	static defaultProps = {
+		fallbackMessage: __('An error occurred while loading content.', 'taglock'),
+	};
+
+	/**
 	 * Constructor.
 	 *
 	 * @param {Object} props - Component props.
@@ -75,10 +82,6 @@ class ErrorBoundary extends Component {
 ErrorBoundary.propTypes = {
 	children: PropTypes.node.isRequired,
 	fallbackMessage: PropTypes.string,
-};
-
-ErrorBoundary.defaultProps = {
-	fallbackMessage: __('An error occurred while loading content.', 'taglock'),
 };
 
 export default ErrorBoundary;

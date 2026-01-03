@@ -24,7 +24,6 @@ use function md5;
 use function set_transient;
 use function shortcode_atts;
 use function sprintf;
-use function time;
 use function trim;
 use function wp_create_nonce;
 
@@ -104,8 +103,9 @@ final class ShortcodeService {
 			$dataAttributes['data-admin-bypass'] = '1';
 		}
 
-		// Store protected content in a transient with unique ID
-		$contentId = 'taglock_' . md5( (string) $content . $ruleId . time() );
+		// Store protected content in a transient with unique ID.
+		// Use deterministic hash based on content + rule to allow transient reuse.
+		$contentId = 'taglock_' . md5( (string) $content . $ruleId );
 		set_transient( $contentId, $content, HOUR_IN_SECONDS );
 
 		$dataAttributes['data-content-id'] = esc_attr( $contentId );

@@ -113,6 +113,20 @@ const AdminApp = () => {
 	}, []);
 
 	/**
+	 * Clear rules notice.
+	 */
+	const clearRulesNotice = useCallback(() => {
+		setRulesNotice(null);
+	}, [setRulesNotice]);
+
+	/**
+	 * Clear modal notice.
+	 */
+	const clearModalNotice = useCallback(() => {
+		setModalNotice(null);
+	}, [setModalNotice]);
+
+	/**
 	 * Tab definitions.
 	 */
 	const tabs = useMemo(() => [
@@ -157,7 +171,7 @@ const AdminApp = () => {
 				settingsLoading={settingsLoading}
 				onGoToConnection={goToConnectionTab}
 				notice={rulesNotice}
-				clearNotice={() => setRulesNotice(null)}
+				clearNotice={clearRulesNotice}
 			/>
 		);
 	}, [
@@ -180,7 +194,7 @@ const AdminApp = () => {
 		formatTagList,
 		goToConnectionTab,
 		rulesNotice,
-		setRulesNotice,
+		clearRulesNotice,
 	]);
 
 	return (
@@ -225,7 +239,7 @@ const AdminApp = () => {
 				editingRuleId={editingRuleId}
 				isSaving={ruleSaving}
 				notice={modalNotice}
-				clearNotice={() => setModalNotice(null)}
+				clearNotice={clearModalNotice}
 				tagOptions={tagOptions}
 				tagsById={tagsById}
 				tagsLoading={tagsLoading}

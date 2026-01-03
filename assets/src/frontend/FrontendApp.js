@@ -76,12 +76,12 @@ const createContentState = (content, isTeaser = false) => ({
  * @return {JSX.Element} The frontend app.
  */
 const FrontendApp = ({
-	subscriberId,
+	subscriberId = null,
 	adminBypass,
 	contentId,
-	message,
-	loaderText,
-	batchRequest,
+	message = '',
+	loaderText = '',
+	batchRequest = null,
 	lazyLoad = false,
 }) => {
 	const [state, setState] = useState(INITIAL_STATE);
@@ -223,14 +223,6 @@ FrontendApp.propTypes = {
 	loaderText: PropTypes.string,
 	batchRequest: PropTypes.instanceOf(Promise),
 	lazyLoad: PropTypes.bool,
-};
-
-FrontendApp.defaultProps = {
-	subscriberId: null,
-	message: '',
-	loaderText: '',
-	batchRequest: null,
-	lazyLoad: false,
 };
 
 export default FrontendApp;
