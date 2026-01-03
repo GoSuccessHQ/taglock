@@ -35,13 +35,14 @@ final class ApiRouteRegistrationService {
 			$routeArgs = [];
 			foreach ( $route->getMethodHandlers() as $handler ) {
 				$handlerArgs = [
-					'methods'             => $handler->method->value,
+					'methods'             => $handler->getMethod()->value,
 					'callback'            => $this->exceptionService->wrapCallback( [ $handler, 'callback' ] ),
 					'permission_callback' => [ $handler, 'permissionCallback' ],
 				];
 
-				if ( $handler->args !== [] ) {
-					$handlerArgs['args'] = $handler->args;
+				$args = $handler->getArgs();
+				if ( $args !== [] ) {
+					$handlerArgs['args'] = $args;
 				}
 
 				$routeArgs[] = $handlerArgs;

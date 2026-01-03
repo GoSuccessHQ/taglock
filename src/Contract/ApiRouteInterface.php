@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace GoSuccess\TagLock\Contract;
 
-use GoSuccess\TagLock\Dto\ApiMethodHandler;
-
 /**
  * API Route Interface
  *
@@ -19,7 +17,9 @@ interface ApiRouteInterface {
 	public function getRoute(): string;
 
 	/**
-	 * @return array<int, ApiMethodHandler>
+	 * Get the method handlers for this route.
+	 *
+	 * @return array<int, ApiEndpointMethodHandlerInterface>
 	 */
 	public function getMethodHandlers(): array;
 }
