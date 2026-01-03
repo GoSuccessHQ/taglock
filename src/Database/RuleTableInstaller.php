@@ -85,7 +85,7 @@ final class RuleTableInstaller {
 
 		// Seed timestamps if the table is new and empty.
 		$now = current_time( 'mysql' );
-		$wpdb->query(
+		$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$wpdb->prepare(
 				'UPDATE %i SET created_at = %s WHERE created_at = %s',
 				$rulesTable,
@@ -93,7 +93,7 @@ final class RuleTableInstaller {
 				'0000-00-00 00:00:00'
 			)
 		);
-		$wpdb->query(
+		$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$wpdb->prepare(
 				'UPDATE %i SET updated_at = %s WHERE updated_at = %s',
 				$rulesTable,

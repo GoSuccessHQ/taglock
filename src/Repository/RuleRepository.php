@@ -88,10 +88,10 @@ final class RuleRepository {
 
 		if ( $search !== '' ) {
 			$like = '%' . $wpdb->esc_like( $search ) . '%';
-			$total = (int) $wpdb->get_var(
+			$total = (int) $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 				$wpdb->prepare( 'SELECT COUNT(*) FROM %i WHERE name LIKE %s', $table, $like )
 			);
-			$rows = $wpdb->get_results(
+			$rows = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 				$wpdb->prepare(
 					'SELECT id, name, is_active, access_mode, deny_mode, redirect_post_id, admin_bypass_enabled, engagement_tagging_enabled, updated_at
 					FROM %i
@@ -106,8 +106,8 @@ final class RuleRepository {
 				ARRAY_A
 			);
 		} else {
-			$total = (int) $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %i', $table ) );
-			$rows = $wpdb->get_results(
+			$total = (int) $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %i', $table ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$rows = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 				$wpdb->prepare(
 					'SELECT id, name, is_active, access_mode, deny_mode, redirect_post_id, admin_bypass_enabled, engagement_tagging_enabled, updated_at
 					FROM %i
@@ -155,7 +155,7 @@ final class RuleRepository {
 		}
 
 		$table = $wpdb->prefix . 'taglock_rule';
-		$row = $wpdb->get_row( $wpdb->prepare( 'SELECT * FROM %i WHERE id = %d', $table, $id ), ARRAY_A );
+		$row = $wpdb->get_row( $wpdb->prepare( 'SELECT * FROM %i WHERE id = %d', $table, $id ), ARRAY_A ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		if ( ! is_array( $row ) ) {
 			return null;
 		}
@@ -179,7 +179,7 @@ final class RuleRepository {
 		$insert['created_at'] = $now;
 		$insert['updated_at'] = $now;
 
-		$ok = (bool) $wpdb->insert( $table, $insert );
+		$ok = (bool) $wpdb->insert( $table, $insert ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
 		if ( ! $ok ) {
 			$this->logger->error( __( 'Failed to create rule', 'taglock' ), [ 'error' => $wpdb->last_error ] );
 			return 0;
@@ -201,7 +201,7 @@ final class RuleRepository {
 		$update = $this->sanitizeRuleWrite( $data );
 		$update['updated_at'] = current_time( 'mysql' );
 
-		$ok = $wpdb->update( $table, $update, [ 'id' => $id ] );
+		$ok = $wpdb->update( $table, $update, [ 'id' => $id ] ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
 		if ( $ok === false ) {
 			$this->logger->error( __( 'Failed to update rule', 'taglock' ), [ 'id' => $id, 'error' => $wpdb->last_error ] );
 			return false;
@@ -221,7 +221,7 @@ final class RuleRepository {
 		$this->deleteTags( $id, 'taglock_rule_engagement_tag' );
 
 		$table = $wpdb->prefix . 'taglock_rule';
-		$ok = $wpdb->delete( $table, [ 'id' => $id ] );
+		$ok = $wpdb->delete( $table, [ 'id' => $id ] ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
 		$this->bumpRulesCacheVersion();
 		return $ok !== false;
 	}
@@ -256,7 +256,7 @@ final class RuleRepository {
 		}
 
 		$table = $this->getTagTableName( $tableName );
-		$rows = $wpdb->get_col(
+		$rows = $wpdb->get_col( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$wpdb->prepare( 'SELECT tag_id FROM %i WHERE rule_id = %d ORDER BY tag_id ASC', $table, $ruleId )
 		);
 		if ( ! is_array( $rows ) ) {
@@ -272,7 +272,7 @@ final class RuleRepository {
 	private function deleteTags( int $ruleId, string $tableName ): void {
 		global $wpdb;
 		$table = $this->getTagTableName( $tableName );
-		$wpdb->delete( $table, [ 'rule_id' => $ruleId ] );
+		$wpdb->delete( $table, [ 'rule_id' => $ruleId ] ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
 	}
 
 	/**
@@ -288,7 +288,7 @@ final class RuleRepository {
 		$tagIds = array_values( array_filter( $tagIds, static fn( int $v ) => $v > 0 ) );
 
 		foreach ( $tagIds as $tagId ) {
-			$wpdb->insert( $table, [
+			$wpdb->insert( $table, [ // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
 				'rule_id' => $ruleId,
 				'tag_id'  => $tagId,
 			] );
