@@ -12,10 +12,13 @@ use GoSuccess\TagLock\Util\HookUtil;
 use KlicktippConnector;
 use Throwable;
 
-use function get_option;
 use function class_exists;
+use function defined;
 use function dirname;
 use function file_exists;
+use function get_option;
+
+defined( 'ABSPATH' ) || exit;
 
 /**
  * KlickTipp Provider

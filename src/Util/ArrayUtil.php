@@ -7,6 +7,9 @@ namespace GoSuccess\TagLock\Util;
 use function array_filter;
 use function array_map;
 use function array_values;
+use function defined;
+
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Array Utilities

@@ -4,10 +4,6 @@ declare(strict_types=1);
 
 namespace GoSuccess\TagLock\Controller;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
-
 use GoSuccess\TagLock\Enum\HookAction;
 use GoSuccess\TagLock\Contract\CrmProviderInterface;
 use GoSuccess\TagLock\Service\LoggerService;
@@ -16,15 +12,18 @@ use GoSuccess\TagLock\Util\HookUtil;
 use GoSuccess\TagLock\Util\PluginUtil;
 
 use function add_action;
+use function defined;
+use function get_option;
 use function register_activation_hook;
 use function register_deactivation_hook;
+use function time;
 use function update_option;
-use function get_option;
-use function wp_next_scheduled;
-use function wp_schedule_event;
 use function wp_clear_scheduled_hook;
 use function wp_mkdir_p;
-use function time;
+use function wp_next_scheduled;
+use function wp_schedule_event;
+
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Activation Controller

@@ -9,6 +9,9 @@ use WP_Error;
 use WP_REST_Request;
 
 use function current_user_can;
+use function defined;
+
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Abstract API Handler

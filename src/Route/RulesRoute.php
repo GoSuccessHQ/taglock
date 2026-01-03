@@ -8,18 +8,21 @@ use GoSuccess\TagLock\Contract\ApiRouteInterface;
 use GoSuccess\TagLock\Dto\ApiMethodHandler;
 use GoSuccess\TagLock\Dto\ApiResponse;
 use GoSuccess\TagLock\Enum\HttpMethod;
-use GoSuccess\TagLock\Service\LoggerService;
 use GoSuccess\TagLock\Repository\RuleRepository;
+use GoSuccess\TagLock\Service\LoggerService;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
 
 use function current_user_can;
+use function defined;
 use function is_array;
 use function is_numeric;
 use function is_string;
 use function sanitize_text_field;
+
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Rules collection endpoint.

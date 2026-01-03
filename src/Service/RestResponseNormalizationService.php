@@ -9,7 +9,12 @@ use WP_Error;
 use WP_REST_Request;
 use WP_REST_Server;
 
+use function defined;
+use function is_array;
 use function is_wp_error;
+use function str_starts_with;
+
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Normalizes REST API responses for TagLock.

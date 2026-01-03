@@ -8,13 +8,20 @@ use GoSuccess\TagLock\Exception\EncryptionException;
 
 use function base64_decode;
 use function base64_encode;
+use function count;
 use function defined;
+use function explode;
+use function hash;
 use function hash_hmac;
+use function openssl_cipher_iv_length;
 use function openssl_decrypt;
 use function openssl_encrypt;
-use function openssl_cipher_iv_length;
 use function random_bytes;
+use function str_starts_with;
 use function strlen;
+use function substr;
+
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Encryption Utility

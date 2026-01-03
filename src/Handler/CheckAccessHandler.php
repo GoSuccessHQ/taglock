@@ -15,7 +15,6 @@ use GoSuccess\TagLock\Enum\HttpMethod;
 use GoSuccess\TagLock\Handler\AbstractApiHandler;
 use GoSuccess\TagLock\Service\AccessValidationService;
 use GoSuccess\TagLock\Service\LoggerService;
-use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
 

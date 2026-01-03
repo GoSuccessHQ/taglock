@@ -16,7 +16,10 @@ use WP_REST_Request;
 use WP_REST_Response;
 
 use function current_user_can;
+use function defined;
 use function is_string;
+
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Tags endpoint.

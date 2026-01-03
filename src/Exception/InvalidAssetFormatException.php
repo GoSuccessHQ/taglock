@@ -4,6 +4,11 @@ declare(strict_types=1);
 
 namespace GoSuccess\TagLock\Exception;
 
+use function defined;
+use function sprintf;
+
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Exception thrown when asset data format is invalid.
  */

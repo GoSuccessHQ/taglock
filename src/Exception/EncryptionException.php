@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace GoSuccess\TagLock\Exception;
 
+use function defined;
+
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Exception thrown when encryption or decryption fails.
  */

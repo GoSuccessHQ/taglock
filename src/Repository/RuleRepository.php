@@ -10,6 +10,7 @@ use GoSuccess\TagLock\Util\ArrayUtil;
 
 use function count;
 use function current_time;
+use function defined;
 use function intval;
 use function is_array;
 use function is_numeric;
@@ -21,6 +22,8 @@ use function trim;
 use function wp_cache_get;
 use function wp_cache_set;
 use function wp_json_encode;
+
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Persists and queries TagLock rules.

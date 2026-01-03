@@ -11,8 +11,11 @@ use GoSuccess\TagLock\Util\HookUtil;
 use function add_options_page;
 use function admin_url;
 use function array_merge;
+use function defined;
 use function esc_html__;
 use function esc_url;
+
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Admin Menu Service

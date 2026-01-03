@@ -4,8 +4,14 @@ declare(strict_types=1);
 
 namespace GoSuccess\TagLock\Util;
 
+use function defined;
+use function dirname;
 use function function_exists;
 use function get_plugin_data;
+use function plugin_dir_url;
+use function rtrim;
+
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Plugin Utilities

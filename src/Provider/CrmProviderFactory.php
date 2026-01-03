@@ -8,6 +8,10 @@ use GoSuccess\TagLock\Contract\CrmProviderInterface;
 use GoSuccess\TagLock\Enum\HookFilter;
 use GoSuccess\TagLock\Util\HookUtil;
 
+use function defined;
+
+defined( 'ABSPATH' ) || exit;
+
 /**
  * CRM Provider Factory
  *

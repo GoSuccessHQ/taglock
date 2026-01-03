@@ -16,9 +16,11 @@ use WP_Filesystem_Base;
 
 use function defined;
 use function function_exists;
-use function is_numeric;
 use function get_option;
+use function is_numeric;
 use function wp_normalize_path;
+
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Logger Service

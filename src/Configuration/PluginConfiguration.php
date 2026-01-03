@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace GoSuccess\TagLock\Configuration;
 
+use function defined;
+
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Plugin configuration values.
  */

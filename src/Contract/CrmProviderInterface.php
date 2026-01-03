@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace GoSuccess\TagLock\Contract;
 
+use function defined;
+
+defined( 'ABSPATH' ) || exit;
+
 /**
  * CRM Provider Interface
  *

@@ -4,6 +4,15 @@ declare(strict_types=1);
 
 namespace GoSuccess\TagLock\Service;
 
+use function apply_filters;
+use function array_keys;
+use function defined;
+use function function_exists;
+use function get_plugins;
+use function is_plugin_active;
+
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Determines whether the TagLock Pro addon is installed/active.
  */

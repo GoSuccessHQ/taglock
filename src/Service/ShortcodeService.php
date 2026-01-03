@@ -9,19 +9,22 @@ use GoSuccess\TagLock\Enum\HookFilter;
 use GoSuccess\TagLock\Repository\RuleRepository;
 use GoSuccess\TagLock\Util\HookUtil;
 
+use function array_map;
+use function ctype_digit;
+use function current_user_can;
+use function defined;
 use function esc_attr;
 use function esc_html;
-use function ctype_digit;
-use function shortcode_atts;
-use function wp_create_nonce;
+use function function_exists;
+use function implode;
 use function set_transient;
+use function shortcode_atts;
 use function sprintf;
 use function time;
-use function implode;
-use function array_map;
-use function current_user_can;
-use function function_exists;
 use function trim;
+use function wp_create_nonce;
+
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Shortcode Service

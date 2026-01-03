@@ -6,7 +6,10 @@ namespace GoSuccess\TagLock\Dto;
 
 use WP_REST_Response;
 
+use function defined;
 use function rest_ensure_response;
+
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Standardized API Response

@@ -27,6 +27,8 @@ use function str_replace;
 use function wp_delete_file;
 use function wp_mkdir_p;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Class Plugin
  *

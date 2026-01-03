@@ -7,6 +7,9 @@ namespace GoSuccess\TagLock\Controller;
 use GoSuccess\TagLock\Service\ShortcodeService;
 
 use function add_shortcode;
+use function defined;
+
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Registers the TagLock shortcode.

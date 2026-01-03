@@ -5,24 +5,28 @@ declare(strict_types=1);
 namespace GoSuccess\TagLock\Route;
 
 use GoSuccess\TagLock\Contract\ApiRouteInterface;
-use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
+use GoSuccess\TagLock\Contract\CrmProviderInterface;
 use GoSuccess\TagLock\Dto\ApiMethodHandler;
 use GoSuccess\TagLock\Dto\ApiResponse;
 use GoSuccess\TagLock\Enum\HttpMethod;
 use GoSuccess\TagLock\Service\LoggerService;
-use GoSuccess\TagLock\Contract\CrmProviderInterface;
 use GoSuccess\TagLock\Util\EncryptionUtil;
+use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Throwable;
 use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
 
 use function current_user_can;
+use function defined;
 use function get_option;
+use function is_string;
 use function sanitize_text_field;
+use function time;
 use function update_option;
 use function wp_unslash;
-use function time;
+
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Settings Route

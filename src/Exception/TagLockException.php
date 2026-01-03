@@ -5,6 +5,11 @@ declare(strict_types=1);
 namespace GoSuccess\TagLock\Exception;
 
 use Exception;
+use Throwable;
+
+use function defined;
+
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Base exception for TagLock plugin.

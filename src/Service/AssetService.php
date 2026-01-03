@@ -9,7 +9,11 @@ use GoSuccess\TagLock\Exception\AssetNotFoundException;
 use GoSuccess\TagLock\Exception\InvalidAssetFormatException;
 
 use function basename;
+use function defined;
+use function dirname;
 use function file_exists;
+use function is_array;
+use function is_string;
 use function plugin_dir_url;
 use function rtrim;
 use function wp_add_inline_script;
@@ -18,6 +22,8 @@ use function wp_enqueue_style;
 use function wp_json_encode;
 use function wp_register_script;
 use function wp_register_style;
+
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Asset Service

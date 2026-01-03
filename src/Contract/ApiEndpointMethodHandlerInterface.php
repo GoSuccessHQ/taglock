@@ -9,6 +9,10 @@ use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
 
+use function defined;
+
+defined( 'ABSPATH' ) || exit;
+
 /**
  * API Endpoint Method Handler Interface
  *

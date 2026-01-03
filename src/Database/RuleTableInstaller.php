@@ -7,10 +7,13 @@ namespace GoSuccess\TagLock\Database;
 use GoSuccess\TagLock\Service\LoggerService;
 
 use function current_time;
+use function defined;
 use function function_exists;
 use function get_option;
 use function is_string;
 use function update_option;
+
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Installs and migrates TagLock custom tables.
