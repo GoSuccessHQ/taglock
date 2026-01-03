@@ -29,6 +29,7 @@ final class AssetService {
 
 	public function __construct(
 		private readonly PluginConfiguration $pluginConfiguration,
+		private readonly ProStatusService $proStatusService,
 		private readonly LoggerService $logger
 	) {}
 
@@ -102,7 +103,7 @@ final class AssetService {
 			'window.taglockAdminConfig = ' . wp_json_encode( [
 				'apiNamespace' => $this->pluginConfiguration->apiNamespace,
 				'proUrl'       => $this->pluginConfiguration->proLandingUrl,
-				'isPro'        => false,
+				'isPro'        => $this->proStatusService->isProActive(),
 			] ) . ';',
 			'before'
 		);
