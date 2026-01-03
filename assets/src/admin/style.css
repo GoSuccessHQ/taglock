@@ -1,29 +1,21 @@
 .taglock-admin {
-	color-scheme: light dark;
-
 	/* Spacing */
-	--taglock-admin-max-width: 1200px;
-	--taglock-admin-space: clamp(12px, 3vw, 20px);
-	--taglock-admin-gap: clamp(10px, 2vw, 16px);
-	--taglock-admin-input-margin: clamp(12px, 2.5vw, 15px);
-	--taglock-admin-spinner-size: clamp(16px, 2vw, 20px);
-	--taglock-admin-credentials-min-col: min(260px, 100%);
-	--taglock-admin-code-padding: clamp(8px, 1.5vw, 10px);
-	--taglock-admin-radius: 0.4rem;
-	--taglock-admin-h2-size: clamp(1.1rem, 2vw, 1.3rem);
+	--taglock-admin-space: 16px;
+	--taglock-admin-gap: 12px;
+	--taglock-admin-radius: 4px;
 
-	/* Colors with light-dark() */
-	--taglock-admin-code-bg: light-dark(#f0f0f0, #2c3338);
-	--taglock-admin-success: light-dark(#00a32a, #00ba37);
-	--taglock-admin-error: light-dark(#d63638, #f86368);
-	--taglock-admin-warning: light-dark(#dba617, #f0c33c);
-	--taglock-admin-border: light-dark(#ddd, #3c434a);
-	--taglock-admin-table-stripe: light-dark(#f6f7f7, #2c3338);
-
-	max-width: var(--taglock-admin-max-width);
+	max-width: 1200px;
 	margin: var(--taglock-admin-space) 0;
 }
 
+/* Modal renders in portal outside .taglock-admin, needs own variables */
+.taglock-admin__modal {
+	--taglock-admin-space: 16px;
+	--taglock-admin-gap: 12px;
+	--taglock-admin-radius: 4px;
+}
+
+/* Tabs */
 .taglock-admin__tabs {
 	display: grid;
 	gap: var(--taglock-admin-gap);
@@ -38,7 +30,7 @@
 	height: 40px !important;
 	padding: 0 12px;
 	border-radius: var(--taglock-admin-radius);
-	box-shadow: inset 0 0 0 1px var(--taglock-admin-border);
+	box-shadow: inset 0 0 0 1px #ddd;
 }
 
 .taglock-admin__tabs .components-tab-panel__tabs-item::after {
@@ -64,6 +56,7 @@
 	color: var(--wp-admin-theme-color);
 }
 
+/* Page Title */
 .taglock-admin__page-title {
 	display: inline-flex;
 	align-items: center;
@@ -80,25 +73,20 @@
 	line-height: 1;
 }
 
-/* The wp.components <Modal /> renders in a portal outside of .taglock-admin. */
-.taglock-admin__modal {
-	--taglock-admin-space: clamp(12px, 3vw, 20px);
-	--taglock-admin-gap: clamp(10px, 2vw, 16px);
-	--taglock-admin-input-margin: clamp(12px, 2.5vw, 15px);
-}
-
+/* Notice */
 .taglock-admin__notice {
 	margin-block-end: var(--taglock-admin-space);
 	border-radius: var(--taglock-admin-radius);
 }
 
+/* Cards */
 .taglock-admin .components-card {
 	margin-bottom: var(--taglock-admin-space);
 }
 
 .taglock-admin .components-card__header h2 {
 	margin: 0;
-	font-size: var(--taglock-admin-h2-size);
+	font-size: 1.2em;
 }
 
 .taglock-admin__card-header {
@@ -118,10 +106,21 @@
 	align-items: center;
 	justify-content: flex-end;
 	flex: 0 0 auto;
-	min-width: var(--taglock-admin-spinner-size);
-	min-height: var(--taglock-admin-spinner-size);
+	min-width: 20px;
+	min-height: 20px;
 }
 
+.taglock-admin__card-header-indicator .components-spinner {
+	margin: 0;
+	width: 20px;
+	height: 20px;
+}
+
+.taglock-admin__card--spaced {
+	margin-top: var(--taglock-admin-space);
+}
+
+/* Status Badge */
 .taglock-admin__status-badge {
 	display: inline-flex;
 	align-items: center;
@@ -136,56 +135,53 @@
 }
 
 .taglock-admin__status-badge--success {
-	color: var(--taglock-admin-success);
+	color: #00a32a;
 }
 
 .taglock-admin__status-badge--error {
-	color: var(--taglock-admin-error);
+	color: #d63638;
 }
 
 .taglock-admin__status-badge--warning {
-	color: var(--taglock-admin-warning);
+	color: #dba617;
 }
 
 .taglock-admin__connection-badge {
 	margin: 0;
 }
 
-.taglock-admin__card-header-indicator .components-spinner {
-	margin: 0;
-	width: var(--taglock-admin-spinner-size);
-	height: var(--taglock-admin-spinner-size);
-}
-
-.taglock-admin__card--spaced {
-	margin-top: var(--taglock-admin-space);
-}
-
+/* Form Controls */
+.taglock-admin .components-base-control,
 .taglock-admin .components-text-control {
-	margin-bottom: var(--taglock-admin-input-margin);
-}
-
-/*
- * WP 6.7+ starts removing default bottom margins for some wp.components controls.
- * We control spacing explicitly within the TagLock admin UI.
- */
-.taglock-admin .components-base-control {
-	margin-bottom: var(--taglock-admin-input-margin);
+	margin-bottom: var(--taglock-admin-gap);
 }
 
 .taglock-admin__modal .components-base-control {
-	margin-bottom: var(--taglock-admin-input-margin);
+	margin-bottom: var(--taglock-admin-gap);
 }
 
 .taglock-admin__modal .components-base-control:last-child {
 	margin-bottom: 0;
 }
 
+/* Credentials Grid */
+.taglock-admin__credentials {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
+	gap: var(--taglock-admin-gap);
+}
+
+.taglock-admin__credentials .components-base-control,
+.taglock-admin__credentials .components-text-control {
+	margin-bottom: 0;
+}
+
+/* Selected Tags */
 .taglock-admin__selected-tags {
 	display: flex;
 	flex-direction: column;
 	gap: var(--taglock-admin-gap);
-	margin-bottom: var(--taglock-admin-input-margin);
+	margin-bottom: var(--taglock-admin-gap);
 }
 
 .taglock-admin__selected-tag {
@@ -195,28 +191,16 @@
 	gap: var(--taglock-admin-gap);
 }
 
-.taglock-admin__credentials .components-base-control {
-	margin-bottom: 0;
-}
-
-.taglock-admin__credentials {
-	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(var(--taglock-admin-credentials-min-col), 1fr));
-	gap: var(--taglock-admin-gap);
-}
-
-.taglock-admin__credentials .components-text-control {
-	margin-bottom: 0;
-}
-
+/* Code Block */
 .taglock-admin__code {
-	padding: var(--taglock-admin-code-padding);
-	background: var(--taglock-admin-code-bg);
+	padding: 10px;
+	background: #f0f0f0;
 	border-radius: var(--taglock-admin-radius);
 	overflow-x: auto;
 	font-family: monospace;
 }
 
+/* Pro Badge */
 .taglock-admin__pro-badge {
 	display: inline-flex;
 	align-items: center;
@@ -246,6 +230,7 @@
 	outline-offset: 2px;
 }
 
+/* Pro Toggle List */
 .taglock-admin__pro-toggle-list {
 	display: flex;
 	flex-direction: column;
@@ -256,6 +241,7 @@
 	margin-bottom: 0;
 }
 
+/* Pagination */
 .taglock-admin__pagination {
 	display: flex;
 	align-items: center;
@@ -267,6 +253,7 @@
 	line-height: 1.4;
 }
 
+/* Modal Actions */
 .taglock-admin__modal-actions {
 	display: flex;
 	justify-content: flex-end;
@@ -289,14 +276,14 @@
 
 .taglock-admin__error-message code {
 	display: block;
-	padding: var(--taglock-admin-code-padding);
-	background: var(--taglock-admin-code-bg);
+	padding: 10px;
+	background: #f0f0f0;
 	border-radius: var(--taglock-admin-radius);
 	font-size: 0.85em;
 	word-break: break-word;
 }
 
-/* Responsive Table */
+/* Table */
 .taglock-admin .wp-list-table {
 	border-collapse: collapse;
 	width: 100%;
@@ -315,20 +302,17 @@
 }
 
 .taglock-admin .wp-list-table tbody tr:nth-child(odd) {
-	background: var(--taglock-admin-table-stripe);
+	background: #f6f7f7;
 }
 
 /* Focus States */
-.taglock-admin__selected-tag .components-button:focus {
-	outline: 2px solid var(--wp-admin-theme-color);
-	outline-offset: 2px;
-}
-
+.taglock-admin__selected-tag .components-button:focus,
 .taglock-admin .wp-list-table .components-button:focus {
 	outline: 2px solid var(--wp-admin-theme-color);
 	outline-offset: 2px;
 }
 
+/* Lists */
 .taglock-admin ul {
 	list-style: disc;
 	margin-left: var(--taglock-admin-space);
