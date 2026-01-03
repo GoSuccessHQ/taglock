@@ -7,9 +7,6 @@
 	--taglock-font-size: clamp(13px, 1.8cqi, 14px);
 	--taglock-radius: 4px;
 	--taglock-text-muted: #666;
-	--taglock-error-bg: #f8d7da;
-	--taglock-error-border: #f5c6cb;
-	--taglock-error-text: #721c24;
 	--taglock-fade-duration: 0.5s;
 
 	position: relative;
@@ -28,19 +25,6 @@
 .taglock-loader-text {
 	font-size: var(--taglock-font-size);
 	color: var(--taglock-text-muted);
-}
-
-.taglock-error {
-	padding: var(--taglock-space);
-	background: var(--taglock-error-bg);
-	border: 1px solid var(--taglock-error-border);
-	border-radius: var(--taglock-radius);
-	color: var(--taglock-error-text);
-	margin: var(--taglock-space) 0;
-}
-
-.taglock-error p {
-	margin: 0;
 }
 
 .taglock-content {
