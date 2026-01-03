@@ -47,20 +47,28 @@
 
 .taglock-admin__tabs .components-tab-panel__tabs-item:hover:not(:disabled, [aria-disabled=true]) {
 	background: rgba(var(--wp-admin-theme-color--rgb), 0.04);
+	color: var(--wp-admin-theme-color);
 }
 
 .taglock-admin__tabs .components-tab-panel__tabs-item.is-active {
 	box-shadow: inset 0 0 0 1px var(--wp-admin-theme-color);
 	background: rgba(var(--wp-admin-theme-color--rgb), 0.04);
+	color: var(--wp-admin-theme-color);
 }
 
 .taglock-admin__page-title {
 	display: inline-flex;
 	align-items: center;
-	gap: var(--taglock-admin-gap);
+	gap: calc(var(--taglock-admin-gap) / 2);
 }
 
 .taglock-admin__page-title-icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 1em;
+	width: 1em;
+	height: 1em;
 	line-height: 1;
 }
 
