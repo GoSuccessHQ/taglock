@@ -7,7 +7,6 @@ namespace GoSuccess\TagLock\Route;
 use GoSuccess\TagLock\Contract\ApiRouteInterface;
 use GoSuccess\TagLock\Dto\ApiMethodHandler;
 use GoSuccess\TagLock\Dto\ApiResponse;
-use GoSuccess\TagLock\Enum\HookFilter;
 use GoSuccess\TagLock\Enum\HttpMethod;
 use GoSuccess\TagLock\Repository\RuleRepository;
 use GoSuccess\TagLock\Service\LoggerService;
@@ -169,7 +168,7 @@ final class RulesRoute implements ApiRouteInterface {
 	}
 
 	private function createRule( WP_REST_Request $request ): WP_REST_Response {
-		$maxRules = (int) apply_filters( HookFilter::MAX_RULES->value, 3 );
+		$maxRules = (int) apply_filters( 'taglock_max_rules', 3 );
 		if ( $maxRules > 0 ) {
 			$currentCount = $this->ruleRepository->getTotalCount();
 			if ( $currentCount >= $maxRules ) {

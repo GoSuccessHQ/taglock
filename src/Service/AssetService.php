@@ -8,9 +8,11 @@ use GoSuccess\TagLock\Configuration\PluginConfiguration;
 use GoSuccess\TagLock\Exception\AssetNotFoundException;
 use GoSuccess\TagLock\Exception\InvalidAssetFormatException;
 
-use function __;use function basename;
+use function __;
+use function basename;
 use function defined;
 use function dirname;
+use function esc_html;
 use function file_exists;
 use function is_array;
 use function is_string;
@@ -49,7 +51,7 @@ final class AssetService {
 	private function loadAssetMetadata( string $assetFile ): array {
 		if ( ! file_exists( $assetFile ) ) {
 			$this->logger->error( __( 'Missing asset metadata file', 'taglock' ), [ 'file' => $assetFile ] );
-			throw AssetNotFoundException::forMetadata( basename( $assetFile ) );
+			throw AssetNotFoundException::forMetadata( esc_html( basename( $assetFile ) ) );
 		}
 
 		/** @var mixed $assetData */
@@ -62,7 +64,7 @@ final class AssetService {
 			! is_string( $assetData['version'] )
 		) {
 			$this->logger->error( __( 'Invalid asset metadata format', 'taglock' ), [ 'file' => $assetFile ] );
-			throw InvalidAssetFormatException::forMetadata( basename( $assetFile ) );
+			throw InvalidAssetFormatException::forMetadata( esc_html( basename( $assetFile ) ) );
 		}
 
 		return $assetData;
