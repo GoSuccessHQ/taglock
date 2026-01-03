@@ -4,8 +4,8 @@
  * Displays the list of TagLocker rules with pagination and actions.
  */
 
-import { useCallback, useMemo } from '@wordpress/element';
-import { __ ,sprintf } from '@wordpress/i18n';
+import { useCallback, useMemo, useState } from '@wordpress/element';
+import { __, sprintf } from '@wordpress/i18n';
 import {
 	Card,
 	CardBody,
@@ -50,6 +50,27 @@ const TagLockersTab = ({
 	notice,
 	clearNotice,
 }) => {
+	/**
+	 * Track expanded rows for mobile view.
+	 */
+	const [expandedRows, setExpandedRows] = useState(new Set());
+
+	/**
+	 * Toggle row expansion for mobile view.
+	 *
+	 * @param {number} ruleId - The rule ID to toggle.
+	 */
+	const toggleRowExpansion = useCallback((ruleId) => {
+		setExpandedRows((prev) => {
+			const next = new Set(prev);
+			if (next.has(ruleId)) {
+				next.delete(ruleId);
+			} else {
+				next.add(ruleId);
+			}
+			return next;
+		});
+	}, []);
 	/**
 	 * Handle previous page click.
 	 */
@@ -139,14 +160,27 @@ const TagLockersTab = ({
 				{isLoading ? (
 					<Spinner />
 				) : (
-					<table className="wp-list-table widefat fixed striped">
+					<table className="wp-list-table widefat fixed striped taglock-admin__table">
 						<thead>
 							<tr>
-								<th scope="col">{__('ID', 'taglock')}</th>
-								<th scope="col">{__('Name', 'taglock')}</th>
-								<th scope="col">{__('Active', 'taglock')}</th>
-								<th scope="col">{__('Required Tags', 'taglock')}</th>
-								<th scope="col">{__('Actions', 'taglock')}</th>
+								<th
+									scope="col"
+									className="manage-column column-name column-primary"
+								>
+									{__('Name', 'taglock')}
+								</th>
+								<th scope="col" className="manage-column column-id">
+									{__('ID', 'taglock')}
+								</th>
+								<th scope="col" className="manage-column column-active">
+									{__('Active', 'taglock')}
+								</th>
+								<th scope="col" className="manage-column column-tags">
+									{__('Required Tags', 'taglock')}
+								</th>
+								<th scope="col" className="manage-column column-actions">
+									{__('Actions', 'taglock')}
+								</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -158,18 +192,55 @@ const TagLockersTab = ({
 								</tr>
 							) : (
 								rules.map((rule) => (
-									<tr key={rule.id}>
-										<td data-label={__('ID', 'taglock')}>{rule.id}</td>
-										<td data-label={__('Name', 'taglock')}>{rule.name}</td>
-										<td data-label={__('Active', 'taglock')}>
+									<tr
+										key={rule.id}
+										className={
+											expandedRows.has(rule.id)
+												? 'is-expanded'
+												: ''
+										}
+									>
+										<td
+											className="column-name column-primary"
+											data-colname={__('Name', 'taglock')}
+										>
+											<strong>{rule.name}</strong>
+											<button
+												type="button"
+												className="toggle-row"
+												onClick={() =>
+													toggleRowExpansion(rule.id)
+												}
+											>
+												<span className="screen-reader-text">
+													{__('Show more details', 'taglock')}
+												</span>
+											</button>
+										</td>
+										<td
+											className="column-id"
+											data-colname={__('ID', 'taglock')}
+										>
+											{rule.id}
+										</td>
+										<td
+											className="column-active"
+											data-colname={__('Active', 'taglock')}
+										>
 											{rule.is_active
 												? __('Yes', 'taglock')
 												: __('No', 'taglock')}
 										</td>
-										<td data-label={__('Required Tags', 'taglock')}>
+										<td
+											className="column-tags"
+											data-colname={__('Required Tags', 'taglock')}
+										>
 											{formatTagList(rule.required_tag_ids)}
 										</td>
-										<td data-label={__('Actions', 'taglock')}>
+										<td
+											className="column-actions"
+											data-colname={__('Actions', 'taglock')}
+										>
 											<Button
 												variant="secondary"
 												onClick={() => onEditRule(rule)}
