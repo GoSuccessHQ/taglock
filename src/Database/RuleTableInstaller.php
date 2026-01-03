@@ -104,16 +104,6 @@ final class RuleTableInstaller {
 			)
 		);
 
-		// Ensure existing rows are associated with the default provider.
-		$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-			$wpdb->prepare(
-				'UPDATE %i SET provider = %s WHERE provider = %s',
-				$rulesTable,
-				'klicktipp',
-				''
-			)
-		);
-
 		update_option( self::DB_VERSION_OPTION, self::DB_VERSION );
 		$this->logger->info( __( 'Database tables installed/updated', 'taglock' ), [ 'version' => self::DB_VERSION ] );
 	}

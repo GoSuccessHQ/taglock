@@ -52,7 +52,14 @@ final class RuleRoute implements ApiRouteInterface {
 			new ApiMethodHandler(
 				HttpMethod::PUT,
 				fn( WP_REST_Request $request ) => $this->updateRule( $request ),
-				fn( WP_REST_Request $request ) => $this->checkPermissions( $request )
+				fn( WP_REST_Request $request ) => $this->checkPermissions( $request ),
+				[
+					'provider' => [
+						'required'          => false,
+						'type'              => 'string',
+						'sanitize_callback' => 'sanitize_text_field',
+					],
+				]
 			),
 			new ApiMethodHandler(
 				HttpMethod::DELETE,

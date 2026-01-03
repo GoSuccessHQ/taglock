@@ -70,6 +70,11 @@ final class RulesRoute implements ApiRouteInterface {
 				fn( WP_REST_Request $request ) => $this->createRule( $request ),
 				fn( WP_REST_Request $request ) => $this->checkPermissions( $request ),
 				[
+					'provider' => [
+						'required'          => false,
+						'type'              => 'string',
+						'sanitize_callback' => 'sanitize_text_field',
+					],
 					'name' => [
 						'required'          => true,
 						'type'              => 'string',
