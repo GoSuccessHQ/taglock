@@ -65,6 +65,22 @@ final class RuleRepository {
 	}
 
 	/**
+	 * Get total number of rules.
+	 *
+	 * @return int Total count.
+	 */
+	public function getTotalCount(): int {
+		global $wpdb;
+
+		$table = $wpdb->prefix . $this->config->ruleTableName;
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$count = $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %i', $table ) );
+
+		return (int) $count;
+	}
+
+	/**
 	 * @return array{items: array<int, array<string, mixed>>, total: int}
 	 */
 	public function listRules( string $search, int $page, int $perPage ): array {

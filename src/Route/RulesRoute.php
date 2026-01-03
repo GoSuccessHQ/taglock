@@ -7,6 +7,7 @@ namespace GoSuccess\TagLock\Route;
 use GoSuccess\TagLock\Contract\ApiRouteInterface;
 use GoSuccess\TagLock\Dto\ApiMethodHandler;
 use GoSuccess\TagLock\Dto\ApiResponse;
+use GoSuccess\TagLock\Enum\HookFilter;
 use GoSuccess\TagLock\Enum\HttpMethod;
 use GoSuccess\TagLock\Repository\RuleRepository;
 use GoSuccess\TagLock\Service\LoggerService;
@@ -15,7 +16,9 @@ use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
 
-use function __;use function current_user_can;
+use function __;
+use function apply_filters;
+use function current_user_can;
 use function defined;
 use function is_array;
 use function is_numeric;
@@ -166,6 +169,22 @@ final class RulesRoute implements ApiRouteInterface {
 	}
 
 	private function createRule( WP_REST_Request $request ): WP_REST_Response {
+		$maxRules = (int) apply_filters( HookFilter::MAX_RULES->value, 3 );
+		if ( $maxRules > 0 ) {
+			$currentCount = $this->ruleRepository->getTotalCount();
+			if ( $currentCount >= $maxRules ) {
+				return ApiResponse::error(
+					sprintf(
+						/* translators: %d: maximum number of rules allowed */
+						__( 'You have reached the maximum of %d TagLockers. Upgrade to Pro for unlimited TagLockers.', 'taglock' ),
+						$maxRules
+					),
+					'limit_reached',
+					403
+				);
+			}
+		}
+
 		$payload = $request->get_json_params();
 		$payload = is_array( $payload ) ? $payload : [];
 

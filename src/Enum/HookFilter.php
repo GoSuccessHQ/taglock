@@ -41,4 +41,5 @@ enum HookFilter: string {
 	// Rules
 	case RULE_ACCESS_MODES = 'taglock_rule_access_modes';
 	case RULE_DENY_MODES = 'taglock_rule_deny_modes';
+	case MAX_RULES = 'taglock_max_rules';
 }
