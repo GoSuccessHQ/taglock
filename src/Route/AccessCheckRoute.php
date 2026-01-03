@@ -11,11 +11,13 @@ declare(strict_types=1);
 
 namespace GoSuccess\TagLock\Route;
 
-defined( 'ABSPATH' ) || exit;
-
 use GoSuccess\TagLock\Contract\ApiRouteInterface;
 use GoSuccess\TagLock\Handler\CheckAccessHandler;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
+
+use function defined;
+
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Route definition for access checking endpoint.

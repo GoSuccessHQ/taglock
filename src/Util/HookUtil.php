@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace GoSuccess\TagLock\Util;
 
-defined( 'ABSPATH' ) || exit;
-
 use GoSuccess\TagLock\Enum\HookAction;
 use GoSuccess\TagLock\Enum\HookFilter;
 
 use function apply_filters;
+use function defined;
 use function do_action;
+
+defined( 'ABSPATH' ) || exit;
 
 /**
  * WordPress Hook Utilities

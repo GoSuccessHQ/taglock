@@ -19,6 +19,9 @@ declare(strict_types=1);
 use GoSuccess\TagLock\Enum\HookAction;
 use GoSuccess\TagLock\Util\HookUtil;
 
+use function defined;
+use function define;
+
 defined( 'ABSPATH' ) || exit;
 
 define( 'TAGLOCK_FILE', __FILE__ );

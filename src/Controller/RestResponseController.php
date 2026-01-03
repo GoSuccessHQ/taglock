@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace GoSuccess\TagLock\Controller;
 
-defined( 'ABSPATH' ) || exit;
-
 use GoSuccess\TagLock\Service\RestResponseNormalizationService;
 
 use function add_filter;
+use function defined;
+
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Registers REST response normalization hooks.

@@ -10,14 +10,15 @@ declare(strict_types=1);
 
 namespace GoSuccess\TagLock\Configuration;
 
-defined( 'ABSPATH' ) || exit;
-
 use GoSuccess\TagLock\Contract\CrmProviderInterface;
 use GoSuccess\TagLock\Provider\CrmProviderFactory;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
+use function defined;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\tagged_iterator;
+
+defined( 'ABSPATH' ) || exit;
 
 return static function ( ContainerConfigurator $container ): void {
 	$services = $container

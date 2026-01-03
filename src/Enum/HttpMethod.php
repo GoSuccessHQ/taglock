@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace GoSuccess\TagLock\Enum;
 
+use function defined;
+
 defined( 'ABSPATH' ) || exit;
 
 enum HttpMethod: string {

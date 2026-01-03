@@ -10,8 +10,6 @@ declare(strict_types=1);
 
 namespace GoSuccess\TagLock\Handler;
 
-defined( 'ABSPATH' ) || exit;
-
 use GoSuccess\TagLock\Dto\ApiResponse;
 use GoSuccess\TagLock\Enum\HttpMethod;
 use GoSuccess\TagLock\Handler\AbstractApiHandler;
@@ -23,11 +21,14 @@ use WP_REST_Response;
 
 use function count;
 use function ctype_digit;
+use function defined;
 use function is_array;
 use function is_numeric;
 use function is_string;
 use function sanitize_text_field;
 use function wp_verify_nonce;
+
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Handler for processing access check requests.

@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace GoSuccess\TagLock\Controller;
 
-defined( 'ABSPATH' ) || exit;
-
 use GoSuccess\TagLock\Service\AdminMenuService;
 
 use function add_action;
 use function add_filter;
+use function defined;
 use function plugin_basename;
+
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Registers admin menu hooks.

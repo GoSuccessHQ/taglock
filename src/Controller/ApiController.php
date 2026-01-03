@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace GoSuccess\TagLock\Controller;
 
-defined( 'ABSPATH' ) || exit;
-
 use GoSuccess\TagLock\Service\ApiRouteRegistrationService;
 
 use function add_action;
+use function defined;
 use function did_action;
+
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Handles the API endpoints for the TagLock plugin.

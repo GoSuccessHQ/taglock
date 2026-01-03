@@ -10,8 +10,6 @@ declare(strict_types=1);
 
 namespace GoSuccess\TagLock\Service;
 
-defined( 'ABSPATH' ) || exit;
-
 use GoSuccess\TagLock\Contract\CrmProviderInterface;
 use GoSuccess\TagLock\Enum\HookAction;
 use GoSuccess\TagLock\Enum\HookFilter;
@@ -21,6 +19,7 @@ use GoSuccess\TagLock\Util\HookUtil;
 
 use function ctype_digit;
 use function current_user_can;
+use function defined;
 use function do_shortcode;
 use function function_exists;
 use function get_permalink;
@@ -28,6 +27,8 @@ use function get_transient;
 use function is_array;
 use function is_string;
 use function wp_kses_post;
+
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Service for validating access to protected content based on CRM tags.
