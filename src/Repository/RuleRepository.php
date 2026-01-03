@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace GoSuccess\TagLock\Repository;
 
+use GoSuccess\TagLock\Enum\CrmProvider;
 use GoSuccess\TagLock\Service\LoggerService;
 
 use function array_filter;
@@ -16,6 +17,7 @@ use function is_array;
 use function is_numeric;
 use function is_string;
 use function sanitize_text_field;
+use function strtolower;
 use function time;
 use function trim;
 use function wp_cache_get;
@@ -93,7 +95,7 @@ final class RuleRepository {
 			);
 			$rows = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 				$wpdb->prepare(
-					'SELECT id, name, is_active, access_mode, deny_mode, redirect_post_id, admin_bypass_enabled, engagement_tagging_enabled, updated_at
+					'SELECT id, name, provider, is_active, access_mode, deny_mode, redirect_post_id, admin_bypass_enabled, engagement_tagging_enabled, updated_at
 					FROM %i
 					WHERE name LIKE %s
 					ORDER BY updated_at DESC
@@ -109,7 +111,7 @@ final class RuleRepository {
 			$total = (int) $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %i', $table ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$rows = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 				$wpdb->prepare(
-					'SELECT id, name, is_active, access_mode, deny_mode, redirect_post_id, admin_bypass_enabled, engagement_tagging_enabled, updated_at
+					'SELECT id, name, provider, is_active, access_mode, deny_mode, redirect_post_id, admin_bypass_enabled, engagement_tagging_enabled, updated_at
 					FROM %i
 					ORDER BY updated_at DESC
 					LIMIT %d OFFSET %d',
@@ -126,6 +128,9 @@ final class RuleRepository {
 		$items = array_map( static function ( array $row ): array {
 			$row['id'] = (int) $row['id'];
 			$row['is_active'] = (bool) $row['is_active'];
+			$row['provider'] = isset( $row['provider'] ) && is_string( $row['provider'] ) && $row['provider'] !== ''
+				? $row['provider']
+				: CrmProvider::default()->value;
 			$row['redirect_post_id'] = $row['redirect_post_id'] !== null ? (int) $row['redirect_post_id'] : null;
 			$row['admin_bypass_enabled'] = (bool) $row['admin_bypass_enabled'];
 			$row['engagement_tagging_enabled'] = (bool) $row['engagement_tagging_enabled'];
@@ -175,7 +180,7 @@ final class RuleRepository {
 		$table = $wpdb->prefix . 'taglock_rule';
 		$now = current_time( 'mysql' );
 
-		$insert = $this->sanitizeRuleWrite( $data );
+		$insert = $this->sanitizeRuleWrite( $data, true );
 		$insert['created_at'] = $now;
 		$insert['updated_at'] = $now;
 
@@ -198,7 +203,7 @@ final class RuleRepository {
 		global $wpdb;
 
 		$table = $wpdb->prefix . 'taglock_rule';
-		$update = $this->sanitizeRuleWrite( $data );
+		$update = $this->sanitizeRuleWrite( $data, false );
 		$update['updated_at'] = current_time( 'mysql' );
 
 		$ok = $wpdb->update( $table, $update, [ 'id' => $id ] ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
@@ -238,6 +243,9 @@ final class RuleRepository {
 		$row['deny_message'] = isset( $row['deny_message'] ) && is_string( $row['deny_message'] ) ? $row['deny_message'] : '';
 		$row['teaser_html'] = isset( $row['teaser_html'] ) && is_string( $row['teaser_html'] ) ? $row['teaser_html'] : '';
 		$row['redirect_post_type'] = isset( $row['redirect_post_type'] ) && is_string( $row['redirect_post_type'] ) ? $row['redirect_post_type'] : null;
+		$row['provider'] = isset( $row['provider'] ) && is_string( $row['provider'] ) && $row['provider'] !== ''
+			? $row['provider']
+			: CrmProvider::default()->value;
 
 		return $row;
 	}
@@ -298,7 +306,19 @@ final class RuleRepository {
 	/**
 	 * @return array<string, mixed>
 	 */
-	private function sanitizeRuleWrite( array $data ): array {
+	private function sanitizeRuleWrite( array $data, bool $includeProviderDefault ): array {
+		$provider = null;
+		if ( isset( $data['provider'] ) && is_string( $data['provider'] ) ) {
+			$providerKey = sanitize_text_field( $data['provider'] );
+			$providerKey = strtolower( $providerKey );
+			$providerEnum = CrmProvider::tryFrom( $providerKey );
+			$provider = $providerEnum?->value;
+		}
+
+		if ( $provider === null && $includeProviderDefault ) {
+			$provider = CrmProvider::default()->value;
+		}
+
 		$name = isset( $data['name'] ) && is_string( $data['name'] ) ? sanitize_text_field( $data['name'] ) : '';
 		$accessMode = isset( $data['access_mode'] ) && is_string( $data['access_mode'] ) ? sanitize_text_field( $data['access_mode'] ) : 'tag_any';
 		$denyMode = isset( $data['deny_mode'] ) && is_string( $data['deny_mode'] ) ? sanitize_text_field( $data['deny_mode'] ) : 'message';
@@ -313,8 +333,9 @@ final class RuleRepository {
 		$adminBypassEnabled = ! empty( $data['admin_bypass_enabled'] ) ? 1 : 0;
 		$engagementEnabled = ! empty( $data['engagement_tagging_enabled'] ) ? 1 : 0;
 
-		return [
+		$payload = [
 			'name'                     => $name,
+			'provider'                 => $provider,
 			'is_active'                => $isActive,
 			'access_mode'              => $accessMode,
 			'deny_mode'                => $denyMode,
@@ -325,5 +346,11 @@ final class RuleRepository {
 			'admin_bypass_enabled'      => $adminBypassEnabled,
 			'engagement_tagging_enabled' => $engagementEnabled,
 		];
+
+		if ( $payload['provider'] === null ) {
+			unset( $payload['provider'] );
+		}
+
+		return $payload;
 	}
 }

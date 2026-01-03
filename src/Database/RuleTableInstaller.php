@@ -18,7 +18,7 @@ use function update_option;
 final class RuleTableInstaller {
 
 	private const string DB_VERSION_OPTION = 'taglock_db_version';
-	private const string DB_VERSION = '1';
+	private const string DB_VERSION = '2';
 
 	public function __construct(
 		private readonly LoggerService $logger
@@ -46,6 +46,7 @@ final class RuleTableInstaller {
 		$sqlRules = "CREATE TABLE {$rulesTable} (
 			id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
 			name varchar(190) NOT NULL,
+			provider varchar(32) NOT NULL DEFAULT 'klicktipp',
 			is_active tinyint(1) NOT NULL DEFAULT 1,
 			access_mode varchar(20) NOT NULL DEFAULT 'tag_any',
 			deny_mode varchar(20) NOT NULL DEFAULT 'message',
@@ -58,6 +59,7 @@ final class RuleTableInstaller {
 			created_at datetime NOT NULL,
 			updated_at datetime NOT NULL,
 			PRIMARY KEY  (id),
+			KEY provider (provider),
 			KEY is_active (is_active),
 			KEY name (name),
 			KEY deny_mode (deny_mode),
@@ -99,6 +101,16 @@ final class RuleTableInstaller {
 				$rulesTable,
 				$now,
 				'0000-00-00 00:00:00'
+			)
+		);
+
+		// Ensure existing rows are associated with the default provider.
+		$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$wpdb->prepare(
+				'UPDATE %i SET provider = %s WHERE provider = %s',
+				$rulesTable,
+				'klicktipp',
+				''
 			)
 		);
 
