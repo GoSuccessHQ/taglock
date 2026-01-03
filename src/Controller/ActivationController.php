@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace GoSuccess\TagLock\Controller;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 use GoSuccess\TagLock\Enum\HookAction;
 use GoSuccess\TagLock\Contract\CRMProviderInterface;
 use GoSuccess\TagLock\Service\LoggerService;

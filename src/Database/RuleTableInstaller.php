@@ -85,8 +85,22 @@ final class RuleTableInstaller {
 
 		// Seed timestamps if the table is new and empty.
 		$now = current_time( 'mysql' );
-		$wpdb->query( $wpdb->prepare( "UPDATE {$rulesTable} SET created_at = %s WHERE created_at = '0000-00-00 00:00:00'", $now ) );
-		$wpdb->query( $wpdb->prepare( "UPDATE {$rulesTable} SET updated_at = %s WHERE updated_at = '0000-00-00 00:00:00'", $now ) );
+		$wpdb->query(
+			$wpdb->prepare(
+				'UPDATE %i SET created_at = %s WHERE created_at = %s',
+				$rulesTable,
+				$now,
+				'0000-00-00 00:00:00'
+			)
+		);
+		$wpdb->query(
+			$wpdb->prepare(
+				'UPDATE %i SET updated_at = %s WHERE updated_at = %s',
+				$rulesTable,
+				$now,
+				'0000-00-00 00:00:00'
+			)
+		);
 
 		update_option( self::DB_VERSION_OPTION, self::DB_VERSION );
 		$this->logger->info( __( 'Database tables installed/updated', 'taglock' ), [ 'version' => self::DB_VERSION ] );

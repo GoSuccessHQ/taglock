@@ -8,21 +8,56 @@ use GoSuccess\TagLock\Service\LoggerService;
 
 use function array_filter;
 use function array_map;
+use function array_values;
 use function count;
 use function current_time;
 use function intval;
 use function is_array;
+use function is_numeric;
 use function is_string;
 use function sanitize_text_field;
+use function time;
+use function trim;
+use function wp_cache_get;
+use function wp_cache_set;
+use function wp_json_encode;
 
 /**
  * Persists and queries TagLock rules.
  */
 final class RuleRepository {
+	private const string CACHE_GROUP = 'taglock';
+	private const int CACHE_TTL_SECONDS = 60;
 
 	public function __construct(
 		private readonly LoggerService $logger
 	) {}
+
+	private function getRulesCacheVersion(): int {
+		$version = wp_cache_get( 'rules_cache_version', self::CACHE_GROUP );
+		$version = is_numeric( $version ) ? (int) $version : 0;
+		if ( $version < 1 ) {
+			$version = 1;
+			wp_cache_set( 'rules_cache_version', $version, self::CACHE_GROUP, self::CACHE_TTL_SECONDS );
+		}
+		return $version;
+	}
+
+	private function bumpRulesCacheVersion(): void {
+		$version = $this->getRulesCacheVersion();
+		$version++;
+		wp_cache_set( 'rules_cache_version', $version, self::CACHE_GROUP, self::CACHE_TTL_SECONDS );
+	}
+
+	private function getTagTableName( string $tableName ): string {
+		global $wpdb;
+
+		return match ( $tableName ) {
+			'taglock_rule_required_tag' => $wpdb->prefix . 'taglock_rule_required_tag',
+			'taglock_rule_engagement_tag' => $wpdb->prefix . 'taglock_rule_engagement_tag',
+			default => $wpdb->prefix . 'taglock_rule_required_tag',
+		};
+	}
 
 	/**
 	 * @return array{items: array<int, array<string, mixed>>, total: int}
@@ -35,28 +70,57 @@ final class RuleRepository {
 		$perPage = $perPage > 100 ? 100 : $perPage;
 		$offset = ( $page - 1 ) * $perPage;
 
-		$table = $wpdb->prefix . 'taglock_rule';
-		$whereSql = '1=1';
-		$whereArgs = [];
-
 		$search = trim( $search );
-		if ( $search !== '' ) {
-			$like = '%' . $wpdb->esc_like( $search ) . '%';
-			$whereSql .= ' AND name LIKE %s';
-			$whereArgs[] = $like;
+		$table = $wpdb->prefix . 'taglock_rule';
+
+		$cacheVersion = $this->getRulesCacheVersion();
+		$cacheKey = 'rules_list_' . md5( wp_json_encode( [
+			'v' => $cacheVersion,
+			'search' => $search,
+			'page' => $page,
+			'per_page' => $perPage,
+		] ) ?: (string) time() );
+
+		$cached = wp_cache_get( $cacheKey, self::CACHE_GROUP );
+		if ( is_array( $cached ) && isset( $cached['items'], $cached['total'] ) ) {
+			return $cached;
 		}
 
-		$countSql = "SELECT COUNT(*) FROM {$table} WHERE {$whereSql}";
-		$total = (int) $wpdb->get_var( $wpdb->prepare( $countSql, ...$whereArgs ) );
+		if ( $search !== '' ) {
+			$like = '%' . $wpdb->esc_like( $search ) . '%';
+			$total = (int) $wpdb->get_var(
+				$wpdb->prepare( 'SELECT COUNT(*) FROM %i WHERE name LIKE %s', $table, $like )
+			);
+			$rows = $wpdb->get_results(
+				$wpdb->prepare(
+					'SELECT id, name, is_active, access_mode, deny_mode, redirect_post_id, admin_bypass_enabled, engagement_tagging_enabled, updated_at
+					FROM %i
+					WHERE name LIKE %s
+					ORDER BY updated_at DESC
+					LIMIT %d OFFSET %d',
+					$table,
+					$like,
+					$perPage,
+					$offset
+				),
+				ARRAY_A
+			);
+		} else {
+			$total = (int) $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %i', $table ) );
+			$rows = $wpdb->get_results(
+				$wpdb->prepare(
+					'SELECT id, name, is_active, access_mode, deny_mode, redirect_post_id, admin_bypass_enabled, engagement_tagging_enabled, updated_at
+					FROM %i
+					ORDER BY updated_at DESC
+					LIMIT %d OFFSET %d',
+					$table,
+					$perPage,
+					$offset
+				),
+				ARRAY_A
+			);
+		}
 
-		$listSql = "SELECT id, name, is_active, access_mode, deny_mode, redirect_post_id, admin_bypass_enabled, engagement_tagging_enabled, updated_at
-			FROM {$table}
-			WHERE {$whereSql}
-			ORDER BY updated_at DESC
-			LIMIT %d OFFSET %d";
-
-		$listArgs = [ ...$whereArgs, $perPage, $offset ];
-		$rows = $wpdb->get_results( $wpdb->prepare( $listSql, ...$listArgs ), ARRAY_A );
 		$items = is_array( $rows ) ? $rows : [];
 
 		$items = array_map( static function ( array $row ): array {
@@ -68,10 +132,13 @@ final class RuleRepository {
 			return $row;
 		}, $items );
 
-		return [
+		$result = [
 			'items' => $items,
 			'total' => $total,
 		];
+
+		wp_cache_set( $cacheKey, $result, self::CACHE_GROUP, self::CACHE_TTL_SECONDS );
+		return $result;
 	}
 
 	/**
@@ -80,8 +147,15 @@ final class RuleRepository {
 	public function getRule( int $id ): ?array {
 		global $wpdb;
 
+		$cacheVersion = $this->getRulesCacheVersion();
+		$cacheKey = 'rule_' . $id . '_' . $cacheVersion;
+		$cached = wp_cache_get( $cacheKey, self::CACHE_GROUP );
+		if ( is_array( $cached ) ) {
+			return $cached;
+		}
+
 		$table = $wpdb->prefix . 'taglock_rule';
-		$row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", $id ), ARRAY_A );
+		$row = $wpdb->get_row( $wpdb->prepare( 'SELECT * FROM %i WHERE id = %d', $table, $id ), ARRAY_A );
 		if ( ! is_array( $row ) ) {
 			return null;
 		}
@@ -89,6 +163,8 @@ final class RuleRepository {
 		$rule = $this->normalizeRuleRow( $row );
 		$rule['required_tag_ids'] = $this->getTagIds( $id, 'taglock_rule_required_tag' );
 		$rule['engagement_tag_ids'] = $this->getTagIds( $id, 'taglock_rule_engagement_tag' );
+
+		wp_cache_set( $cacheKey, $rule, self::CACHE_GROUP, self::CACHE_TTL_SECONDS );
 
 		return $rule;
 	}
@@ -113,6 +189,7 @@ final class RuleRepository {
 
 		$this->syncTagIds( $ruleId, $data['required_tag_ids'] ?? [], 'taglock_rule_required_tag' );
 		$this->syncTagIds( $ruleId, $data['engagement_tag_ids'] ?? [], 'taglock_rule_engagement_tag' );
+		$this->bumpRulesCacheVersion();
 
 		return $ruleId;
 	}
@@ -132,6 +209,7 @@ final class RuleRepository {
 
 		$this->syncTagIds( $id, $data['required_tag_ids'] ?? [], 'taglock_rule_required_tag' );
 		$this->syncTagIds( $id, $data['engagement_tag_ids'] ?? [], 'taglock_rule_engagement_tag' );
+		$this->bumpRulesCacheVersion();
 
 		return true;
 	}
@@ -144,6 +222,7 @@ final class RuleRepository {
 
 		$table = $wpdb->prefix . 'taglock_rule';
 		$ok = $wpdb->delete( $table, [ 'id' => $id ] );
+		$this->bumpRulesCacheVersion();
 		return $ok !== false;
 	}
 
@@ -166,35 +245,45 @@ final class RuleRepository {
 	/**
 	 * @return array<int, int>
 	 */
-	private function getTagIds( int $ruleId, string $suffix ): array {
+	private function getTagIds( int $ruleId, string $tableName ): array {
 		global $wpdb;
 
-		$table = $wpdb->prefix . $suffix;
-		$rows = $wpdb->get_col( $wpdb->prepare( "SELECT tag_id FROM {$table} WHERE rule_id = %d ORDER BY tag_id ASC", $ruleId ) );
+		$cacheVersion = $this->getRulesCacheVersion();
+		$cacheKey = 'rule_tag_ids_' . md5( $tableName . '_' . $ruleId . '_' . $cacheVersion );
+		$cached = wp_cache_get( $cacheKey, self::CACHE_GROUP );
+		if ( is_array( $cached ) ) {
+			return $cached;
+		}
+
+		$table = $this->getTagTableName( $tableName );
+		$rows = $wpdb->get_col(
+			$wpdb->prepare( 'SELECT tag_id FROM %i WHERE rule_id = %d ORDER BY tag_id ASC', $table, $ruleId )
+		);
 		if ( ! is_array( $rows ) ) {
 			return [];
 		}
 
 		$ids = array_map( 'intval', $rows );
 		$ids = array_values( array_filter( $ids, static fn( int $v ) => $v > 0 ) );
+		wp_cache_set( $cacheKey, $ids, self::CACHE_GROUP, self::CACHE_TTL_SECONDS );
 		return $ids;
 	}
 
-	private function deleteTags( int $ruleId, string $suffix ): void {
+	private function deleteTags( int $ruleId, string $tableName ): void {
 		global $wpdb;
-		$table = $wpdb->prefix . $suffix;
+		$table = $this->getTagTableName( $tableName );
 		$wpdb->delete( $table, [ 'rule_id' => $ruleId ] );
 	}
 
 	/**
 	 * @param array<int, mixed> $tagIds
 	 */
-	private function syncTagIds( int $ruleId, array $tagIds, string $suffix ): void {
+	private function syncTagIds( int $ruleId, array $tagIds, string $tableName ): void {
 		global $wpdb;
 
-		$this->deleteTags( $ruleId, $suffix );
+		$this->deleteTags( $ruleId, $tableName );
 
-		$table = $wpdb->prefix . $suffix;
+		$table = $this->getTagTableName( $tableName );
 		$tagIds = array_map( 'intval', $tagIds );
 		$tagIds = array_values( array_filter( $tagIds, static fn( int $v ) => $v > 0 ) );
 
