@@ -159,15 +159,17 @@ const TagLockersTab = ({
 							) : (
 								rules.map((rule) => (
 									<tr key={rule.id}>
-										<td>{rule.id}</td>
-										<td>{rule.name}</td>
-										<td>
+										<td data-label={__('ID', 'taglock')}>{rule.id}</td>
+										<td data-label={__('Name', 'taglock')}>{rule.name}</td>
+										<td data-label={__('Active', 'taglock')}>
 											{rule.is_active
 												? __('Yes', 'taglock')
 												: __('No', 'taglock')}
 										</td>
-										<td>{formatTagList(rule.required_tag_ids)}</td>
-										<td>
+										<td data-label={__('Required Tags', 'taglock')}>
+											{formatTagList(rule.required_tag_ids)}
+										</td>
+										<td data-label={__('Actions', 'taglock')}>
 											<Button
 												variant="secondary"
 												onClick={() => onEditRule(rule)}

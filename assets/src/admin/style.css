@@ -1,6 +1,7 @@
 .taglock-admin {
 	container-type: inline-size;
 
+	/* Spacing */
 	--taglock-admin-max-width: 1200px;
 	--taglock-admin-space: clamp(12px, 2cqi, 20px);
 	--taglock-admin-gap: clamp(10px, 1.6cqi, 16px);
@@ -9,11 +10,27 @@
 	--taglock-admin-credentials-min-col: min(260px, 100%);
 	--taglock-admin-code-padding: clamp(8px, 1.4cqi, 10px);
 	--taglock-admin-radius: 0.4rem;
-	--taglock-admin-code-bg: #f0f0f0;
 	--taglock-admin-h2-size: clamp(1.1rem, 1.6cqi, 1.3rem);
+
+	/* Colors - Light Mode */
+	--taglock-admin-code-bg: #f0f0f0;
+	--taglock-admin-success: #00a32a;
+	--taglock-admin-error: #d63638;
+	--taglock-admin-warning: #dba617;
+	--taglock-admin-border: #ddd;
+	--taglock-admin-table-stripe: #f6f7f7;
 
 	max-width: var(--taglock-admin-max-width);
 	margin: var(--taglock-admin-space) 0;
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+	.taglock-admin {
+		--taglock-admin-code-bg: #2c3338;
+		--taglock-admin-border: #3c434a;
+		--taglock-admin-table-stripe: #2c3338;
+	}
 }
 
 .taglock-admin__tabs {
@@ -30,7 +47,7 @@
 	height: 40px !important;
 	padding: 0 12px;
 	border-radius: var(--taglock-admin-radius);
-	box-shadow: inset 0 0 0 1px #ddd;
+	box-shadow: inset 0 0 0 1px var(--taglock-admin-border);
 }
 
 .taglock-admin__tabs .components-tab-panel__tabs-item::after {
@@ -128,11 +145,15 @@
 }
 
 .taglock-admin__status-badge--success {
-	color: #00a32a;
+	color: var(--taglock-admin-success);
 }
 
 .taglock-admin__status-badge--error {
-	color: #d63638;
+	color: var(--taglock-admin-error);
+}
+
+.taglock-admin__status-badge--warning {
+	color: var(--taglock-admin-warning);
 }
 
 .taglock-admin__connection-badge {
@@ -262,9 +283,107 @@
 	margin-top: var(--taglock-admin-space);
 }
 
-.taglock-admin__modal .taglock-admin__modal-actions {
-	gap: var(--taglock-admin-gap);
-	margin-top: var(--taglock-admin-space);
+/* Error Boundary */
+.taglock-admin__error-boundary {
+	padding: var(--taglock-admin-space);
+}
+
+.taglock-admin__error-boundary .components-notice {
+	margin: 0;
+}
+
+.taglock-admin__error-message {
+	margin: var(--taglock-admin-gap) 0;
+}
+
+.taglock-admin__error-message code {
+	display: block;
+	padding: var(--taglock-admin-code-padding);
+	background: var(--taglock-admin-code-bg);
+	border-radius: var(--taglock-admin-radius);
+	font-size: 0.85em;
+	word-break: break-word;
+}
+
+/* Responsive Table */
+.taglock-admin .wp-list-table {
+	border-collapse: collapse;
+	width: 100%;
+}
+
+.taglock-admin .wp-list-table th,
+.taglock-admin .wp-list-table td {
+	padding: var(--taglock-admin-gap);
+	text-align: left;
+	vertical-align: middle;
+}
+
+.taglock-admin .wp-list-table th {
+	font-weight: 600;
+	white-space: nowrap;
+}
+
+.taglock-admin .wp-list-table tbody tr:nth-child(odd) {
+	background: var(--taglock-admin-table-stripe);
+}
+
+/* Focus States */
+.taglock-admin__selected-tag .components-button:focus {
+	outline: 2px solid var(--wp-admin-theme-color);
+	outline-offset: 2px;
+}
+
+.taglock-admin .wp-list-table .components-button:focus {
+	outline: 2px solid var(--wp-admin-theme-color);
+	outline-offset: 2px;
+}
+
+/* Responsive: Stack table on small screens */
+@container (max-width: 600px) {
+	.taglock-admin .wp-list-table,
+	.taglock-admin .wp-list-table thead,
+	.taglock-admin .wp-list-table tbody,
+	.taglock-admin .wp-list-table th,
+	.taglock-admin .wp-list-table td,
+	.taglock-admin .wp-list-table tr {
+		display: block;
+	}
+
+	.taglock-admin .wp-list-table thead {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		padding: 0;
+		margin: -1px;
+		overflow: hidden;
+		clip: rect(0, 0, 0, 0);
+		white-space: nowrap;
+		border: 0;
+	}
+
+	.taglock-admin .wp-list-table tbody tr {
+		margin-bottom: var(--taglock-admin-gap);
+		border: 1px solid var(--taglock-admin-border);
+		border-radius: var(--taglock-admin-radius);
+	}
+
+	.taglock-admin .wp-list-table td {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: var(--taglock-admin-gap);
+		border-bottom: 1px solid var(--taglock-admin-border);
+	}
+
+	.taglock-admin .wp-list-table td:last-child {
+		border-bottom: 0;
+	}
+
+	.taglock-admin .wp-list-table td::before {
+		content: attr(data-label);
+		font-weight: 600;
+		margin-right: var(--taglock-admin-gap);
+	}
 }
 
 .taglock-admin ul {
