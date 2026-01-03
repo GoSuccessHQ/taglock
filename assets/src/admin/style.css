@@ -1,6 +1,10 @@
 .taglock-admin {
-	container-type: inline-size;
 	color-scheme: light dark;
+
+	/* "Has me" query - sets container-type on parent */
+	:has(> &) {
+		container-type: inline-size;
+	}
 
 	/* Spacing */
 	--taglock-admin-max-width: 1200px;
