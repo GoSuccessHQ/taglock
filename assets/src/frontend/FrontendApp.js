@@ -66,9 +66,10 @@ const createContentState = (content, isTeaser = false) => ({
  * Frontend App component.
  *
  * @param {Object} props - Component props.
+ * @param {string|null} props.error - Immediate error from shortcode validation.
  * @param {string|null} props.subscriberId - Subscriber ID from localStorage or URL.
  * @param {boolean} props.adminBypass - Whether admin bypass is enabled.
- * @param {string} props.contentId - Unique content ID for this block.
+ * @param {string|null} props.contentId - Unique content ID for this block.
  * @param {string} props.message - Default deny message.
  * @param {string} props.loaderText - Text to show while loading.
  * @param {Promise|null} props.batchRequest - Batch API request promise.
@@ -76,15 +77,18 @@ const createContentState = (content, isTeaser = false) => ({
  * @return {JSX.Element} The frontend app.
  */
 const FrontendApp = ({
+	error = null,
 	subscriberId = null,
 	adminBypass,
-	contentId,
+	contentId = null,
 	message = '',
 	loaderText = '',
 	batchRequest = null,
 	lazyLoad = false,
 }) => {
-	const [state, setState] = useState(INITIAL_STATE);
+	// If there's an immediate error from shortcode validation, show it directly.
+	const initialState = error ? createErrorState(error) : INITIAL_STATE;
+	const [state, setState] = useState(initialState);
 	const [hasStartedLoading, setHasStartedLoading] = useState(!lazyLoad);
 
 	// Intersection observer for lazy loading.
@@ -149,6 +153,11 @@ const FrontendApp = ({
 	 * Check access on mount.
 	 */
 	useEffect(() => {
+		// Skip if there's an immediate error from shortcode validation.
+		if (error) {
+			return;
+		}
+
 		// For lazy loading, wait until visible.
 		if (lazyLoad && !isVisible) {
 			return;
@@ -177,13 +186,13 @@ const FrontendApp = ({
 			try {
 				const response = await batchRequest;
 				processResponse(response);
-			} catch (error) {
-				setState(createErrorState(error.message || defaultError));
+			} catch (err) {
+				setState(createErrorState(err.message || defaultError));
 			}
 		};
 
 		checkAccess();
-	}, [subscriberId, adminBypass, batchRequest, processResponse, defaultError, accessDeniedError, lazyLoad, isVisible, hasStartedLoading]);
+	}, [error, subscriberId, adminBypass, batchRequest, processResponse, defaultError, accessDeniedError, lazyLoad, isVisible, hasStartedLoading]);
 
 	// Loading state (including lazy load placeholder).
 	if (state.loading) {
@@ -216,9 +225,10 @@ const FrontendApp = ({
 };
 
 FrontendApp.propTypes = {
+	error: PropTypes.string,
 	subscriberId: PropTypes.string,
 	adminBypass: PropTypes.bool.isRequired,
-	contentId: PropTypes.string.isRequired,
+	contentId: PropTypes.string,
 	message: PropTypes.string,
 	loaderText: PropTypes.string,
 	batchRequest: PropTypes.instanceOf(Promise),

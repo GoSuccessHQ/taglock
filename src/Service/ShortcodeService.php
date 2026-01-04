@@ -73,15 +73,24 @@ final class ShortcodeService {
 
 		$ruleId = (string) ( $attributes['id'] ?? '' );
 		$ruleId = trim( $ruleId );
+
+		// Build data attributes for React - React handles ALL rendering including errors
+		$dataAttributes = [
+			'data-loader-text' => esc_attr( __( 'Checking access...', 'taglock' ) ),
+		];
+
+		// Validate rule ID
 		if ( $ruleId === '' || ! ctype_digit( $ruleId ) ) {
 			$this->logger->warning( __( 'TagLock shortcode missing or invalid rule id', 'taglock' ) );
-			return '<div class="taglock-error">' . esc_html__( 'Error: id attribute is required. Example: [taglock id="1"]...[/taglock]', 'taglock' ) . '</div>';
+			$dataAttributes['data-error'] = esc_attr( __( 'Error: id attribute is required. Example: [taglock id="1"]...[/taglock]', 'taglock' ) );
+			return $this->renderContainer( $dataAttributes, $attributes );
 		}
 
 		$rule = $this->ruleRepository->getRule( (int) $ruleId );
 		if ( $rule === null || empty( $rule['is_active'] ) ) {
 			$this->logger->warning( __( 'TagLock shortcode references missing/inactive rule', 'taglock' ), [ 'rule_id' => $ruleId ] );
-			return '<div class="taglock-error">' . esc_html__( 'Error: This TagLock rule does not exist or is disabled.', 'taglock' ) . '</div>';
+			$dataAttributes['data-error'] = esc_attr( __( 'Error: This TagLock rule does not exist or is disabled.', 'taglock' ) );
+			return $this->renderContainer( $dataAttributes, $attributes );
 		}
 
 		// Generate nonce for REST API request
@@ -91,13 +100,10 @@ final class ShortcodeService {
 			$adminBypassEnabled = ! empty( $rule['admin_bypass_enabled'] );
 		}
 
-		// Create data attributes for React
-		$dataAttributes = [
-			'data-rule-id'     => esc_attr( $ruleId ),
-			'data-nonce'       => esc_attr( $nonce ),
-			'data-message'     => esc_attr( __( 'This content is protected. Please check your access.', 'taglock' ) ),
-			'data-loader-text' => esc_attr( __( 'Checking access...', 'taglock' ) ),
-		];
+		// Add successful rule data attributes
+		$dataAttributes['data-rule-id'] = esc_attr( $ruleId );
+		$dataAttributes['data-nonce']   = esc_attr( $nonce );
+		$dataAttributes['data-message'] = esc_attr( __( 'This content is protected. Please check your access.', 'taglock' ) );
 
 		if ( $adminBypassEnabled ) {
 			$dataAttributes['data-admin-bypass'] = '1';
@@ -110,6 +116,22 @@ final class ShortcodeService {
 
 		$dataAttributes['data-content-id'] = esc_attr( $contentId );
 
+		$this->logger->debug( __( 'TagLock shortcode rendered', 'taglock' ), [
+			'rule_id'    => $ruleId,
+			'content_id' => $contentId,
+		] );
+
+		return $this->renderContainer( $dataAttributes, $attributes );
+	}
+
+	/**
+	 * Render the container element for React to mount.
+	 *
+	 * @param array<string, string> $dataAttributes Data attributes for the container.
+	 * @param array<string, mixed> $attributes Shortcode attributes.
+	 * @return string The HTML container.
+	 */
+	private function renderContainer( array $dataAttributes, array $attributes ): string {
 		$dataAttrString = implode( ' ', array_map(
 			fn( $key, $value ) => sprintf( '%s="%s"', $key, $value ),
 			array_keys( $dataAttributes ),
@@ -123,14 +145,9 @@ final class ShortcodeService {
 		);
 
 		// Allow filtering final HTML (for Pro customizations)
-		$html = HookUtil::applyFilter( HookFilter::SHORTCODE_CONTAINER_HTML, $html, $attributes, $content );
+		$html = HookUtil::applyFilter( HookFilter::SHORTCODE_CONTAINER_HTML, $html, $attributes, null );
 
 		HookUtil::doAction( HookAction::AFTER_SHORTCODE_RENDER, $html, $attributes );
-
-		$this->logger->debug( __( 'TagLock shortcode rendered', 'taglock' ), [
-			'rule_id'    => $ruleId,
-			'content_id' => $contentId,
-		] );
 
 		return $html;
 	}

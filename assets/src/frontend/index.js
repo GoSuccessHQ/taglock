@@ -97,23 +97,24 @@ domReady(() => {
 		: null;
 
 	containers.forEach((container) => {
+		const error = container.getAttribute('data-error');
 		const contentId = container.getAttribute('data-content-id');
 		const message = container.getAttribute('data-message');
 		const loaderText = container.getAttribute('data-loader-text');
 
-		if (contentId) {
-			createRoot(container).render(
-				<ErrorBoundary>
-					<FrontendApp
-						contentId={contentId}
-						message={message}
-						loaderText={loaderText}
-						subscriberId={subscriberId}
-						adminBypass={adminBypass}
-						batchRequest={batchRequest}
-					/>
-				</ErrorBoundary>
-			);
-		}
+		// Always render React - it handles errors and content display
+		createRoot(container).render(
+			<ErrorBoundary>
+				<FrontendApp
+					error={error}
+					contentId={contentId}
+					message={message}
+					loaderText={loaderText}
+					subscriberId={subscriberId}
+					adminBypass={adminBypass}
+					batchRequest={batchRequest}
+				/>
+			</ErrorBoundary>
+		);
 	});
 });
