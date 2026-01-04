@@ -32,6 +32,7 @@ const useAdminConfig = () => {
 			proUrl: adminConfig?.proUrl || 'https://gosuccess.io/taglock',
 			isPro: Boolean(adminConfig?.isPro),
 			isProDisabled: !Boolean(adminConfig?.isPro),
+			maxRules: adminConfig?.maxRules || 0,
 		};
 	}, []);
 };

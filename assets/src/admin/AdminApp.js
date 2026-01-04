@@ -174,6 +174,8 @@ const AdminApp = () => {
 				onGoToConnection={goToConnectionTab}
 				notice={rulesNotice}
 				clearNotice={clearRulesNotice}
+				maxRules={config.maxRules}
+				upgradeUrl={config.proUrl}
 			/>
 		);
 	}, [
@@ -199,6 +201,8 @@ const AdminApp = () => {
 		goToConnectionTab,
 		rulesNotice,
 		clearRulesNotice,
+		config.maxRules,
+		config.proUrl,
 	]);
 
 	return (

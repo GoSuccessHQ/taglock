@@ -95,6 +95,18 @@ const RuleModal = ({
 		updateField('engagement_tag_ids', newIds);
 	}, [updateField]);
 
+	/**
+	 * Handle form submit.
+	 *
+	 * @param {Event} e - Form submit event.
+	 */
+	const handleSubmit = useCallback((e) => {
+		e.preventDefault();
+		if (!isSaving) {
+			onSave();
+		}
+	}, [isSaving, onSave]);
+
 	if (!isOpen) {
 		return null;
 	}
@@ -109,15 +121,17 @@ const RuleModal = ({
 			className="taglock-admin__modal"
 			onRequestClose={onClose}
 		>
-			{notice && (
-				<Notice
-					status={notice.status}
-					isDismissible
-					onRemove={clearNotice}
-				>
-					{notice.message}
-				</Notice>
-			)}
+			<form onSubmit={handleSubmit}>
+				{notice && (
+					<Notice
+						className="taglock-admin__notice"
+						status={notice.status}
+						isDismissible
+						onRemove={clearNotice}
+					>
+						{notice.message}
+					</Notice>
+				)}
 
 			<TextControl
 				label={__('Name', 'taglock')}
@@ -272,13 +286,14 @@ const RuleModal = ({
 				</Button>
 				<Button
 					variant="primary"
-					onClick={onSave}
+					type="submit"
 					isBusy={isSaving}
 					disabled={isSaving}
 				>
 					{editingRuleId ? __('Save', 'taglock') : __('Create', 'taglock')}
 				</Button>
 			</div>
+			</form>
 		</Modal>
 	);
 };

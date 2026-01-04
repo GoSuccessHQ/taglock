@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace GoSuccess\TagLock\Service;
 
 use GoSuccess\TagLock\Configuration\PluginConfiguration;
+use GoSuccess\TagLock\Enum\HookFilter;
 use GoSuccess\TagLock\Exception\AssetNotFoundException;
 use GoSuccess\TagLock\Exception\InvalidAssetFormatException;
 
 use function __;
+use function apply_filters;
 use function basename;
 use function defined;
 use function dirname;
@@ -103,6 +105,7 @@ final class AssetService {
 				'apiNamespace' => $this->pluginConfiguration->apiNamespace,
 				'proUrl'       => $this->pluginConfiguration->proLandingUrl,
 				'isPro'        => $this->proStatusService->isProActive(),
+				'maxRules'     => (int) apply_filters( HookFilter::MAX_RULES->value, 3 ),
 			] ) . ';',
 			'before'
 		);
