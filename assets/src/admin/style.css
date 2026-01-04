@@ -15,6 +15,10 @@
 	--taglock-admin-radius: 4px;
 }
 
+.taglock-admin__modal .components-modal__frame {
+	width: 600px;
+}
+
 /* Tabs */
 .taglock-admin__tabs {
 	display: grid;
@@ -164,10 +168,11 @@
 	margin-bottom: 0;
 }
 
-/* ComboboxControl (TagPicker) - Fix height and width jumping */
-.taglock-admin .components-combobox-control input[type="text"] {
+/* ComboboxControl (TagPicker) - Fix height jumping */
+.taglock-admin .components-combobox-control__suggestions-container .components-flex,
+.taglock-admin__modal .components-combobox-control__suggestions-container .components-flex {
 	min-height: 40px;
-	width: 100%;
+	max-height: 40px;
 }
 
 /* Credentials Grid */

@@ -160,7 +160,7 @@ const AdminApp = () => {
 		return (
 			<TagLockersTab
 				rules={rules}
-				isLoading={rulesLoading}
+				isLoading={rulesLoading || tagsLoading}
 				pagination={rulesPagination}
 				setPage={setRulesPage}
 				onNewRule={handleNewRuleClick}
@@ -186,6 +186,7 @@ const AdminApp = () => {
 		handleSaveSettings,
 		rules,
 		rulesLoading,
+		tagsLoading,
 		rulesPagination,
 		setRulesPage,
 		handleNewRuleClick,
