@@ -111,8 +111,8 @@ final class RulesRoute implements ApiRouteInterface {
 					],
 					'redirect_post_id' => [
 						'required'          => false,
-						'type'              => 'integer',
-						'validate_callback' => static fn( $param ) => $param === null || is_numeric( $param ),
+						'type'              => [ 'integer', 'null' ],
+						'sanitize_callback' => static fn( $v ) => is_numeric( $v ) ? (int) $v : null,
 					],
 					'redirect_post_type' => [
 						'required'          => false,
