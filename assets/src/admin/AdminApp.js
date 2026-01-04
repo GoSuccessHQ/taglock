@@ -2,7 +2,7 @@
  * Admin App component.
  *
  * Main component for the TagLock admin interface. Provides tabs for
- * managing TagLocker rules and KlickTipp connection settings.
+ * managing TagLock rules and KlickTipp connection settings.
  *
  * @package TagLock
  */
@@ -18,7 +18,7 @@ import {
 } from './hooks';
 import {
 	ConnectionTab,
-	TagLockersTab,
+	TagLocksTab,
 	RuleModal,
 } from './components';
 
@@ -60,6 +60,7 @@ const AdminApp = () => {
 		isSaving: ruleSaving,
 		openCreateModal,
 		openEditModal,
+		openDuplicateModal,
 		closeModal,
 		saveRule,
 		deleteRule,
@@ -75,7 +76,7 @@ const AdminApp = () => {
 	} = useTags();
 
 	// Local state for UI.
-	const [activeTab, setActiveTab] = useState('taglockers');
+	const [activeTab, setActiveTab] = useState('taglocks');
 	const [tabPanelKey, setTabPanelKey] = useState(0);
 
 	// Load tags when settings are loaded and connected.
@@ -130,7 +131,7 @@ const AdminApp = () => {
 	 * Tab definitions.
 	 */
 	const tabs = useMemo(() => [
-		{ name: 'taglockers', title: __('TagLockers', 'taglock') },
+		{ name: 'taglocks', title: __('TagLocks', 'taglock') },
 		{ name: 'connection', title: __('KlickTipp Connection', 'taglock') },
 	], []);
 
@@ -158,13 +159,14 @@ const AdminApp = () => {
 		}
 
 		return (
-			<TagLockersTab
+			<TagLocksTab
 				rules={rules}
 				isLoading={rulesLoading || tagsLoading}
 				pagination={rulesPagination}
 				setPage={setRulesPage}
 				onNewRule={handleNewRuleClick}
 				onEditRule={openEditModal}
+				onDuplicateRule={openDuplicateModal}
 				onDeleteRule={deleteRule}
 				formatTagList={formatTagList}
 				isConnected={isConnected}
@@ -191,6 +193,7 @@ const AdminApp = () => {
 		setRulesPage,
 		handleNewRuleClick,
 		openEditModal,
+		openDuplicateModal,
 		deleteRule,
 		formatTagList,
 		goToConnectionTab,

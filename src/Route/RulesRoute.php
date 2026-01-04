@@ -175,7 +175,7 @@ final class RulesRoute implements ApiRouteInterface {
 				return ApiResponse::error(
 					sprintf(
 						/* translators: %d: maximum number of rules allowed */
-						__( 'You have reached the maximum of %d TagLockers. Upgrade to Pro for unlimited TagLockers.', 'taglock' ),
+						__( 'You have reached the maximum of %d TagLocks. Upgrade to Pro for unlimited TagLocks.', 'taglock' ),
 						$maxRules
 					),
 					'limit_reached',

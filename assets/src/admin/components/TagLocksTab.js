@@ -1,11 +1,11 @@
 /**
- * TagLockers Tab component.
+ * TagLocks Tab component.
  *
- * Displays the list of TagLocker rules with pagination and actions.
+ * Displays the list of TagLock rules with pagination and actions.
  */
 
 import { useCallback, useMemo } from '@wordpress/element';
-import { __ ,sprintf } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import {
 	Card,
 	CardBody,
@@ -17,7 +17,7 @@ import {
 import PropTypes from 'prop-types';
 
 /**
- * TagLockers Tab component.
+ * TagLocks Tab component.
  *
  * @param {Object} props - Component props.
  * @param {Array<Object>} props.rules - List of rules.
@@ -27,15 +27,16 @@ import PropTypes from 'prop-types';
  * @param {Function} props.onNewRule - Callback to create new rule.
  * @param {Function} props.onEditRule - Callback to edit a rule.
  * @param {Function} props.onDeleteRule - Callback to delete a rule.
+ * @param {Function} props.onDuplicateRule - Callback to duplicate a rule.
  * @param {Function} props.formatTagList - Function to format tag list.
  * @param {boolean} props.isConnected - Whether connected to KlickTipp.
  * @param {boolean} props.settingsLoading - Whether settings are loading.
  * @param {Function} props.onGoToConnection - Callback to navigate to connection tab.
  * @param {Object|null} props.notice - Notice to display.
  * @param {Function} props.clearNotice - Callback to clear notice.
- * @return {JSX.Element} The TagLockers tab.
+ * @return {JSX.Element} The TagLocks tab.
  */
-const TagLockersTab = ({
+const TagLocksTab = ({
 	rules,
 	isLoading,
 	pagination,
@@ -43,6 +44,7 @@ const TagLockersTab = ({
 	onNewRule,
 	onEditRule,
 	onDeleteRule,
+	onDuplicateRule,
 	formatTagList,
 	isConnected,
 	settingsLoading,
@@ -89,19 +91,30 @@ const TagLockersTab = ({
 		);
 	}, [pagination.page, pagination.total_pages]);
 
+	/**
+	 * Copy shortcode to clipboard.
+	 *
+	 * @param {number} ruleId - The rule ID.
+	 */
+	const copyShortcode = useCallback((ruleId) => {
+		const placeholder = __('Your content here', 'taglock');
+		const shortcode = `[taglock id="${ruleId}"]${placeholder}[/taglock]`;
+		navigator.clipboard.writeText(shortcode);
+	}, []);
+
 	return (
 		<Card>
 			<CardHeader>
 				<div className="taglock-admin__card-header">
 					<h2 className="taglock-admin__card-header-title">
-						{__('TagLockers', 'taglock')}
+						{__('TagLocks', 'taglock')}
 					</h2>
 					<Button
 						variant="primary"
 						onClick={onNewRule}
 						disabled={settingsLoading || !isConnected}
 					>
-						{__('New TagLocker', 'taglock')}
+						{__('New TagLock', 'taglock')}
 					</Button>
 				</div>
 			</CardHeader>
@@ -115,7 +128,7 @@ const TagLockersTab = ({
 						<strong>{__('No KlickTipp connection', 'taglock')}</strong>
 						<div>
 							{__(
-								'Please save valid credentials first. While disconnected, you cannot create new TagLockers.',
+								'Please save valid credentials first. While disconnected, you cannot create new TagLocks.',
 								'taglock'
 							)}
 						</div>
@@ -139,7 +152,7 @@ const TagLockersTab = ({
 				{isLoading ? (
 					<Spinner />
 				) : (
-					<table className="wp-list-table widefat fixed striped table-view-list taglockers">
+					<table className="wp-list-table widefat fixed striped table-view-list taglocks">
 						<thead>
 							<tr>
 								<th
@@ -166,7 +179,7 @@ const TagLockersTab = ({
 							{rules.length === 0 ? (
 								<tr>
 									<td colSpan="4">
-										{__('No TagLockers found.', 'taglock')}
+										{__('No TagLocks found.', 'taglock')}
 									</td>
 								</tr>
 							) : (
@@ -193,6 +206,30 @@ const TagLockersTab = ({
 														}}
 													>
 														{__('Edit', 'taglock')}
+													</a>{' '}
+													|{' '}
+												</span>
+												<span className="duplicate">
+													<a
+														href="#"
+														onClick={(e) => {
+															e.preventDefault();
+															onDuplicateRule(rule);
+														}}
+													>
+														{__('Duplicate', 'taglock')}
+													</a>{' '}
+													|{' '}
+												</span>
+												<span className="copy">
+													<a
+														href="#"
+														onClick={(e) => {
+															e.preventDefault();
+															copyShortcode(rule.id);
+														}}
+													>
+														{__('Copy Shortcode', 'taglock')}
 													</a>{' '}
 													|{' '}
 												</span>
@@ -262,7 +299,7 @@ const TagLockersTab = ({
 	);
 };
 
-TagLockersTab.propTypes = {
+TagLocksTab.propTypes = {
 	rules: PropTypes.arrayOf(
 		PropTypes.shape({
 			id: PropTypes.number.isRequired,
@@ -281,6 +318,7 @@ TagLockersTab.propTypes = {
 	setPage: PropTypes.func.isRequired,
 	onNewRule: PropTypes.func.isRequired,
 	onEditRule: PropTypes.func.isRequired,
+	onDuplicateRule: PropTypes.func.isRequired,
 	onDeleteRule: PropTypes.func.isRequired,
 	formatTagList: PropTypes.func.isRequired,
 	isConnected: PropTypes.bool.isRequired,
@@ -293,4 +331,4 @@ TagLockersTab.propTypes = {
 	clearNotice: PropTypes.func.isRequired,
 };
 
-export default TagLockersTab;
+export default TagLocksTab;

@@ -1,7 +1,7 @@
 /**
  * Rule Modal component.
  *
- * Modal dialog for creating and editing TagLocker rules.
+ * Modal dialog for creating and editing TagLock rules.
  */
 
 import { useCallback, useMemo } from '@wordpress/element';
@@ -100,8 +100,8 @@ const RuleModal = ({
 	}
 
 	const modalTitle = editingRuleId
-		? __('Edit TagLocker', 'taglock')
-		: __('New TagLocker', 'taglock');
+		? __('Edit TagLock', 'taglock')
+		: __('New TagLock', 'taglock');
 
 	return (
 		<Modal

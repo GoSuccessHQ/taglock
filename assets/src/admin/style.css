@@ -13,9 +13,6 @@
 	--taglock-admin-space: 16px;
 	--taglock-admin-gap: 12px;
 	--taglock-admin-radius: 4px;
-}
-
-.taglock-admin__modal .components-modal__frame {
 	width: 600px;
 }
 

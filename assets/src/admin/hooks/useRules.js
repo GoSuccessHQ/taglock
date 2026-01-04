@@ -1,7 +1,7 @@
 /**
  * Rules hook.
  *
- * Manages TagLocker rules state and CRUD operations.
+ * Manages TagLock rules state and CRUD operations.
  */
 
 import { useState, useEffect, useCallback } from '@wordpress/element';
@@ -104,7 +104,7 @@ const useRules = (perPage = 10) => {
 			setPagination({ ...DEFAULT_PAGINATION, page: pageNum, per_page: perPage });
 			setNotice({
 				status: 'error',
-				message: error.message || __('Failed to load TagLockers.', 'taglock'),
+				message: error.message || __('Failed to load TagLocks.', 'taglock'),
 			});
 		} finally {
 			setIsLoading(false);
@@ -131,6 +131,34 @@ const useRules = (perPage = 10) => {
 		setEditingRuleId(rule?.id ?? null);
 		setRuleForm({
 			name: rule?.name || '',
+			is_active: Boolean(rule?.is_active),
+			access_mode: rule?.access_mode || 'tag_any',
+			required_tag_ids: normalizeIdArray(rule?.required_tag_ids),
+			deny_mode: rule?.deny_mode || 'message',
+			deny_message: rule?.deny_message || '',
+			teaser_html: rule?.teaser_html || '',
+			redirect_post_id:
+				rule?.redirect_post_id && Number(rule.redirect_post_id) > 0
+					? String(rule.redirect_post_id)
+					: '',
+			engagement_tagging_enabled: Boolean(rule?.engagement_tagging_enabled),
+			engagement_tag_ids: normalizeIdArray(rule?.engagement_tag_ids),
+			admin_bypass_enabled: Boolean(rule?.admin_bypass_enabled),
+		});
+		setIsModalOpen(true);
+	}, []);
+
+	/**
+	 * Open modal for duplicating an existing rule.
+	 * Creates a new rule with the same settings but a modified name.
+	 *
+	 * @param {Object} rule - The rule to duplicate.
+	 */
+	const openDuplicateModal = useCallback((rule) => {
+		setModalNotice(null);
+		setEditingRuleId(null); // null = create mode
+		setRuleForm({
+			name: rule?.name ? `${rule.name} (Copy)` : '',
 			is_active: Boolean(rule?.is_active),
 			access_mode: rule?.access_mode || 'tag_any',
 			required_tag_ids: normalizeIdArray(rule?.required_tag_ids),
@@ -223,7 +251,7 @@ const useRules = (perPage = 10) => {
 		} catch (error) {
 			setModalNotice({
 				status: 'error',
-				message: error.message || __('Failed to save TagLocker.', 'taglock'),
+				message: error.message || __('Failed to save TagLock.', 'taglock'),
 			});
 		} finally {
 			setIsSaving(false);
@@ -242,7 +270,7 @@ const useRules = (perPage = 10) => {
 			return;
 		}
 		// eslint-disable-next-line no-alert
-		if (!window.confirm(__('Delete this TagLocker? This cannot be undone.', 'taglock'))) {
+		if (!window.confirm(__('Delete this TagLock? This cannot be undone.', 'taglock'))) {
 			return;
 		}
 		try {
@@ -251,7 +279,7 @@ const useRules = (perPage = 10) => {
 		} catch (error) {
 			setNotice({
 				status: 'error',
-				message: error.message || __('Failed to delete TagLocker.', 'taglock'),
+				message: error.message || __('Failed to delete TagLock.', 'taglock'),
 			});
 		}
 	}, [loadRules, page]);
@@ -296,21 +324,26 @@ const useRules = (perPage = 10) => {
 		page,
 		isLoading,
 		notice,
+		setNotice,
 		
 		// Modal state
 		isModalOpen,
 		editingRuleId,
 		isSaving,
 		modalNotice,
+		setModalNotice,
 		ruleForm,
 		
 		// Actions
 		loadRules,
+		reloadRules: loadRules,
 		openCreateModal,
 		openEditModal,
+		openDuplicateModal,
 		closeModal,
 		saveRule,
 		removeRule,
+		deleteRule: removeRule,
 		updateFormField,
 		setRuleForm,
 		clearNotice,
