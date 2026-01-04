@@ -4,7 +4,7 @@
  * Displays the list of TagLock rules with pagination and actions.
  */
 
-import { useCallback, useMemo } from '@wordpress/element';
+import { useCallback, useMemo, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	Card,
@@ -92,6 +92,11 @@ const TagLocksTab = ({
 	}, [pagination.page, pagination.total_pages]);
 
 	/**
+	 * Track which rule ID was just copied (for feedback).
+	 */
+	const [copiedRuleId, setCopiedRuleId] = useState(null);
+
+	/**
 	 * Copy shortcode to clipboard.
 	 *
 	 * @param {number} ruleId - The rule ID.
@@ -100,6 +105,8 @@ const TagLocksTab = ({
 		const placeholder = __('Your content here', 'taglock');
 		const shortcode = `[taglock id="${ruleId}"]${placeholder}[/taglock]`;
 		navigator.clipboard.writeText(shortcode);
+		setCopiedRuleId(ruleId);
+		setTimeout(() => setCopiedRuleId(null), 1500);
 	}, []);
 
 	return (
@@ -229,7 +236,9 @@ const TagLocksTab = ({
 															copyShortcode(rule.id);
 														}}
 													>
-														{__('Copy Shortcode', 'taglock')}
+														{copiedRuleId === rule.id
+															? __('Copied!', 'taglock')
+															: __('Copy Shortcode', 'taglock')}
 													</a>{' '}
 													|{' '}
 												</span>
