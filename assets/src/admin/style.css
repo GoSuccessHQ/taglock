@@ -164,6 +164,12 @@
 	margin-bottom: 0;
 }
 
+/* ComboboxControl (TagPicker) - Fix height and width jumping */
+.taglock-admin .components-combobox-control input[type="text"] {
+	min-height: 40px;
+	width: 100%;
+}
+
 /* Credentials Grid */
 .taglock-admin__credentials {
 	display: grid;

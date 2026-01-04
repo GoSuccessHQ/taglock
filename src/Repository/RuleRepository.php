@@ -144,7 +144,7 @@ final class RuleRepository {
 
 		$items = is_array( $rows ) ? $rows : [];
 
-		$items = array_map( static function ( array $row ): array {
+		$items = array_map( function ( array $row ): array {
 			$row['id'] = (int) $row['id'];
 			$row['is_active'] = (bool) $row['is_active'];
 			$row['provider'] = isset( $row['provider'] ) && is_string( $row['provider'] ) && $row['provider'] !== ''
@@ -153,6 +153,7 @@ final class RuleRepository {
 			$row['redirect_post_id'] = $row['redirect_post_id'] !== null ? (int) $row['redirect_post_id'] : null;
 			$row['admin_bypass_enabled'] = (bool) $row['admin_bypass_enabled'];
 			$row['engagement_tagging_enabled'] = (bool) $row['engagement_tagging_enabled'];
+			$row['required_tag_ids'] = $this->getTagIds( $row['id'], 'required' );
 			return $row;
 		}, $items );
 
