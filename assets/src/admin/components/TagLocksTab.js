@@ -284,25 +284,27 @@ const TagLocksTab = ({
 					</table>
 				)}
 
-				<div className="taglock-admin__pagination">
-					<Button
-						variant="secondary"
-						disabled={isPrevDisabled}
-						onClick={handlePrevPage}
-					>
-						{__('Previous', 'taglock')}
-					</Button>
-					<span className="taglock-admin__pagination-label">
-						{paginationLabel}
-					</span>
-					<Button
-						variant="secondary"
-						disabled={isNextDisabled}
-						onClick={handleNextPage}
-					>
-						{__('Next', 'taglock')}
-					</Button>
-				</div>
+				{!isLoading && pagination.total_pages > 1 && (
+					<div className="taglock-admin__pagination">
+						<Button
+							variant="secondary"
+							disabled={isPrevDisabled}
+							onClick={handlePrevPage}
+						>
+							{__('Previous', 'taglock')}
+						</Button>
+						<span className="taglock-admin__pagination-label">
+							{paginationLabel}
+						</span>
+						<Button
+							variant="secondary"
+							disabled={isNextDisabled}
+							onClick={handleNextPage}
+						>
+							{__('Next', 'taglock')}
+						</Button>
+					</div>
+				)}
 			</CardBody>
 		</Card>
 	);

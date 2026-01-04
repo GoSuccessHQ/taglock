@@ -160,9 +160,20 @@ final class RulesRoute implements ApiRouteInterface {
 		$page = (int) ( $request->get_param( 'page' ) ?: 1 );
 		$perPage = (int) ( $request->get_param( 'per_page' ) ?: 20 );
 
+		// Apply max rules limit (free version).
+		$maxRules = (int) apply_filters( 'taglock_max_rules', 3 );
+		if ( $maxRules > 0 ) {
+			$perPage = min( $perPage, $maxRules );
+		}
+
 		$result = $this->ruleRepository->listRules( $search, $page, $perPage );
 		$items = $result['items'];
 		$total = (int) $result['total'];
+
+		// Limit total count to max rules for pagination.
+		if ( $maxRules > 0 ) {
+			$total = min( $total, $maxRules );
+		}
 
 		return ApiResponse::paginatedSuccess( $items, $page, $perPage, $total );
 	}
