@@ -110,8 +110,15 @@ final class ProStatusService {
 			return;
 		}
 
-		if ( defined( 'ABSPATH' ) && file_exists( ABSPATH . 'wp-admin/includes/plugin.php' ) ) {
-			require_once ABSPATH . 'wp-admin/includes/plugin.php';
+		// Only load plugin.php when in admin context - these functions are only
+		// available in admin and we should not force-load them on frontend.
+		if ( ! is_admin() ) {
+			return;
+		}
+
+		$pluginFile = ABSPATH . 'wp-admin/includes/plugin.php';
+		if ( file_exists( $pluginFile ) ) {
+			require_once $pluginFile;
 		}
 	}
 }

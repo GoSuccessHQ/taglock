@@ -19,6 +19,7 @@ use function function_exists;
 use function get_option;
 use function is_numeric;
 use function wp_normalize_path;
+use function wp_upload_dir;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -53,7 +54,7 @@ final class LoggerService {
 		}
 
 		$filesystem = $this->getFilesystem();
-		$logDir = wp_normalize_path( WP_CONTENT_DIR . '/uploads/taglock/logs' );
+		$logDir = $this->getLogDirectory();
 		$logFile = "{$logDir}/taglock.log";
 
 		if ( ! $filesystem->is_dir( $logDir ) ) {
@@ -101,6 +102,16 @@ final class LoggerService {
 	}
 
 	/**
+	 * Get the log directory path using wp_upload_dir().
+	 *
+	 * @return string The normalized log directory path.
+	 */
+	private function getLogDirectory(): string {
+		$uploadDir = wp_upload_dir();
+		return wp_normalize_path( $uploadDir['basedir'] . '/taglock/logs' );
+	}
+
+	/**
 	 * Create and configure the Monolog logger.
 	 *
 	 * @return LoggerInterface The configured logger instance.
@@ -119,7 +130,7 @@ final class LoggerService {
 		);
 
 		// Get log directory
-		$logDir  = wp_normalize_path( WP_CONTENT_DIR . '/uploads/taglock/logs' );
+		$logDir  = $this->getLogDirectory();
 		$logFile = "{$logDir}/taglock.log";
 
 		// Determine log level based on WP_DEBUG

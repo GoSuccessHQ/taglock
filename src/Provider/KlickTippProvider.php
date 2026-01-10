@@ -114,7 +114,7 @@ final class KlickTippProvider implements CrmProviderInterface {
 			return true;
 		}
 
-		$connectorFile = dirname( TAGLOCK_FILE ) . '/vendor/klicktipp/php-connector/klicktipp.api.inc';
+		$connectorFile = dirname( TAGLOCK_FILE ) . '/vendor/klicktipp/php-connector/klicktipp.api.php';
 		if ( ! file_exists( $connectorFile ) ) {
 			$this->lastError = __( 'KlickTipp connector library is missing. Please reinstall the plugin.', 'taglock' );
 			$this->logger->error( __( 'KlickTipp connector library file missing', 'taglock' ), [ 'file' => $connectorFile ] );

@@ -24,6 +24,7 @@ use function wp_clear_scheduled_hook;
 use function wp_mkdir_p;
 use function wp_next_scheduled;
 use function wp_schedule_event;
+use function wp_upload_dir;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -54,9 +55,9 @@ final class ActivationController {
 	public function activate(): void {
 		HookUtil::doAction( HookAction::BEFORE_ACTIVATION );
 
-		// Ensure required runtime directories exist.
-		wp_mkdir_p( WP_CONTENT_DIR . '/cache/taglock' );
-		wp_mkdir_p( WP_CONTENT_DIR . '/uploads/taglock/logs' );
+		// Ensure required runtime directories exist using wp_upload_dir().
+		$uploadDir = wp_upload_dir();
+		wp_mkdir_p( $uploadDir['basedir'] . '/taglock/logs' );
 
 		// Ensure custom database tables exist.
 		$this->databaseMigrationService->install();
