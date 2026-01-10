@@ -16,8 +16,6 @@ use Throwable;
 use function __;
 use function class_exists;
 use function defined;
-use function dirname;
-use function file_exists;
 use function get_class;
 use function get_option;
 
@@ -110,25 +108,9 @@ final class KlickTippProvider implements CrmProviderInterface {
 	}
 
 	private function ensureConnectorLoaded(): bool {
-		if ( class_exists( KlicktippConnector::class ) ) {
-			return true;
-		}
-
-		$connectorFile = dirname( TAGLOCK_FILE ) . '/vendor/klicktipp/php-connector/klicktipp.api.php';
-		if ( ! file_exists( $connectorFile ) ) {
-			$this->lastError = __( 'KlickTipp connector library is missing. Please reinstall the plugin.', 'taglock' );
-			$this->logger->error( __( 'KlickTipp connector library file missing', 'taglock' ), [ 'file' => $connectorFile ] );
-			return false;
-		}
-
-		require_once $connectorFile;
-
 		if ( ! class_exists( KlicktippConnector::class ) ) {
-			$this->lastError = __( 'KlickTipp connector library could not be loaded. Please reinstall the plugin.', 'taglock' );
-			$this->logger->error( __( 'KlickTipp connector class not found after include', 'taglock' ), [
-				'file'  => $connectorFile,
-				'class' => KlicktippConnector::class,
-			] );
+			$this->lastError = __( 'KlickTipp connector library is missing. Please reinstall the plugin.', 'taglock' );
+			$this->logger->error( __( 'KlickTipp connector class not found', 'taglock' ) );
 			return false;
 		}
 

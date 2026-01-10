@@ -4,7 +4,10 @@
     "autoload": {
         "psr-4": {
             "GoSuccess\\TagLock\\": "src/"
-        }
+        },
+        "classmap": [
+            "vendor/klicktipp/php-connector/klicktipp.api.php"
+        ]
     },
     "authors": [
         {
