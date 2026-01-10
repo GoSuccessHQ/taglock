@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace GoSuccess\TagLock\Service;
 
 use GoSuccess\TagLock\Configuration\PluginConfiguration;
-use GoSuccess\TagLock\Enum\HookFilter;
 use GoSuccess\TagLock\Exception\AssetNotFoundException;
 use GoSuccess\TagLock\Exception\InvalidAssetFormatException;
 
@@ -105,7 +104,7 @@ final class AssetService {
 				'apiNamespace' => $this->pluginConfiguration->apiNamespace,
 				'proUrl'       => $this->pluginConfiguration->proLandingUrl,
 				'isPro'        => $this->proStatusService->isProActive(),
-				'maxRules'     => (int) apply_filters( HookFilter::MAX_RULES->value, 3 ),
+				'maxRules'     => (int) apply_filters( 'taglock_max_rules', 3 ),
 			] ) . ';',
 			'before'
 		);
