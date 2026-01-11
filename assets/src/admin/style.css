@@ -332,6 +332,36 @@
 .taglock-admin .wp-list-table {
 	border-collapse: collapse;
 	width: 100%;
+	table-layout: auto;
+}
+
+/* Responsive table wrapper */
+.taglock-admin__table-wrapper {
+	overflow-x: auto;
+	-webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 782px) {
+	.taglock-admin .wp-list-table {
+		table-layout: fixed;
+		min-width: 600px; /* Force horizontal scroll on mobile */
+	}
+
+	.taglock-admin .wp-list-table .column-id {
+		width: 60px;
+	}
+
+	.taglock-admin .wp-list-table .column-name {
+		width: auto;
+	}
+
+	.taglock-admin .wp-list-table .column-active {
+		width: 80px;
+	}
+
+	.taglock-admin .wp-list-table .column-tags {
+		width: 200px;
+	}
 }
 
 .taglock-admin .wp-list-table th,

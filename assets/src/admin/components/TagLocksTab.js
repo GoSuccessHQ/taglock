@@ -159,10 +159,11 @@ const TagLocksTab = ({
 				{isLoading ? (
 					<Spinner />
 				) : (
-					<table className="wp-list-table widefat fixed striped table-view-list taglocks">
-						<thead>
-							<tr>
-								<th
+					<div className="taglock-admin__table-wrapper">
+						<table className="wp-list-table widefat fixed striped table-view-list taglocks">
+							<thead>
+								<tr>
+									<th
 									scope="col"
 									className="manage-column column-id"
 								>
@@ -282,6 +283,7 @@ const TagLocksTab = ({
 							)}
 						</tbody>
 					</table>
+				</div>
 				)}
 
 				{!isLoading && pagination.total_pages > 1 && (
