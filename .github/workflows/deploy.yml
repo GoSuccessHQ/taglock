@@ -1,0 +1,53 @@
+name: Deploy to WordPress.org
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  tag:
+    name: New release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          tools: composer
+
+      - name: Install Composer dependencies
+        run: composer install --no-dev --optimize-autoloader
+
+      - name: Update readme.txt changelog
+        run: |
+          VERSION="${{ github.event.release.tag_name }}"
+          VERSION_NUMBER="${VERSION#v}"
+          RELEASE_NOTES="${{ github.event.release.body }}"
+          DATE=$(date +"%Y-%m-%d")
+          
+          # Create changelog entry
+          CHANGELOG_ENTRY="= ${VERSION_NUMBER} - ${DATE} =\n${RELEASE_NOTES}\n"
+          
+          # Insert after "== Changelog ==" line
+          sed -i "/== Changelog ==/a\\
+          ${CHANGELOG_ENTRY}" readme.txt
+          
+          echo "Updated readme.txt with version ${VERSION_NUMBER}"
+
+      - name: Commit updated readme.txt
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add readme.txt
+          git commit -m "Update readme.txt changelog for version ${{ github.event.release.tag_name }}" || echo "No changes to commit"
+          git push origin HEAD:main || echo "Nothing to push"
+
+      - name: WordPress Plugin Deploy
+        uses: 10up/action-wordpress-plugin-deploy@stable
+        env:
+          SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
+          SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
+          SLUG: taglock
