@@ -13,7 +13,6 @@
 	display: grid;
 	grid-template-columns: 1fr;
 	gap: var(--taglock-admin-space);
-	margin-top: var(--taglock-admin-space);
 }
 
 @media (min-width: 1024px) {
@@ -38,6 +37,8 @@
 		position: sticky;
 		top: calc(32px + var(--wp-admin--admin-bar--height, 0px));
 		height: fit-content;
+		max-height: calc(100vh - 32px - var(--wp-admin--admin-bar--height, 0px) - 32px);
+		overflow-y: auto;
 	}
 }
 
@@ -366,8 +367,11 @@
 
 /* Pro Sidebar */
 .taglock-pro-sidebar {
-	background: #f9f9f9;
-	border: 1px solid #e0e0e0;
+	background: #fff;
+	border: 1px solid #dcdcde;
+	border-radius: 2px;
+	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+	padding: var(--taglock-admin-space);
 }
 
 .taglock-pro-sidebar__header {
@@ -396,12 +400,13 @@
 	gap: var(--taglock-admin-space);
 	margin: 0 0 var(--taglock-admin-space) 0;
 	padding: 0;
-	list-style: none;
+	list-style: none !important;
 }
 
 .taglock-pro-sidebar__feature {
 	padding-left: 20px;
 	position: relative;
+	list-style: none !important;
 }
 
 .taglock-pro-sidebar__feature::before {
