@@ -110,6 +110,8 @@ const TagPicker = ({
 				options={tagOptions}
 				help={helpText}
 				disabled={disabled}
+				__next40pxDefaultSize
+				__nextHasNoMarginBottom
 			/>
 
 			{selectedIds.length > 0 && (
