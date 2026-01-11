@@ -23,44 +23,37 @@ const ProSidebar = () => {
 
 	const features = [
 		{
-			title: __('Unlimited TagLocks', 'taglock'),
+			title: __('Teaser Mode', 'taglock'),
 			description: __(
-				'Create as many protected content blocks as you need. No limits, no restrictions.',
+				'Show a preview of protected content to increase conversion rates. Perfect for enticing visitors to take action.',
 				'taglock'
 			),
 		},
 		{
-			title: __('Advanced Analytics', 'taglock'),
+			title: __('Custom Redirects', 'taglock'),
 			description: __(
-				'Track access patterns, conversion rates, and user engagement with detailed reports.',
+				'Send visitors to specific pages when access is denied. Ideal for sales pages, landing pages, or custom messaging.',
 				'taglock'
 			),
 		},
 		{
-			title: __('Custom Redirect Pages', 'taglock'),
+			title: __('Engagement Tagging', 'taglock'),
 			description: __(
-				'Send visitors to specific pages when access is denied. Perfect for upselling and conversion optimization.',
+				'Automatically tag subscribers when they access protected content. Track engagement and trigger follow-up campaigns.',
 				'taglock'
 			),
 		},
 		{
-			title: __('Email Notifications', 'taglock'),
+			title: __('Admin Bypass', 'taglock'),
 			description: __(
-				'Get instant alerts when users access protected content. Stay informed about your audience.',
+				'Preview protected content as administrator without needing a subscriber ID. Simplifies content testing and quality control.',
 				'taglock'
 			),
 		},
 		{
 			title: __('Priority Support', 'taglock'),
 			description: __(
-				'Get help when you need it. Our Pro support team responds within 24 hours.',
-				'taglock'
-			),
-		},
-		{
-			title: __('White-Label Options', 'taglock'),
-			description: __(
-				'Remove all TagLock branding and customize the plugin to match your brand identity.',
+				'Get direct help from our support team with faster response times and priority handling of your requests.',
 				'taglock'
 			),
 		},
@@ -103,9 +96,6 @@ const ProSidebar = () => {
 					>
 						{__('Upgrade to Pro', 'taglock')}
 					</Button>
-					<p className="taglock-pro-sidebar__guarantee">
-						{__('30-day money-back guarantee', 'taglock')}
-					</p>
 				</div>
 			</CardBody>
 		</Card>
