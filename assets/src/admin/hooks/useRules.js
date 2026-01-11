@@ -31,13 +31,7 @@ export const DEFAULT_RULE_FORM = {
 	is_active: true,
 	access_mode: 'tag_any',
 	required_tag_ids: [],
-	deny_mode: 'message',
 	deny_message: '',
-	teaser_html: '',
-	redirect_post_id: '',
-	engagement_tagging_enabled: false,
-	engagement_tag_ids: [],
-	admin_bypass_enabled: false,
 };
 
 /**
@@ -134,16 +128,7 @@ const useRules = (perPage = 10) => {
 			is_active: Boolean(rule?.is_active),
 			access_mode: rule?.access_mode || 'tag_any',
 			required_tag_ids: normalizeIdArray(rule?.required_tag_ids),
-			deny_mode: rule?.deny_mode || 'message',
 			deny_message: rule?.deny_message || '',
-			teaser_html: rule?.teaser_html || '',
-			redirect_post_id:
-				rule?.redirect_post_id && Number(rule.redirect_post_id) > 0
-					? String(rule.redirect_post_id)
-					: '',
-			engagement_tagging_enabled: Boolean(rule?.engagement_tagging_enabled),
-			engagement_tag_ids: normalizeIdArray(rule?.engagement_tag_ids),
-			admin_bypass_enabled: Boolean(rule?.admin_bypass_enabled),
 		});
 		setIsModalOpen(true);
 	}, []);
@@ -162,16 +147,7 @@ const useRules = (perPage = 10) => {
 			is_active: Boolean(rule?.is_active),
 			access_mode: rule?.access_mode || 'tag_any',
 			required_tag_ids: normalizeIdArray(rule?.required_tag_ids),
-			deny_mode: rule?.deny_mode || 'message',
 			deny_message: rule?.deny_message || '',
-			teaser_html: rule?.teaser_html || '',
-			redirect_post_id:
-				rule?.redirect_post_id && Number(rule.redirect_post_id) > 0
-					? String(rule.redirect_post_id)
-					: '',
-			engagement_tagging_enabled: Boolean(rule?.engagement_tagging_enabled),
-			engagement_tag_ids: normalizeIdArray(rule?.engagement_tag_ids),
-			admin_bypass_enabled: Boolean(rule?.admin_bypass_enabled),
 		});
 		setIsModalOpen(true);
 	}, []);

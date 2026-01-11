@@ -17,7 +17,6 @@ import {
 } from '@wordpress/components';
 import PropTypes from 'prop-types';
 import TagPicker from './TagPicker';
-import ProBadge from './ProBadge';
 
 /**
  * Rule Modal component.
@@ -35,8 +34,6 @@ import ProBadge from './ProBadge';
  * @param {Array<{value: string, label: string}>} props.tagOptions - Available tag options.
  * @param {Object<string, string>} props.tagsById - Map of tag IDs to names.
  * @param {boolean} props.tagsLoading - Whether tags are loading.
- * @param {boolean} props.isPro - Whether Pro features are enabled.
- * @param {string} props.upgradeUrl - URL to upgrade page.
  * @return {JSX.Element|null} The rule modal or null.
  */
 const RuleModal = ({
@@ -52,21 +49,7 @@ const RuleModal = ({
 	tagOptions,
 	tagsById,
 	tagsLoading,
-	isPro,
-	upgradeUrl,
 }) => {
-	const isProDisabled = !isPro;
-
-	/**
-	 * Pro badge element.
-	 */
-	const proBadge = useMemo(() => {
-		if (isPro) {
-			return null;
-		}
-		return <ProBadge upgradeUrl={upgradeUrl} />;
-	}, [isPro, upgradeUrl]);
-
 	/**
 	 * Update a single field in the rule form.
 	 *
@@ -84,15 +67,6 @@ const RuleModal = ({
 	 */
 	const handleRequiredTagsChange = useCallback((newIds) => {
 		updateField('required_tag_ids', newIds);
-	}, [updateField]);
-
-	/**
-	 * Handle engagement tags change.
-	 *
-	 * @param {Array<number>} newIds - New engagement tag IDs.
-	 */
-	const handleEngagementTagsChange = useCallback((newIds) => {
-		updateField('engagement_tag_ids', newIds);
 	}, [updateField]);
 
 	/**
@@ -169,110 +143,15 @@ const RuleModal = ({
 				isLoading={tagsLoading}
 			/>
 
-			<SelectControl
-				label={
-					<span className="taglock-admin__label-with-badge">
-						{__('Deny mode', 'taglock')}
-						{proBadge}
-					</span>
-				}
-				value={ruleForm.deny_mode}
-				onChange={(value) => updateField('deny_mode', value)}
-				options={[
-					{ label: __('Message', 'taglock'), value: 'message' },
-					{ label: __('Teaser', 'taglock'), value: 'teaser', disabled: isProDisabled },
-					{ label: __('Redirect', 'taglock'), value: 'redirect', disabled: isProDisabled },
-				]}
+			<TextControl
+				label={__('Deny message', 'taglock')}
+				value={ruleForm.deny_message}
+				onChange={(value) => updateField('deny_message', value)}
 				help={__(
-					'Teaser and redirect modes are available in TagLock Pro.',
+					'Message shown to users who don\'t have the required tags.',
 					'taglock'
 				)}
 				__next40pxDefaultSize
-				__nextHasNoMarginBottom
-			/>
-
-			{ruleForm.deny_mode === 'message' && (
-				<TextControl
-					label={__('Deny message', 'taglock')}
-					value={ruleForm.deny_message}
-					onChange={(value) => updateField('deny_message', value)}
-					__next40pxDefaultSize
-					__nextHasNoMarginBottom
-				/>
-			)}
-
-			{ruleForm.deny_mode === 'teaser' && (
-				<TextareaControl
-					disabled={isProDisabled}
-					label={
-						<span className="taglock-admin__label-with-badge">
-							{__('Teaser HTML', 'taglock')}
-							{proBadge}
-						</span>
-					}
-					value={ruleForm.teaser_html}
-					onChange={(value) => updateField('teaser_html', value)}
-					help={__(
-						'Shortcodes are allowed and will be executed on the server.',
-						'taglock'
-					)}
-					__nextHasNoMarginBottom
-				/>
-			)}
-
-			{ruleForm.deny_mode === 'redirect' && (
-				<TextControl
-					disabled={isProDisabled}
-					label={
-						<span className="taglock-admin__label-with-badge">
-							{__('Redirect post ID', 'taglock')}
-							{proBadge}
-						</span>
-					}
-					type="number"
-					value={ruleForm.redirect_post_id}
-					onChange={(value) => updateField('redirect_post_id', value)}
-					__next40pxDefaultSize
-					__nextHasNoMarginBottom
-				/>
-			)}
-
-			<ToggleControl
-				disabled={isProDisabled}
-				label={
-					<span className="taglock-admin__label-with-badge">
-						{__('Engagement tagging', 'taglock')}
-						{proBadge}
-					</span>
-				}
-				checked={ruleForm.engagement_tagging_enabled}
-				onChange={(value) => updateField('engagement_tagging_enabled', value)}
-				__nextHasNoMarginBottom
-			/>
-
-			{ruleForm.engagement_tagging_enabled && (
-				<TagPicker
-					label={__('Engagement tags', 'taglock')}
-					selectedIds={ruleForm.engagement_tag_ids}
-					onChange={handleEngagementTagsChange}
-					tagOptions={tagOptions}
-					tagsById={tagsById}
-					isLoading={tagsLoading}
-					disabled={isProDisabled}
-					labelSuffix={proBadge}
-				/>
-			)}
-
-			<ToggleControl
-				disabled={isProDisabled}
-				label={
-					<span className="taglock-admin__label-with-badge">
-						{__('Admin bypass (preview without subscriber ID)', 'taglock')}
-						{proBadge}
-					</span>
-				}
-				checked={ruleForm.admin_bypass_enabled}
-				onChange={(value) => updateField('admin_bypass_enabled', value)}
 				__nextHasNoMarginBottom
 			/>
 
@@ -307,13 +186,7 @@ RuleModal.propTypes = {
 		is_active: PropTypes.bool.isRequired,
 		access_mode: PropTypes.string.isRequired,
 		required_tag_ids: PropTypes.arrayOf(PropTypes.number).isRequired,
-		deny_mode: PropTypes.string.isRequired,
 		deny_message: PropTypes.string.isRequired,
-		teaser_html: PropTypes.string.isRequired,
-		redirect_post_id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-		engagement_tagging_enabled: PropTypes.bool.isRequired,
-		engagement_tag_ids: PropTypes.arrayOf(PropTypes.number).isRequired,
-		admin_bypass_enabled: PropTypes.bool.isRequired,
 	}).isRequired,
 	setRuleForm: PropTypes.func.isRequired,
 	editingRuleId: PropTypes.number,
@@ -331,8 +204,6 @@ RuleModal.propTypes = {
 	).isRequired,
 	tagsById: PropTypes.objectOf(PropTypes.string).isRequired,
 	tagsLoading: PropTypes.bool.isRequired,
-	isPro: PropTypes.bool.isRequired,
-	upgradeUrl: PropTypes.string.isRequired,
 };
 
 export default RuleModal;

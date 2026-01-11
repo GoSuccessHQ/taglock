@@ -256,8 +256,6 @@ const AdminApp = () => {
 				tagOptions={tagOptions}
 				tagsById={tagsById}
 				tagsLoading={tagsLoading}
-				isPro={config.isPro}
-				upgradeUrl={config.proUrl}
 			/>
 		</div>
 	);
