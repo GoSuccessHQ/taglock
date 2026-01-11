@@ -13,6 +13,7 @@
 	display: grid;
 	grid-template-columns: 1fr;
 	gap: var(--taglock-admin-space);
+	margin-top: var(--taglock-admin-space);
 }
 
 @media (min-width: 1024px) {
@@ -26,19 +27,17 @@
 }
 
 .taglock-admin__sidebar {
-	/* Mobile: Below content, full width */
-	width: 100%;
+	/* Mobile: Below content */
+	order: 2;
 }
 
 @media (min-width: 1024px) {
 	.taglock-admin__sidebar {
 		/* Desktop: Right side, sticky */
-		width: auto;
+		order: 0;
 		position: sticky;
 		top: calc(32px + var(--wp-admin--admin-bar--height, 0px));
 		height: fit-content;
-		max-height: calc(100vh - 64px - var(--wp-admin--admin-bar--height, 0px));
-		overflow-y: auto;
 	}
 }
 
@@ -367,11 +366,8 @@
 
 /* Pro Sidebar */
 .taglock-pro-sidebar {
-	background: #fff;
-	border: 1px solid #dcdcde;
-	border-radius: 2px;
-	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
-	padding: var(--taglock-admin-space);
+	background: #f9f9f9;
+	border: 1px solid #e0e0e0;
 }
 
 .taglock-pro-sidebar__header {
@@ -400,13 +396,12 @@
 	gap: var(--taglock-admin-space);
 	margin: 0 0 var(--taglock-admin-space) 0;
 	padding: 0;
-	list-style: none !important;
+	list-style: none;
 }
 
 .taglock-pro-sidebar__feature {
 	padding-left: 20px;
 	position: relative;
-	list-style: none !important;
 }
 
 .taglock-pro-sidebar__feature::before {
