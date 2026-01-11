@@ -332,54 +332,6 @@
 .taglock-admin .wp-list-table {
 	border-collapse: collapse;
 	width: 100%;
-	table-layout: auto;
-}
-
-/* Mobile: Convert table to cards */
-@media (max-width: 782px) {
-	.taglock-admin .wp-list-table thead {
-		display: none; /* Hide header on mobile */
-	}
-
-	.taglock-admin .wp-list-table,
-	.taglock-admin .wp-list-table tbody,
-	.taglock-admin .wp-list-table tr,
-	.taglock-admin .wp-list-table td {
-		display: block;
-		width: 100%;
-	}
-
-	.taglock-admin .wp-list-table tr {
-		margin-bottom: var(--taglock-admin-space);
-		padding: var(--taglock-admin-gap);
-		border: 1px solid #dcdcde;
-		border-radius: var(--taglock-admin-radius);
-		background: #fff;
-	}
-
-	.taglock-admin .wp-list-table td {
-		padding: calc(var(--taglock-admin-gap) / 2) 0;
-		text-align: left;
-		border: none;
-		background: transparent !important;
-	}
-
-	.taglock-admin .wp-list-table td::before {
-		content: attr(data-colname) ": ";
-		font-weight: 600;
-		display: inline-block;
-		margin-right: 8px;
-	}
-
-	.taglock-admin .wp-list-table .column-name {
-		font-size: 1.1em;
-		margin-bottom: calc(var(--taglock-admin-gap) / 2);
-	}
-
-	.taglock-admin .wp-list-table .row-actions {
-		position: static;
-		padding-top: calc(var(--taglock-admin-gap) / 2);
-	}
 }
 
 .taglock-admin .wp-list-table th,
