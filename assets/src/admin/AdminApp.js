@@ -143,23 +143,19 @@ const AdminApp = () => {
 	 * @return {JSX.Element} Tab content.
 	 */
 	const renderTab = useCallback((tab) => {
-		if (tab.name === 'connection') {
-			return (
-				<ConnectionTab
-					username={username}
-					password={password}
-					hasPassword={hasPassword}
-					isLoading={settingsLoading}
-					isSaving={settingsSaving}
-					isConnected={isConnected}
-					onUsernameChange={setUsername}
-					onPasswordChange={setPassword}
-					onSave={handleSaveSettings}
-				/>
-			);
-		}
-
-		return (
+		const content = tab.name === 'connection' ? (
+			<ConnectionTab
+				username={username}
+				password={password}
+				hasPassword={hasPassword}
+				isLoading={settingsLoading}
+				isSaving={settingsSaving}
+				isConnected={isConnected}
+				onUsernameChange={setUsername}
+				onPasswordChange={setPassword}
+				onSave={handleSaveSettings}
+			/>
+		) : (
 			<TagLocksTab
 				rules={rules}
 				isLoading={rulesLoading || tagsLoading}
@@ -176,6 +172,17 @@ const AdminApp = () => {
 				notice={rulesNotice}
 				clearNotice={clearRulesNotice}
 			/>
+		);
+
+		return (
+			<div className="taglock-admin__layout">
+				<div className="taglock-admin__main">
+					{content}
+				</div>
+				<div className="taglock-admin__sidebar">
+					<ProSidebar />
+				</div>
+			</div>
 		);
 	}, [
 		username,
@@ -224,23 +231,15 @@ const AdminApp = () => {
 					</Notice>
 				)}
 
-				<div className="taglock-admin__layout">
-					<div className="taglock-admin__main">
-						<TabPanel
-							key={tabPanelKey}
-							className="taglock-admin__tabs"
-							initialTabName={activeTab}
-							onSelect={setActiveTab}
-							tabs={tabs}
-						>
-							{renderTab}
-						</TabPanel>
-					</div>
-
-					<div className="taglock-admin__sidebar">
-						<ProSidebar />
-					</div>
-				</div>
+				<TabPanel
+					key={tabPanelKey}
+					className="taglock-admin__tabs"
+					initialTabName={activeTab}
+					onSelect={setActiveTab}
+					tabs={tabs}
+				>
+					{renderTab}
+				</TabPanel>
 			</div>
 
 			<RuleModal
