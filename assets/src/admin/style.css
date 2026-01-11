@@ -13,7 +13,6 @@
 	display: grid;
 	grid-template-columns: 1fr;
 	gap: var(--taglock-admin-space);
-	margin-top: var(--taglock-admin-space);
 }
 
 @media (min-width: 1024px) {
@@ -28,16 +27,18 @@
 
 .taglock-admin__sidebar {
 	/* Mobile: Below content */
-	order: 2;
+	width: 100%;
 }
 
 @media (min-width: 1024px) {
 	.taglock-admin__sidebar {
 		/* Desktop: Right side, sticky */
-		order: 0;
+		width: auto;
 		position: sticky;
 		top: calc(32px + var(--wp-admin--admin-bar--height, 0px));
 		height: fit-content;
+		max-height: calc(100vh - 64px - var(--wp-admin--admin-bar--height, 0px));
+		overflow-y: auto;
 	}
 }
 
