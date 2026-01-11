@@ -104,7 +104,6 @@ final class AssetService {
 				'apiNamespace' => $this->pluginConfiguration->apiNamespace,
 				'proUrl'       => $this->pluginConfiguration->proLandingUrl,
 				'isPro'        => $this->proStatusService->isProActive(),
-				'maxRules'     => (int) apply_filters( 'taglock_max_rules', 3 ),
 			] ) . ';',
 			'before'
 		);

@@ -160,41 +160,14 @@ final class RulesRoute implements ApiRouteInterface {
 		$page = (int) ( $request->get_param( 'page' ) ?: 1 );
 		$perPage = (int) ( $request->get_param( 'per_page' ) ?: 20 );
 
-		// Apply max rules limit (free version).
-		$maxRules = (int) apply_filters( 'taglock_max_rules', 3 );
-		if ( $maxRules > 0 ) {
-			$perPage = min( $perPage, $maxRules );
-		}
-
 		$result = $this->ruleRepository->listRules( $search, $page, $perPage );
 		$items = $result['items'];
 		$total = (int) $result['total'];
-
-		// Limit total count to max rules for pagination.
-		if ( $maxRules > 0 ) {
-			$total = min( $total, $maxRules );
-		}
 
 		return ApiResponse::paginatedSuccess( $items, $page, $perPage, $total );
 	}
 
 	private function createRule( WP_REST_Request $request ): WP_REST_Response {
-		$maxRules = (int) apply_filters( 'taglock_max_rules', 3 );
-		if ( $maxRules > 0 ) {
-			$currentCount = $this->ruleRepository->getTotalCount();
-			if ( $currentCount >= $maxRules ) {
-				return ApiResponse::error(
-					sprintf(
-						/* translators: %d: maximum number of rules allowed */
-						__( 'You have reached the maximum of %d TagLocks. Upgrade to Pro for unlimited TagLocks.', 'taglock' ),
-						$maxRules
-					),
-					'limit_reached',
-					403
-				);
-			}
-		}
-
 		$payload = $request->get_json_params();
 		$payload = is_array( $payload ) ? $payload : [];
 

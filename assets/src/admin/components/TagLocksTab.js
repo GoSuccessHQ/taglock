@@ -34,8 +34,6 @@ import PropTypes from 'prop-types';
  * @param {Function} props.onGoToConnection - Callback to navigate to connection tab.
  * @param {Object|null} props.notice - Notice to display.
  * @param {Function} props.clearNotice - Callback to clear notice.
- * @param {number} props.maxRules - Maximum number of rules allowed (0 = unlimited).
- * @param {string} props.upgradeUrl - URL to upgrade to Pro.
  * @return {JSX.Element} The TagLocks tab.
  */
 const TagLocksTab = ({
@@ -53,8 +51,6 @@ const TagLocksTab = ({
 	onGoToConnection,
 	notice,
 	clearNotice,
-	maxRules,
-	upgradeUrl,
 }) => {
 	/**
 	 * Handle previous page click.
@@ -113,13 +109,6 @@ const TagLocksTab = ({
 		setTimeout(() => setCopiedRuleId(null), 1500);
 	}, []);
 
-	/**
-	 * Check if the maximum number of rules has been reached.
-	 */
-	const isLimitReached = useMemo(() => {
-		return maxRules > 0 && rules.length >= maxRules;
-	}, [maxRules, rules.length]);
-
 	return (
 		<Card>
 			<CardHeader>
@@ -130,7 +119,7 @@ const TagLocksTab = ({
 					<Button
 						variant="primary"
 						onClick={onNewRule}
-						disabled={settingsLoading || !isConnected || isLimitReached}
+						disabled={settingsLoading || !isConnected}
 					>
 						{__('New TagLock', 'taglock')}
 					</Button>
@@ -153,34 +142,6 @@ const TagLocksTab = ({
 						<Button variant="link" onClick={onGoToConnection}>
 							{__('Go to KlickTipp Connection', 'taglock')}
 						</Button>
-					</Notice>
-				)}
-
-				{isConnected && isLimitReached && (
-					<Notice
-						className="taglock-admin__notice"
-						status="info"
-						isDismissible={false}
-					>
-						<strong>
-							{sprintf(
-								/* translators: %d: maximum number of TagLocks */
-								__('Maximum of %d TagLocks reached', 'taglock'),
-								maxRules
-							)}
-						</strong>
-						<div>
-							{__('Upgrade to Pro for unlimited TagLocks.', 'taglock')}
-						</div>
-						{upgradeUrl && (
-							<Button
-								variant="link"
-								href={upgradeUrl}
-								target="_blank"
-							>
-								{__('Upgrade to Pro', 'taglock')}
-							</Button>
-						)}
 					</Notice>
 				)}
 
@@ -379,14 +340,10 @@ TagLocksTab.propTypes = {
 		message: PropTypes.string.isRequired,
 	}),
 	clearNotice: PropTypes.func.isRequired,
-	maxRules: PropTypes.number,
-	upgradeUrl: PropTypes.string,
 };
 
 TagLocksTab.defaultProps = {
 	notice: null,
-	maxRules: 0,
-	upgradeUrl: '',
 };
 
 export default TagLocksTab;

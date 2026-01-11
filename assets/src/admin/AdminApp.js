@@ -20,6 +20,7 @@ import {
 	ConnectionTab,
 	TagLocksTab,
 	RuleModal,
+	ProSidebar,
 } from './components';
 
 /**
@@ -174,8 +175,6 @@ const AdminApp = () => {
 				onGoToConnection={goToConnectionTab}
 				notice={rulesNotice}
 				clearNotice={clearRulesNotice}
-				maxRules={config.maxRules}
-				upgradeUrl={config.proUrl}
 			/>
 		);
 	}, [
@@ -201,8 +200,6 @@ const AdminApp = () => {
 		goToConnectionTab,
 		rulesNotice,
 		clearRulesNotice,
-		config.maxRules,
-		config.proUrl,
 	]);
 
 	return (
@@ -227,15 +224,23 @@ const AdminApp = () => {
 					</Notice>
 				)}
 
-				<TabPanel
-					key={tabPanelKey}
-					className="taglock-admin__tabs"
-					initialTabName={activeTab}
-					onSelect={setActiveTab}
-					tabs={tabs}
-				>
-					{renderTab}
-				</TabPanel>
+				<div className="taglock-admin__layout">
+					<div className="taglock-admin__main">
+						<TabPanel
+							key={tabPanelKey}
+							className="taglock-admin__tabs"
+							initialTabName={activeTab}
+							onSelect={setActiveTab}
+							tabs={tabs}
+						>
+							{renderTab}
+						</TabPanel>
+					</div>
+
+					<div className="taglock-admin__sidebar">
+						<ProSidebar />
+					</div>
+				</div>
 			</div>
 
 			<RuleModal

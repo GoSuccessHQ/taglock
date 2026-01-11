@@ -4,8 +4,41 @@
 	--taglock-admin-gap: 12px;
 	--taglock-admin-radius: 4px;
 
-	max-width: 1200px;
+	max-width: 1400px;
 	margin: var(--taglock-admin-space) 0;
+}
+
+/* Two-Column Layout */
+.taglock-admin__layout {
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: var(--taglock-admin-space);
+	margin-top: var(--taglock-admin-space);
+}
+
+@media (min-width: 1024px) {
+	.taglock-admin__layout {
+		grid-template-columns: 1fr 320px;
+	}
+}
+
+.taglock-admin__main {
+	min-width: 0; /* Prevent overflow */
+}
+
+.taglock-admin__sidebar {
+	/* Mobile: Below content */
+	order: 2;
+}
+
+@media (min-width: 1024px) {
+	.taglock-admin__sidebar {
+		/* Desktop: Right side, sticky */
+		order: 0;
+		position: sticky;
+		top: calc(32px + var(--wp-admin--admin-bar--height, 0px));
+		height: fit-content;
+	}
 }
 
 /* Modal renders in portal outside .taglock-admin, needs own variables */
@@ -329,4 +362,88 @@
 .taglock-admin ul {
 	list-style: disc;
 	margin-left: var(--taglock-admin-space);
+}
+
+/* Pro Sidebar */
+.taglock-pro-sidebar {
+	background: #f9f9f9;
+	border: 1px solid #e0e0e0;
+}
+
+.taglock-pro-sidebar__header {
+	margin-bottom: var(--taglock-admin-space);
+	padding-bottom: var(--taglock-admin-space);
+	border-bottom: 1px solid #e0e0e0;
+}
+
+.taglock-pro-sidebar__title {
+	margin: 0 0 8px 0;
+	font-size: 1.3em;
+	font-weight: 600;
+	color: var(--wp-admin-theme-color);
+}
+
+.taglock-pro-sidebar__subtitle {
+	margin: 0;
+	color: #666;
+	font-size: 0.95em;
+	line-height: 1.5;
+}
+
+.taglock-pro-sidebar__features {
+	display: flex;
+	flex-direction: column;
+	gap: var(--taglock-admin-space);
+	margin: 0 0 var(--taglock-admin-space) 0;
+	padding: 0;
+	list-style: none;
+}
+
+.taglock-pro-sidebar__feature {
+	padding-left: 20px;
+	position: relative;
+}
+
+.taglock-pro-sidebar__feature::before {
+	content: "✓";
+	position: absolute;
+	left: 0;
+	top: 0;
+	color: var(--wp-admin-theme-color);
+	font-weight: bold;
+	font-size: 1.1em;
+}
+
+.taglock-pro-sidebar__feature-title {
+	margin: 0 0 4px 0;
+	font-size: 1em;
+	font-weight: 600;
+	color: #1e1e1e;
+}
+
+.taglock-pro-sidebar__feature-description {
+	margin: 0;
+	font-size: 0.9em;
+	line-height: 1.5;
+	color: #666;
+}
+
+.taglock-pro-sidebar__cta {
+	padding-top: var(--taglock-admin-space);
+	border-top: 1px solid #e0e0e0;
+	text-align: center;
+}
+
+.taglock-pro-sidebar__button {
+	width: 100%;
+	height: 44px;
+	font-size: 1em;
+	font-weight: 600;
+	justify-content: center;
+}
+
+.taglock-pro-sidebar__guarantee {
+	margin: 8px 0 0 0;
+	font-size: 0.85em;
+	color: #666;
 }

@@ -6,6 +6,7 @@
 
 export { default as ErrorBoundary } from './ErrorBoundary';
 export { default as ProBadge } from './ProBadge';
+export { default as ProSidebar } from './ProSidebar';
 export { default as StatusBadge } from './StatusBadge';
 export { default as TagPicker } from './TagPicker';
 export { default as ConnectionTab } from './ConnectionTab';
