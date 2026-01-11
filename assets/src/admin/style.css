@@ -334,6 +334,20 @@
 	width: 100%;
 }
 
+/* Mobile: Hide non-primary columns in header */
+@media (max-width: 782px) {
+	.taglock-admin .wp-list-table th:not(.column-primary) {
+		display: none;
+	}
+
+	.taglock-admin .wp-list-table td:not(.column-primary)::before {
+		content: attr(data-colname) ": ";
+		font-weight: 600;
+		display: inline-block;
+		margin-right: 8px;
+	}
+}
+
 .taglock-admin .wp-list-table th,
 .taglock-admin .wp-list-table td {
 	padding: var(--taglock-admin-gap);
