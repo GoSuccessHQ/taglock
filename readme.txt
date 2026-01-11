@@ -17,16 +17,16 @@ TagLock allows you to protect WordPress content (videos, text, downloads) based 
 
 Unlike traditional solutions, TagLock uses a headless approach: Protected content is not rendered in the initial HTML but is dynamically loaded via React and REST API only after successful API validation.
 
-= 🔥 Features (Lite) =
+= 🔥 Features =
 
 * **TagLocker-based Protection** - Shortcode `[taglock id="1"]...[/taglock]` protects any content.
+* **Tag-based Access Control** - Define which KlickTipp tags are required (Any or All tags mode).
 * **Cache Compatible** - Protected content is loaded only after verification.
 * **Secure by Design** - Protected content is not rendered in the initial HTML.
 * **React-based Admin Interface** - Modern settings UI using WordPress Components.
 * **Connection Health Monitoring** - Periodic connection checks and a connected/disconnected status in the admin UI.
 * **No User Accounts Required** - Access is verified via a subscriber identifier.
-
-Note: The plugin exposes filters/actions to support add-ons and customizations.
+* **Extensible** - Provides filters and actions for customizations and add-ons.
 
 = Requirements =
 
@@ -90,12 +90,6 @@ This plugin requires PHP 8.3 or higher.
 == Changelog ==
 = 1.0.0 =
 * Initial release
-
-== Upgrade Notice ==
-= 1.0.0 =
-Initial release.
-
-== Additional Info ==
 
 = Privacy Policy =
 

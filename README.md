@@ -84,30 +84,23 @@ These endpoints are used by the admin UI and frontend loader:
 - **assets/src/admin/**: Settings UI with WordPress Components
 - **assets/src/frontend/**: Content loader with access check
 
-## Lite vs Pro Architecture
+## Extensibility
 
-The plugin is designed with Pro addon support:
+The plugin provides hooks for customizations and add-ons:
 
-### Hooks for Pro Features
+### Available Filters
 
-**Filters:**
-- `taglock_access_denied_response`: Modify response (add redirect URL, etc.)
+- `taglock_access_denied_response`: Modify response when access is denied
 - `taglock_access_granted_response`: Modify response after access granted
 - `taglock_protected_content`: Filter content before output
-- `taglock_settings_fields`: Add Pro settings fields
+- `taglock_settings_fields`: Add custom settings fields
 
-**Actions:**
+### Available Actions
+
 - `taglock_access_granted`: Triggered when access is granted
 - `taglock_access_denied`: Triggered when access is denied
 - `taglock_before_access_check`: Before tag verification
 - `taglock_after_access_check`: After tag verification
-
-### Pro Features (Coming Soon)
-
-- Custom redirect URLs on access denied
-- Automatically apply tags after viewing content
-- Advanced analytics and tracking
-- Priority support
 
 ## Development
 
