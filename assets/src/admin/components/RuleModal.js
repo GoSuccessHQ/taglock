@@ -17,6 +17,7 @@ import {
 } from '@wordpress/components';
 import PropTypes from 'prop-types';
 import TagPicker from './TagPicker';
+import ProBadge from './ProBadge';
 
 /**
  * Rule Modal component.
@@ -34,6 +35,8 @@ import TagPicker from './TagPicker';
  * @param {Array<{value: string, label: string}>} props.tagOptions - Available tag options.
  * @param {Object<string, string>} props.tagsById - Map of tag IDs to names.
  * @param {boolean} props.tagsLoading - Whether tags are loading.
+ * @param {boolean} props.isPro - Whether Pro features are enabled.
+ * @param {string} props.upgradeUrl - URL to upgrade page.
  * @return {JSX.Element|null} The rule modal or null.
  */
 const RuleModal = ({
@@ -49,7 +52,21 @@ const RuleModal = ({
 	tagOptions,
 	tagsById,
 	tagsLoading,
+	isPro,
+	upgradeUrl,
 }) => {
+	const isProDisabled = !isPro;
+
+	/**
+	 * Pro badge element.
+	 */
+	const proBadge = useMemo(() => {
+		if (isPro) {
+			return null;
+		}
+		return <ProBadge upgradeUrl={upgradeUrl} />;
+	}, [isPro, upgradeUrl]);
+
 	/**
 	 * Update a single field in the rule form.
 	 *
@@ -153,14 +170,23 @@ const RuleModal = ({
 			/>
 
 			<SelectControl
-				label={__('Deny mode', 'taglock')}
+				label={
+					<span className="taglock-admin__label-with-badge">
+						{__('Deny mode', 'taglock')}
+						{proBadge}
+					</span>
+				}
 				value={ruleForm.deny_mode}
 				onChange={(value) => updateField('deny_mode', value)}
 				options={[
 					{ label: __('Message', 'taglock'), value: 'message' },
-					{ label: __('Teaser', 'taglock'), value: 'teaser' },
-					{ label: __('Redirect', 'taglock'), value: 'redirect' },
+					{ label: __('Teaser', 'taglock'), value: 'teaser', disabled: isProDisabled },
+					{ label: __('Redirect', 'taglock'), value: 'redirect', disabled: isProDisabled },
 				]}
+				help={__(
+					'Teaser and redirect modes are available in TagLock Pro.',
+					'taglock'
+				)}
 				__next40pxDefaultSize
 				__nextHasNoMarginBottom
 			/>
@@ -177,7 +203,13 @@ const RuleModal = ({
 
 			{ruleForm.deny_mode === 'teaser' && (
 				<TextareaControl
-					label={__('Teaser HTML', 'taglock')}
+					disabled={isProDisabled}
+					label={
+						<span className="taglock-admin__label-with-badge">
+							{__('Teaser HTML', 'taglock')}
+							{proBadge}
+						</span>
+					}
 					value={ruleForm.teaser_html}
 					onChange={(value) => updateField('teaser_html', value)}
 					help={__(
@@ -190,7 +222,13 @@ const RuleModal = ({
 
 			{ruleForm.deny_mode === 'redirect' && (
 				<TextControl
-					label={__('Redirect post ID', 'taglock')}
+					disabled={isProDisabled}
+					label={
+						<span className="taglock-admin__label-with-badge">
+							{__('Redirect post ID', 'taglock')}
+							{proBadge}
+						</span>
+					}
 					type="number"
 					value={ruleForm.redirect_post_id}
 					onChange={(value) => updateField('redirect_post_id', value)}
@@ -200,7 +238,13 @@ const RuleModal = ({
 			)}
 
 			<ToggleControl
-				label={__('Engagement tagging', 'taglock')}
+				disabled={isProDisabled}
+				label={
+					<span className="taglock-admin__label-with-badge">
+						{__('Engagement tagging', 'taglock')}
+						{proBadge}
+					</span>
+				}
 				checked={ruleForm.engagement_tagging_enabled}
 				onChange={(value) => updateField('engagement_tagging_enabled', value)}
 				__nextHasNoMarginBottom
@@ -214,11 +258,19 @@ const RuleModal = ({
 					tagOptions={tagOptions}
 					tagsById={tagsById}
 					isLoading={tagsLoading}
+					disabled={isProDisabled}
+					labelSuffix={proBadge}
 				/>
 			)}
 
 			<ToggleControl
-				label={__('Admin bypass (preview without subscriber ID)', 'taglock')}
+				disabled={isProDisabled}
+				label={
+					<span className="taglock-admin__label-with-badge">
+						{__('Admin bypass (preview without subscriber ID)', 'taglock')}
+						{proBadge}
+					</span>
+				}
 				checked={ruleForm.admin_bypass_enabled}
 				onChange={(value) => updateField('admin_bypass_enabled', value)}
 				__nextHasNoMarginBottom
@@ -279,6 +331,8 @@ RuleModal.propTypes = {
 	).isRequired,
 	tagsById: PropTypes.objectOf(PropTypes.string).isRequired,
 	tagsLoading: PropTypes.bool.isRequired,
+	isPro: PropTypes.bool.isRequired,
+	upgradeUrl: PropTypes.string.isRequired,
 };
 
 export default RuleModal;

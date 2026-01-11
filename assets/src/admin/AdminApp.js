@@ -224,17 +224,19 @@ const AdminApp = () => {
 					</Notice>
 				)}
 
-				<TabPanel
-					key={tabPanelKey}
-					className="taglock-admin__tabs"
-					initialTabName={activeTab}
-					onSelect={setActiveTab}
-					tabs={tabs}
-				>
-					{renderTab}
-				</TabPanel>
-
 				<div className="taglock-admin__layout">
+					<div className="taglock-admin__main">
+						<TabPanel
+							key={tabPanelKey}
+							className="taglock-admin__tabs"
+							initialTabName={activeTab}
+							onSelect={setActiveTab}
+							tabs={tabs}
+						>
+							{renderTab}
+						</TabPanel>
+					</div>
+
 					<div className="taglock-admin__sidebar">
 						<ProSidebar />
 					</div>
@@ -254,6 +256,8 @@ const AdminApp = () => {
 				tagOptions={tagOptions}
 				tagsById={tagsById}
 				tagsLoading={tagsLoading}
+				isPro={config.isPro}
+				upgradeUrl={config.proUrl}
 			/>
 		</div>
 	);
