@@ -412,10 +412,6 @@
 }
 
 /* Pro Sidebar */
-.taglock-pro-sidebar {
-	/* Don't override Card styles, they're already perfect */
-}
-
 @media (min-width: 1024px) {
 	.taglock-pro-sidebar {
 		max-height: calc(100vh - 64px - var(--wp-admin--admin-bar--height, 0px));
