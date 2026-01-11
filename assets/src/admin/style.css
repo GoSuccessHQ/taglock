@@ -367,10 +367,10 @@
 
 /* Pro Sidebar */
 .taglock-pro-sidebar {
-	background: #fff;
-	border: 1px solid #dcdcde;
-	border-radius: 2px;
-	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+	/* Don't override Card styles, they're already perfect */
+}
+
+.taglock-pro-sidebar .components-card__body {
 	padding: var(--taglock-admin-space);
 }
 
