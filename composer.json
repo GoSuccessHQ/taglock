@@ -4,10 +4,7 @@
     "autoload": {
         "psr-4": {
             "GoSuccess\\TagLock\\": "src/"
-        },
-        "classmap": [
-            "vendor/klicktipp/php-connector/klicktipp.api.php"
-        ]
+        }
     },
     "authors": [
         {
@@ -17,7 +14,6 @@
     ],
     "require": {
         "php": "^8.2 || ^8.3",
-        "klicktipp/php-connector": "^1.0",
         "symfony/dependency-injection": "^7.1",
         "symfony/config": "^7.1",
         "monolog/monolog": "^3.9"

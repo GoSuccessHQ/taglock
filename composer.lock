@@ -4,49 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c449ec406059f14f6eb214bd97d61dde",
+    "content-hash": "0828a1bc09c1ed6294b738f7a9b3ee70",
     "packages": [
-        {
-            "name": "klicktipp/php-connector",
-            "version": "1.0.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/klicktipp/php-connector.git",
-                "reference": "f98f92b74de26f8961ceb9746162e0c3bfee9224"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/klicktipp/php-connector/zipball/f98f92b74de26f8961ceb9746162e0c3bfee9224",
-                "reference": "f98f92b74de26f8961ceb9746162e0c3bfee9224",
-                "shasum": ""
-            },
-            "type": "library",
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "KlickTipp Team",
-                    "email": "info@klicktipp.com"
-                }
-            ],
-            "description": "Simple PHP connector for the KlickTipp REST API (session, API key, partner auth).",
-            "homepage": "https://www.klicktipp.com",
-            "keywords": [
-                "Klicktipp",
-                "REST API",
-                "api",
-                "email marketing",
-                "newsletter"
-            ],
-            "support": {
-                "docs": "https://www.klicktipp.com/de/support/wissensdatenbank/schnittstellen-api/",
-                "issues": "https://github.com/klicktipp/php-connector/issues",
-                "source": "https://github.com/klicktipp/php-connector"
-            },
-            "time": "2025-12-01T10:39:53+00:00"
-        },
         {
             "name": "monolog/monolog",
             "version": "3.10.0",

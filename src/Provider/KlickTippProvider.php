@@ -7,14 +7,13 @@ namespace GoSuccess\TagLock\Provider;
 use GoSuccess\TagLock\Configuration\PluginConfiguration;
 use GoSuccess\TagLock\Contract\CrmProviderInterface;
 use GoSuccess\TagLock\Enum\HookAction;
+use GoSuccess\TagLock\Service\KlickTippApiService;
 use GoSuccess\TagLock\Service\LoggerService;
 use GoSuccess\TagLock\Util\EncryptionUtil;
 use GoSuccess\TagLock\Util\HookUtil;
-use KlicktippConnector;
 use Throwable;
 
 use function __;
-use function class_exists;
 use function defined;
 use function get_class;
 use function get_option;
@@ -24,12 +23,12 @@ defined( 'ABSPATH' ) || exit;
 /**
  * KlickTipp Provider
  *
- * Implements CRM provider for KlickTipp using the PHP connector.
+ * Implements CRM provider for KlickTipp using internal API service.
  * Handles authentication and tag checking via username/password session.
  */
 final class KlickTippProvider implements CrmProviderInterface {
 
-	private ?KlicktippConnector $connector = null;
+	private ?KlickTippApiService $api = null;
 	private bool $isAuthenticated = false;
 	private string $lastError = '';
 	/** @var array<string, array<int, string>> */
@@ -41,22 +40,18 @@ final class KlickTippProvider implements CrmProviderInterface {
 	) {}
 
 	/**
-	 * Initialize the KlickTipp connector and authenticate.
+	 * Initialize the KlickTipp API and authenticate.
 	 */
 	private function initialize(): void {
-		if ( $this->connector !== null ) {
-			return;
-		}
-
-		if ( ! $this->ensureConnectorLoaded() ) {
+		if ( $this->api !== null ) {
 			return;
 		}
 
 		try {
-			$this->connector = new KlicktippConnector();
+			$this->api = new KlickTippApiService();
 		} catch ( Throwable $exception ) {
-			$this->lastError = __( 'KlickTipp connector could not be initialized. Please contact support.', 'taglock' );
-			$this->logger->error( __( 'Failed to initialize KlickTipp connector', 'taglock' ), [
+			$this->lastError = __( 'KlickTipp API could not be initialized. Please contact support.', 'taglock' );
+			$this->logger->error( __( 'Failed to initialize KlickTipp API', 'taglock' ), [
 				'exception' => get_class( $exception ),
 				'message'   => $exception->getMessage(),
 			] );
@@ -93,7 +88,7 @@ final class KlickTippProvider implements CrmProviderInterface {
 
 		HookUtil::doAction( HookAction::BEFORE_CRM_API_CALL, 'login' );
 
-		$result = $this->connector->login( $username, $password );
+		$result = $this->api->login( $username, $password );
 
 		HookUtil::doAction( HookAction::AFTER_CRM_API_CALL, 'login', $result );
 
@@ -101,20 +96,10 @@ final class KlickTippProvider implements CrmProviderInterface {
 			$this->isAuthenticated = true;
 			$this->logger->debug( __( 'KlickTipp authentication successful', 'taglock' ) );
 		} else {
-			$this->lastError = $this->connector->get_last_error() ?: __( 'Login failed. Please check your credentials.', 'taglock' );
+			$this->lastError = $this->api->getLastError() ?: __( 'Login failed. Please check your credentials.', 'taglock' );
 			$this->logger->error( __( 'KlickTipp authentication failed', 'taglock' ), [ 'error' => $this->lastError ] );
 			HookUtil::doAction( HookAction::CRM_API_ERROR, 'login', $this->lastError );
 		}
-	}
-
-	private function ensureConnectorLoaded(): bool {
-		if ( ! class_exists( KlicktippConnector::class ) ) {
-			$this->lastError = __( 'KlickTipp connector library is missing. Please reinstall the plugin.', 'taglock' );
-			$this->logger->error( __( 'KlickTipp connector class not found', 'taglock' ) );
-			return false;
-		}
-
-		return true;
 	}
 
 	/**
@@ -132,15 +117,11 @@ final class KlickTippProvider implements CrmProviderInterface {
 	 * @inheritDoc
 	 */
 	public function testCredentials( string $username, string $password ): bool {
-		if ( ! $this->ensureConnectorLoaded() ) {
-			return false;
-		}
-
 		try {
-			$connector = new KlicktippConnector();
+			$api = new KlickTippApiService();
 		} catch ( Throwable $exception ) {
-			$this->lastError = __( 'KlickTipp connector could not be initialized.', 'taglock' );
-			$this->logger->error( __( 'Failed to initialize KlickTipp connector for credential test', 'taglock' ), [
+			$this->lastError = __( 'KlickTipp API could not be initialized.', 'taglock' );
+			$this->logger->error( __( 'Failed to initialize KlickTipp API for credential test', 'taglock' ), [
 				'exception' => get_class( $exception ),
 				'message'   => $exception->getMessage(),
 			] );
@@ -149,18 +130,18 @@ final class KlickTippProvider implements CrmProviderInterface {
 
 		HookUtil::doAction( HookAction::BEFORE_CRM_API_CALL, 'login_test' );
 
-		$result = $connector->login( $username, $password );
+		$result = $api->login( $username, $password );
 
 		HookUtil::doAction( HookAction::AFTER_CRM_API_CALL, 'login_test', $result );
 
 		if ( ! $result ) {
-			$this->lastError = $connector->get_last_error() ?: __( 'Login failed. Please check your credentials.', 'taglock' );
+			$this->lastError = $api->getLastError() ?: __( 'Login failed. Please check your credentials.', 'taglock' );
 			$this->logger->warning( __( 'KlickTipp credential test failed', 'taglock' ), [ 'error' => $this->lastError ] );
 			return false;
 		}
 
 		// Logout the test connection
-		$connector->logout();
+		$api->logout();
 
 		$this->logger->debug( __( 'KlickTipp credential test successful', 'taglock' ) );
 		return true;
@@ -183,12 +164,12 @@ final class KlickTippProvider implements CrmProviderInterface {
 		HookUtil::doAction( HookAction::BEFORE_CRM_API_CALL, 'subscriber_get', $subscriberId );
 
 		// Get subscriber data
-		$subscriber = $this->connector->subscriber_get( $subscriberId );
+		$subscriber = $this->api->subscriberGet( $subscriberId );
 
 		HookUtil::doAction( HookAction::AFTER_CRM_API_CALL, 'subscriber_get', $subscriber );
 
 		if ( ! $subscriber ) {
-			$this->lastError = $this->connector->get_last_error() ?: __( 'Subscriber not found', 'taglock' );
+			$this->lastError = $this->api->getLastError() ?: __( 'Subscriber not found', 'taglock' );
 			$this->logger->warning( __( 'Subscriber not found', 'taglock' ), [
 				'subscriber_id' => $subscriberId,
 				'error'         => $this->lastError,
@@ -237,10 +218,10 @@ final class KlickTippProvider implements CrmProviderInterface {
 		HookUtil::doAction( HookAction::BEFORE_CRM_API_CALL, 'tag', $subscriberId, $tagId );
 
 		// Get subscriber email first (required by KlickTipp API)
-		$subscriber = $this->connector->subscriber_get( $subscriberId );
+		$subscriber = $this->api->subscriberGet( $subscriberId );
 
 		if ( ! $subscriber || empty( $subscriber->email ) ) {
-			$this->lastError = $this->connector->get_last_error() ?: __( 'Subscriber not found', 'taglock' );
+			$this->lastError = $this->api->getLastError() ?: __( 'Subscriber not found', 'taglock' );
 			$this->logger->error( __( 'Cannot apply tag: Subscriber not found', 'taglock' ), [
 				'subscriber_id' => $subscriberId,
 				'tag_id'        => $tagId,
@@ -249,7 +230,7 @@ final class KlickTippProvider implements CrmProviderInterface {
 		}
 
 		// Apply tag using email
-		$result = $this->connector->tag( $subscriber->email, [ $tagId ] );
+		$result = $this->api->tag( $subscriber->email, [ $tagId ] );
 
 		HookUtil::doAction( HookAction::AFTER_CRM_API_CALL, 'tag', $result );
 
@@ -261,7 +242,7 @@ final class KlickTippProvider implements CrmProviderInterface {
 			return true;
 		}
 
-		$this->lastError = $this->connector->get_last_error() ?: __( 'Failed to apply tag', 'taglock' );
+		$this->lastError = $this->api->getLastError() ?: __( 'Failed to apply tag', 'taglock' );
 		$this->logger->error( __( 'Failed to apply tag', 'taglock' ), [
 			'subscriber_id' => $subscriberId,
 			'tag_id'        => $tagId,
@@ -282,11 +263,11 @@ final class KlickTippProvider implements CrmProviderInterface {
 		}
 
 		HookUtil::doAction( HookAction::BEFORE_CRM_API_CALL, 'tag_index' );
-		$result = $this->connector->tag_index();
+		$result = $this->api->tagIndex();
 		HookUtil::doAction( HookAction::AFTER_CRM_API_CALL, 'tag_index', $result );
 
 		if ( $result === false || $result === null ) {
-			$this->lastError = $this->connector->get_last_error() ?: __( 'Failed to load tags', 'taglock' );
+			$this->lastError = $this->api->getLastError() ?: __( 'Failed to load tags', 'taglock' );
 			$this->logger->error( __( 'Failed to load KlickTipp tags', 'taglock' ), [ 'error' => $this->lastError ] );
 			HookUtil::doAction( HookAction::CRM_API_ERROR, 'tag_index', $this->lastError );
 			return [];
@@ -315,8 +296,8 @@ final class KlickTippProvider implements CrmProviderInterface {
 	 * Destructor - logout when object is destroyed
 	 */
 	public function __destruct() {
-		if ( $this->isAuthenticated && $this->connector !== null ) {
-			$this->connector->logout();
+		if ( $this->isAuthenticated && $this->api !== null ) {
+			$this->api->logout();
 			$this->logger->debug( __( 'KlickTipp session logged out', 'taglock' ) );
 		}
 	}
