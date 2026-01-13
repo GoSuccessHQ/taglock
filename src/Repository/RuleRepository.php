@@ -31,7 +31,7 @@ defined( 'ABSPATH' ) || exit;
  * Persists and queries TagLock rules.
  */
 final class RuleRepository {
-	private const int CACHE_TTL_SECONDS = 60;
+	private const CACHE_TTL_SECONDS = 60;
 
 	public function __construct(
 		private readonly PluginConfiguration $config,
