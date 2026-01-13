@@ -15,16 +15,12 @@
 
 .taglock-loader {
 	display: flex;
-	flex-direction: column;
+	flex-direction: row;
 	align-items: center;
-	justify-content: center;
-	padding: var(--taglock-space-lg) var(--taglock-space);
-	text-align: center;
-}
 
-.taglock-loader-text {
-	font-size: var(--taglock-font-size);
-	color: var(--taglock-text-muted);
+    .components-spinner {
+        margin: 10px;
+    }
 }
 
 .taglock-content {
