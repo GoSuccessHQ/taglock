@@ -30,8 +30,7 @@ defined( 'ABSPATH' ) || exit;
  * Uses WordPress AUTH_KEY as encryption key.
  */
 final class EncryptionUtil {
-	private const string CIPHER_V2 = 'aes-256-gcm';
-	private const string PREFIX_V2 = 'v2:';
+	private const CIPHER = 'aes-256-gcm';
 
 	/**
 	 * Encrypt a string.
@@ -42,17 +41,17 @@ final class EncryptionUtil {
 	 */
 	public static function encrypt( string $data ): string {
 		$key = self::getEncryptionKeyBytes();
-		$iv  = random_bytes( openssl_cipher_iv_length( self::CIPHER_V2 ) );
+		$iv  = random_bytes( openssl_cipher_iv_length( self::CIPHER ) );
 		$tag = '';
 
-		$ciphertext = openssl_encrypt( $data, self::CIPHER_V2, $key, OPENSSL_RAW_DATA, $iv, $tag );
+		$ciphertext = openssl_encrypt( $data, self::CIPHER, $key, OPENSSL_RAW_DATA, $iv, $tag );
 		if ( false === $ciphertext || '' === $tag ) {
 			throw EncryptionException::encryptionFailed();
 		}
 
 		$payload = base64_encode( $iv ) . ':' . base64_encode( $tag ) . ':' . base64_encode( $ciphertext );
 
-		return self::PREFIX_V2 . $payload;
+		return $payload;
 	}
 
 	/**
@@ -62,12 +61,7 @@ final class EncryptionUtil {
 	 * @return string|false The decrypted data or false on failure.
 	 */
 	public static function decrypt( string $data ): string|false {
-		if ( ! str_starts_with( $data, self::PREFIX_V2 ) ) {
-			return false;
-		}
-
-		$payload = substr( $data, strlen( self::PREFIX_V2 ) );
-		$parts   = explode( ':', $payload );
+		$parts = explode( ':', $data );
 
 		if ( 3 !== count( $parts ) ) {
 			return false;
@@ -83,7 +77,7 @@ final class EncryptionUtil {
 
 		$key = self::getEncryptionKeyBytes();
 
-		return openssl_decrypt( $ciphertext, self::CIPHER_V2, $key, OPENSSL_RAW_DATA, $iv, $tag );
+		return openssl_decrypt( $ciphertext, self::CIPHER, $key, OPENSSL_RAW_DATA, $iv, $tag );
 	}
 
 	/**

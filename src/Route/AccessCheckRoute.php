@@ -25,7 +25,7 @@ defined( 'ABSPATH' ) || exit;
 #[AutoconfigureTag( 'taglock.api_route' )]
 final class AccessCheckRoute implements ApiRouteInterface {
 
-	private const string ROUTE = '/check-access';
+	private const ROUTE = '/check-access';
 
 	public function __construct(
 		private readonly CheckAccessHandler $checkAccessHandler

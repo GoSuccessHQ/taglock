@@ -9,7 +9,7 @@ Protect WordPress content based on KlickTipp tags - no membership required, cach
 - ✅ **Secure by Design**: Protected content is not rendered into the initial HTML
 - ✅ **KlickTipp Integration**: Checks subscriber tags via KlickTipp API
 - ✅ **Connection Health Monitoring**: The plugin periodically checks whether the KlickTipp connection is healthy and shows a connected/disconnected status in the admin UI
-- ✅ **Modern Architecture**: PHP 8.3, Symfony DI, React, WordPress REST API
+- ✅ **Modern Architecture**: PHP 8.2, Symfony DI, React, WordPress REST API
 - ✅ **Extensible**: Filter/action hooks for customizations and add-ons
 
 ## Installation (Production)
@@ -129,7 +129,7 @@ npm run format       # Format code
 ## Requirements
 
 - WordPress 6.8+
-- PHP 8.3+
+- PHP 8.2+
 - Composer
 - Node.js & npm
 

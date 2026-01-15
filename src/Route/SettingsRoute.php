@@ -41,7 +41,7 @@ defined( 'ABSPATH' ) || exit;
 #[AutoconfigureTag( 'taglock.api_route' )]
 final class SettingsRoute implements ApiRouteInterface {
 
-	private const string ROUTE = '/settings';
+	private const ROUTE = '/settings';
 
 	public function __construct(
 		private readonly PluginConfiguration $config,

@@ -35,7 +35,7 @@ defined( 'ABSPATH' ) || exit;
 #[AutoconfigureTag( 'taglock.api_route' )]
 final class RulesRoute implements ApiRouteInterface {
 
-	private const string ROUTE = '/rules';
+	private const ROUTE = '/rules';
 
 	public function __construct(
 		private readonly RuleRepository $ruleRepository,

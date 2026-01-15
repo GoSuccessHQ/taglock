@@ -6,7 +6,7 @@
  * Description:       Protect WordPress content based on KlickTipp tags - no membership required, 100% cache compatible and secure.
  * Version:           1.0.0
  * Requires at least: 6.8
- * Requires PHP:      8.3
+ * Requires PHP:      8.2
  * Author:            GoSuccess
  * Author URI:        https://gosuccess.io
  * License:           GPL v3 or later

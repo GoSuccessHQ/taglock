@@ -29,7 +29,7 @@ defined( 'ABSPATH' ) || exit;
 #[AutoconfigureTag( 'taglock.api_route' )]
 final class TagsRoute implements ApiRouteInterface {
 
-	private const string ROUTE = '/tags';
+	private const ROUTE = '/tags';
 
 	public function __construct(
 		private readonly CrmProviderInterface $provider,
