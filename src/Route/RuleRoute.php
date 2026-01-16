@@ -10,7 +10,6 @@ use GoSuccess\TagLock\Dto\ApiResponse;
 use GoSuccess\TagLock\Enum\HttpMethod;
 use GoSuccess\TagLock\Repository\RuleRepository;
 use GoSuccess\TagLock\Service\LoggerService;
-use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
@@ -31,7 +30,6 @@ defined( 'ABSPATH' ) || exit;
  * PUT    /wp-json/taglock/v1/rules/{id}
  * DELETE /wp-json/taglock/v1/rules/{id}
  */
-#[AutoconfigureTag( 'taglock.api_route' )]
 final class RuleRoute implements ApiRouteInterface {
 
 	private const ROUTE = '/rules/(?P<id>\\d+)';

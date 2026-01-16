@@ -13,7 +13,6 @@ namespace GoSuccess\TagLock\Route;
 
 use GoSuccess\TagLock\Contract\ApiRouteInterface;
 use GoSuccess\TagLock\Handler\CheckAccessHandler;
-use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 use function defined;
 
@@ -22,7 +21,6 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Route definition for access checking endpoint.
  */
-#[AutoconfigureTag( 'taglock.api_route' )]
 final class AccessCheckRoute implements ApiRouteInterface {
 
 	private const ROUTE = '/check-access';

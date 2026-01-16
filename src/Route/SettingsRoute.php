@@ -12,7 +12,6 @@ use GoSuccess\TagLock\Dto\ApiResponse;
 use GoSuccess\TagLock\Enum\HttpMethod;
 use GoSuccess\TagLock\Service\LoggerService;
 use GoSuccess\TagLock\Util\EncryptionUtil;
-use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Throwable;
 use WP_Error;
 use WP_REST_Request;
@@ -38,7 +37,6 @@ defined( 'ABSPATH' ) || exit;
  * GET /wp-json/taglock/v1/settings - Retrieve current settings
  * POST /wp-json/taglock/v1/settings - Update settings
  */
-#[AutoconfigureTag( 'taglock.api_route' )]
 final class SettingsRoute implements ApiRouteInterface {
 
 	private const ROUTE = '/settings';

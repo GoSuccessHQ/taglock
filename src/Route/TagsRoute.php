@@ -10,7 +10,6 @@ use GoSuccess\TagLock\Dto\ApiMethodHandler;
 use GoSuccess\TagLock\Dto\ApiResponse;
 use GoSuccess\TagLock\Enum\HttpMethod;
 use GoSuccess\TagLock\Service\LoggerService;
-use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
@@ -26,7 +25,6 @@ defined( 'ABSPATH' ) || exit;
  *
  * GET /wp-json/taglock/v1/tags
  */
-#[AutoconfigureTag( 'taglock.api_route' )]
 final class TagsRoute implements ApiRouteInterface {
 
 	private const ROUTE = '/tags';
