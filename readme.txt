@@ -88,6 +88,9 @@ This plugin requires PHP 8.3 or higher.
 1. TagLock settings screen
 
 == Changelog ==
+= 1.0.0 - 2026-01-16 =
+Initial release.
+
 
 = Privacy Policy =
 
