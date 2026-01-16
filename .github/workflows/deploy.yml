@@ -21,13 +21,6 @@ jobs:
       - name: Install Composer dependencies
         run: composer install --no-dev --optimize-autoloader
 
-      - name: WordPress Plugin Deploy
-        uses: 10up/action-wordpress-plugin-deploy@stable
-        env:
-          SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
-          SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
-          SLUG: taglock
-
       - name: Update readme.txt changelog
         run: |
           VERSION="${{ github.event.release.tag_name }}"
@@ -43,6 +36,13 @@ jobs:
           ${CHANGELOG_ENTRY}" readme.txt
           
           echo "Updated readme.txt with version ${VERSION_NUMBER}"
+
+      - name: WordPress Plugin Deploy
+        uses: 10up/action-wordpress-plugin-deploy@stable
+        env:
+          SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
+          SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
+          SLUG: taglock
 
       - name: Commit updated readme.txt
         run: |
