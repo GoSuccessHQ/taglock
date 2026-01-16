@@ -21,6 +21,13 @@ jobs:
       - name: Install Composer dependencies
         run: composer install --no-dev --optimize-autoloader
 
+      - name: WordPress Plugin Deploy
+        uses: 10up/action-wordpress-plugin-deploy@stable
+        env:
+          SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
+          SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
+          SLUG: taglock
+
       - name: Update readme.txt changelog
         run: |
           VERSION="${{ github.event.release.tag_name }}"
@@ -44,10 +51,3 @@ jobs:
           git add readme.txt
           git commit -m "Update readme.txt changelog for version ${{ github.event.release.tag_name }}" || echo "No changes to commit"
           git push origin HEAD:main || echo "Nothing to push"
-
-      - name: WordPress Plugin Deploy
-        uses: 10up/action-wordpress-plugin-deploy@stable
-        env:
-          SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
-          SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
-          SLUG: taglock
